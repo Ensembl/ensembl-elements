@@ -6,6 +6,8 @@ import { prepareFeatureTracks, type FeatureTracks } from './prepareFeatureTracks
 import { getImageHeightAndTopOffsets } from './getImageHeight';
 import { renderGeneTracks } from './geneTracks';
 
+import draggableViewport from './draggableViewport';
+
 import ViewportController from './viewportController';
 
 import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
@@ -54,6 +56,11 @@ export class RegionOverview extends LitElement {
 
   scale: ScaleLinear<number, number> | null = null;
 
+  constructor() {
+    super();
+    new ViewportController(this);
+  }
+
   connectedCallback(): void {
     super.connectedCallback();
     this.observeHostSize();
@@ -74,6 +81,13 @@ export class RegionOverview extends LitElement {
         start: this.start,
         end: this.end
       });
+      this.scale = scaleLinear().domain([
+        this.start,
+        this.end
+      ]).rangeRound([
+        0,
+        this.imageWidth
+      ]);
     }
 
     if (changedProperties.has('imageWidth')) {
@@ -114,7 +128,10 @@ export class RegionOverview extends LitElement {
         viewBox="0 0 ${this.imageWidth} ${imageHeight}"
         style="width: 100%; height: ${imageHeight}px;"
       >
-        ${this.renderGeneTracks()}
+        <g>
+          ${draggableViewport()}
+          ${this.renderGeneTracks()}
+        </g>
       </svg>
     `;
   }
@@ -129,7 +146,5 @@ export class RegionOverview extends LitElement {
       width: this.imageWidth
     })
   }
-
-
 
 }
