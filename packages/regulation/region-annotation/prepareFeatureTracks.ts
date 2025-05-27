@@ -41,6 +41,8 @@ export const prepareFeatureTracks = (params: Params) => {
     bins: filteredDataBins
   };
 
+  // const data = params.data;
+
   const geneTracks = prepareGeneTracks({
     data,
     start: params.start,
@@ -65,7 +67,7 @@ const pickBins = (params: Params) => {
   for (const [binKey, binValue] of Object.entries(params.data.bins)) {
     const { binStart, binEnd } = parseBinKey(binKey);
 
-    if (start > binStart && start < binEnd || end > binStart && end < binEnd) {
+    if (start < binEnd && end > binStart) {
       filteredBins[binKey] = binValue;
     }
   }

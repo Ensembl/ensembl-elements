@@ -146,13 +146,15 @@ const renderGeneLowRes = ({
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
 
+  // <text x=${start} y=${offsetTop}>${gene.data.stable_id}</text>
+
   return svg`
     <rect
       x=${start}
       width=${width}
       y=${offsetTop}
       height=${GENE_HEIGHT}
-      fill="blue"
+      fill=${color}
     />
   `;
 };

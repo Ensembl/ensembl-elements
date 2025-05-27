@@ -18,6 +18,7 @@
   },
   "workspaces": [
     "packages/regulation",
-    "packages/components-playground"
+    "packages/components-playground",
+    "packages/helpers"
   ]
 }
