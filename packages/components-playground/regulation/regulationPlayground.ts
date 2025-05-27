@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 // not using the RegionOverview class directly,
 // but importing it so that the component gets initialized
-import { RegionOverview } from 'ensembl-regulation';
+import { RegionOverview } from '@ensembl/ensembl-regulation';
 import './zoomButtons';
 
 import dataStore from './services/dataStore';

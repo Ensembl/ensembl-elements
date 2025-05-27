@@ -1,10 +1,12 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { scaleLinear, type ScaleLinear } from 'd3';
+import { yieldToMain } from '@ensembl/ensembl-elements-helpers';
 
 import { prepareFeatureTracks, type FeatureTracks } from './prepareFeatureTracks';
 import { getImageHeightAndTopOffsets } from './getImageHeight';
 import { renderGeneTracks } from './geneTracks';
+import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 
 import draggableViewport from './draggableViewport';
 
@@ -81,6 +83,7 @@ export class RegionOverview extends LitElement {
         start: this.start,
         end: this.end
       });
+
       this.scale = scaleLinear().domain([
         this.start,
         this.end
@@ -101,6 +104,11 @@ export class RegionOverview extends LitElement {
     }
   }
 
+  async scheduleUpdate(): Promise<void> {
+    await yieldToMain();
+    super.scheduleUpdate();
+  }
+
   observeHostSize = () => {
     const resizeObserver = new ResizeObserver((entries) => {
       const [hostElementEntry] = entries;
@@ -116,7 +124,10 @@ export class RegionOverview extends LitElement {
       return;
     }
 
-    const { imageHeight } = getImageHeightAndTopOffsets(this.featureTracks);
+    const {
+      imageHeight,
+      regulatoryFeatureTracksTopOffset
+    } = getImageHeightAndTopOffsets(this.featureTracks);
 
     // - remember that we have two scales: one for immediate viewport; the other for three viewports
     // - draw gene tracks
@@ -131,6 +142,9 @@ export class RegionOverview extends LitElement {
         <g>
           ${draggableViewport()}
           ${this.renderGeneTracks()}
+          ${this.renderRegulatoryFeatureTracks({
+            offsetTop: regulatoryFeatureTracksTopOffset
+          })}
         </g>
       </svg>
     `;
@@ -145,6 +159,20 @@ export class RegionOverview extends LitElement {
       end: this.end,
       width: this.imageWidth
     })
+  }
+
+  renderRegulatoryFeatureTracks({
+    offsetTop
+  }: {
+    offsetTop: number;
+  }) {
+    const { regulatoryFeatureTracks } = this.featureTracks;
+    return renderRegulatoryFeatureTracks({
+      tracks: regulatoryFeatureTracks,
+      featureTypes: this.data.regulatory_feature_types,
+      scale: this.scale,
+      offsetTop
+    });
   }
 
 }
