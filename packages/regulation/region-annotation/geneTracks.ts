@@ -8,9 +8,10 @@ import {
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 
+import { renderTranscriptionStartSites } from './transcriptionStartSites';
+
 import type { FeatureTracks, GeneTrack, GeneInTrack } from './prepareFeatureTracks';
-import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata, ExonInRegionOverview, OverlappingCDSFragment } from '../types/regionOverview';
-import type { InputData } from '../types/inputData';
+import type { ExonInRegionOverview, OverlappingCDSFragment } from '../types/regionOverview';
 
 type Intron = {
   start: number;
@@ -63,9 +64,10 @@ export const renderGeneTracks = ({
       ? forwardStrandTrackYs
       : reverseStrandTrackYs;
 
-    return tracks.map((track, index) => renderGeneTrack({
-      track,
-      trackOffsetTop: yCoordLookup[index],
+    return tracks.map((_, index) => renderGeneTrack({
+      tracks,
+      trackIndex: index,
+      trackOffsetsTop: yCoordLookup,
       scale,
       start,
       end
@@ -84,22 +86,26 @@ export const renderGeneTracks = ({
 
 
 const renderGeneTrack = ({
-  track,
-  trackOffsetTop,
+  tracks,
+  trackIndex,
+  trackOffsetsTop,
   scale,
   start,
   end
 }: {
-  track: GeneTrack;
-  trackOffsetTop: number;
+  // passing a whole bunch of tracks and their offsets in a single track renderer,
+  // because they will be needed to render transcription start sites
+  tracks: GeneTrack[];
+  trackIndex: number;
+  trackOffsetsTop: number[];
   scale: ScaleLinear<number, number>;
   start: number;
   end: number;
 }) => {
+  const track = tracks[trackIndex];
+  const trackOffsetTop = trackOffsetsTop[trackIndex];
   const shouldDisplayLowResGenes =
     end - start > MAX_SLICE_LENGTH_FOR_DETAILED_VIEW;
-
-  // const shouldDisplayLowResGenes = true;
 
   const geneElements = track.map((gene) => {
     if (shouldDisplayLowResGenes) {
@@ -117,6 +123,14 @@ const renderGeneTrack = ({
         scale,
         offsetTop: trackOffsetTop,
         color: 'blue'
+      })}
+      ${renderTranscriptionStartSites({
+        tss: gene.data.tss,
+        strand: gene.data.strand,
+        geneTracks: tracks,
+        trackIndex,
+        scale,
+        trackOffsetsTop
       })}
     `;
   });
