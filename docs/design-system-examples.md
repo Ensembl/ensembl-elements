@@ -19,6 +19,7 @@
 - Practically abandoned as a result of Google's internal politics and layoffs
 - Very high quality
 - Has a custom-made documentation/demo site, built with Eleventy
+- See how they delegate aria attributes from the custom element to the native component: https://github.com/material-components/material-web/blob/main/internal/aria/delegate.ts
 
 ## Adobe Spectrum
 - [Documentation site](https://opensource.adobe.com/spectrum-web-components/); [components playground](https://opensource.adobe.com/spectrum-web-components/storybook/index.html); [repo](https://github.com/adobe/spectrum-web-components)
@@ -38,6 +39,11 @@
 - [Documentation site](https://nordhealth.design/)
 - Closed-source; but the build can be accessed over npm (e.g. [@nordhealth/components](https://www.npmjs.com/package/@nordhealth/components)); and the components can be inspected on the documentation site
 - The documentation / demo site is masterfully built with Eleventy; but since it is closed-source, it is impossible to inspect how they did this
+
+## Lion, by ING bank
+- [Documentation site](https://lion.js.org/) and [repository](https://github.com/ing-bank/lion)
+- Made of web components; uses Lit and typescript
+- Has a custom demo site built with Eleventy
 
 ## PIE Web Components, by Just Eat Takeaway
 - [Link to documentation site](https://webc.pie.design/?path=/docs/introduction-getting-started--docs); [link to repo](https://github.com/justeattakeaway/pie)

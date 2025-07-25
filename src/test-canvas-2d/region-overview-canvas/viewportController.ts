@@ -1,0 +1,103 @@
+import { ReactiveController, ReactiveControllerHost } from 'lit';
+
+import type { RegionOverviewCanvas } from './regionOverviewCanvas';
+
+class ViewportController implements ReactiveController {
+
+  host: ReactiveControllerHost;
+  canvas: HTMLCanvasElement | null;
+
+  isMouseDown = false;
+  isDragging = false;
+
+  mouseDownX: number | null = null;
+  mouseDownY: number | null = null;
+
+  constructor(host: ReactiveControllerHost) {
+    this.host = host;
+    host.addController(this);
+  }
+
+  hostConnected() {
+    this.canvas = (this.host as RegionOverviewCanvas).canvas;
+    this.#addListeners();
+  }
+
+  hostDisconnected() {
+    this.#removeListeners();
+    this.canvas = null;
+  }
+
+  registerCanvas = (canvas: HTMLCanvasElement) => {
+    this.canvas = canvas;
+    this.#addListeners();
+  }
+
+  #addListeners = () => {
+    this.canvas!.addEventListener('mousedown', this.onMouseDown);
+  }
+
+  #removeListeners = () => {
+    this.canvas!.removeEventListener('mousedown', this.onMouseDown);
+  }
+
+  onMouseDown = (event: MouseEvent) => {
+    this.isMouseDown = true;
+    const { clientX: x, clientY: y } = event;
+    this.mouseDownX = x;
+    this.mouseDownY = y;
+
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+  }
+
+  onMouseMove = (event: MouseEvent) => {
+    this.isDragging = true;
+
+    const { clientX: x } = event;
+
+    const deltaX = (x - this.mouseDownX) * devicePixelRatio;
+    const directionCoefficient = deltaX >= 0 ? 1 : -1;
+    this.mouseDownX = x;
+
+    const regionOverviewCanvas = this.host as RegionOverviewCanvas;
+    const scale = regionOverviewCanvas.scale;
+    const [ genomicStart, genomicEnd ] = scale.domain();
+
+    let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
+
+    genomicDistance = genomicDistance * directionCoefficient;
+    
+    // FIXME: end should not exceed region end
+    const newGenomicStart = Math.max(genomicStart - genomicDistance, 1);
+    const newGenomicEnd = genomicEnd - genomicDistance;
+
+    if (deltaX === 0) {
+      return;      
+    }
+
+    const viewportChangeEvent = new CustomEvent('viewport-change', {
+      detail: {
+        start: newGenomicStart,
+        end: newGenomicEnd
+      }
+    });
+
+    regionOverviewCanvas.dispatchEvent(viewportChangeEvent);
+  }
+
+  onMouseUp = () => {
+    this.isDragging = false;
+    this.isMouseDown = false;
+    this.mouseDownX = null;
+    this.mouseDownY = null;
+
+    document.removeEventListener('mousemove', this.onMouseMove);
+
+    // FIXME: fire a confirmation event
+  }
+
+
+}
+
+export default ViewportController;
