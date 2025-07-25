@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run dev --workspace=packages/components-playground",
+    "storybook": "npm run storybook --workspace=packages/components-playground",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -19,6 +20,7 @@
   "workspaces": [
     "packages/regulation",
     "packages/components-playground",
-    "packages/helpers"
+    "packages/helpers",
+    "packages/common"
   ]
 }
