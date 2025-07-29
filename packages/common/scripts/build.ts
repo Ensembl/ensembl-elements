@@ -18,6 +18,7 @@ const iconsBuildDirectoryPath = path.resolve(buildDirectoryPath, 'icons');
 const fontsBuildDirectoryPath = path.resolve(buildDirectoryPath, 'fonts');
 
 const packageJsonPath = path.resolve(rootPath, 'package.json');
+const npmrcPath = path.resolve(rootPath, '.npmrc');
 
 await build({
   ...viteConfig,
@@ -28,3 +29,4 @@ await cp(stylesSourceDirectoryPath, stylesBuildDirectoryPath, { recursive: true 
 await cp(iconsSourceDirectoryPath, iconsBuildDirectoryPath, { recursive: true });
 await cp(fontsSourceDirectoryPath, fontsBuildDirectoryPath, { recursive: true });
 await copyFile(packageJsonPath, path.resolve(buildDirectoryPath, 'package.json'));
+await copyFile(npmrcPath, path.resolve(buildDirectoryPath, '.npmrc'));
