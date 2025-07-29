@@ -16,11 +16,6 @@ if (!PUBLISH_TOKEN) {
   process.exit(1);
 }
 
-const cwd = process.cwd();
-
 process.chdir(buildDirectoryPath);
-
-
-console.log('reading from env file', process.env.PUBLISH_TOKEN);
 
 execSync(`PUBLISH_TOKEN=${PUBLISH_TOKEN} npm publish`);
