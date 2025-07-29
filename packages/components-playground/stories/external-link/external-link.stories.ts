@@ -13,7 +13,4 @@ export const Default = () => {
   `;
   element.innerHTML = innerHtml;
   return element;
-
-
-  // return document.createElement('my-wrapper-component');
 };
