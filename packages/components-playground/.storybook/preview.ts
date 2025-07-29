@@ -1,10 +1,16 @@
 import type { Preview } from '@storybook/web-components-vite';
 
-// Hide the bottom panel (which is open by default and is used to show "controls" or "actions" tabs)
+import '@ensembl/ensembl-elements-common/styles/resets.css';
+import '@ensembl/ensembl-elements-common/styles/fonts.css';
+import '@ensembl/ensembl-elements-common/styles/global.css';
+import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
+
+// import '../../common/'
 
 const preview: Preview = {
   parameters: {
     options: {
+      // Hide the bottom panel (which is open by default and is used to show "controls" or "actions" tabs)
       bottomPanelHeight: 0
     }
   }

@@ -1,0 +1,21 @@
+input {
+  appearance: none;
+  background-color: var(--checkbox-background-color, var(--color-white));
+  border: 1px solid var(--checkbox-border-color, var(--color-grey));
+  height: var(--checkbox-side-size, 13px);
+  width: var(--checkbox-side-size, 13px);
+  transform: translateY(10%);
+  transition: background-color 0.1s ease-in-out;
+  cursor: pointer;
+}
+
+input:checked {
+  background-color: var(--checkbox-checked-background-color, var(--color-green));
+}
+
+input:disabled {
+  border-color: var(--checkbox-disabled-border-color, var(--color-medium-light-grey));
+  background-color: var(--checkbox-disabled-background-color, var(--color-light-grey));
+  cursor: default;
+  pointer-events: none;
+}
