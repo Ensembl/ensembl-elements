@@ -13,6 +13,7 @@ export class TextButton extends LitElement {
     css`
       :host {
         display: inline-block;
+        line-height: 1;
       }
 
       button {
