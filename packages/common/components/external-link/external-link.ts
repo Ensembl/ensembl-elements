@@ -1,4 +1,4 @@
-import {html, css, unsafeCSS, LitElement } from 'lit';
+import {html, css, unsafeCSS, nothing, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
@@ -15,7 +15,6 @@ export class ExternalLink extends LitElement {
       svg {
         width: var(--external-link-icon-color, 12px);
         aspect-ratio: 1;
-        margin-right: var(--external-link-icon-offset, 3px);
         fill: var(--external-link-icon-color, var(--color-orange));
         transform: translateY(10%);
       }
@@ -25,9 +24,19 @@ export class ExternalLink extends LitElement {
   @property({ type: String })
   href = '';
 
+  /**
+   * By default, external links open pages in a new browser tab
+   */
+  @property({ type: Boolean })
+  'open-new': boolean = true;
+
   render() {
     return html`
-      <a href=${this.href}>
+      <a
+        href=${this.href}
+        target=${this['open-new'] ? '_blank' : nothing}
+        rel=${this['open-new'] ? 'noopener noreferrer' : nothing}
+      >
         ${unsafeSVG(icon)}
         <slot>
         </slot>
