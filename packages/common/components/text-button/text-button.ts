@@ -1,15 +1,15 @@
-import {html, css, unsafeCSS, LitElement } from 'lit';
+import {html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import resetStyles from '../../styles/resets.css?raw';
-import buttonResetStyles from '../../styles/button-resets.css?raw';
+import resetStyles from '../../styles/constructable-stylesheets/resets';
+import buttonResetStyles from '../../styles/constructable-stylesheets/button-resets';
 
 @customElement('ens-text-button')
 export class TextButton extends LitElement {
 
   static styles = [
-    unsafeCSS(resetStyles),
-    unsafeCSS(buttonResetStyles),
+    resetStyles,
+    buttonResetStyles,
     css`
       :host {
         display: inline-block;

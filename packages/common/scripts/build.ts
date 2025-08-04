@@ -25,7 +25,14 @@ await build({
   root: rootPath,
 });
 
-await cp(stylesSourceDirectoryPath, stylesBuildDirectoryPath, { recursive: true });
+
+await cp(stylesSourceDirectoryPath, stylesBuildDirectoryPath, {
+  recursive: true,
+  filter: (source) => {
+    // copy the styles directory itself, and all the css files inside
+    return source.endsWith('styles') || source.endsWith('.css');
+  }
+});
 await cp(iconsSourceDirectoryPath, iconsBuildDirectoryPath, { recursive: true });
 await cp(fontsSourceDirectoryPath, fontsBuildDirectoryPath, { recursive: true });
 await copyFile(packageJsonPath, path.resolve(buildDirectoryPath, 'package.json'));

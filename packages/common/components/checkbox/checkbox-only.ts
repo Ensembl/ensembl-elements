@@ -1,8 +1,8 @@
-import {html, css, unsafeCSS, nothing, LitElement } from 'lit';
+import {html, css, nothing, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import resetStyles from '../../styles/resets.css?raw';
-import checkboxStyles from './checkbox.css?raw';
+import resetStyles from '../../styles/constructable-stylesheets/resets';
+import checkboxStyles from './checkbox-styles';
 
 @customElement('ens-checkbox-only')
 export class CheckboxOnly extends LitElement {
@@ -10,8 +10,8 @@ export class CheckboxOnly extends LitElement {
   #internals: ElementInternals;
 
   static styles = [
-    unsafeCSS(resetStyles),
-    unsafeCSS(checkboxStyles),
+    resetStyles,
+    checkboxStyles,
     css`
       :host {
         display: inline-block;

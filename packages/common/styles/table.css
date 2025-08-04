@@ -2,6 +2,8 @@
 
   .ens-table {
     --_table-background: var(--table-background, var(--color-white));
+    --_sort-arrow-width: 8px;
+    --_sort-arrow-right-margin: 7px;
     border-collapse: collapse;
     background-color: var(--_table-background);
 
@@ -26,9 +28,7 @@
       background-clip: padding-box;
     }
 
-    & th.sortable {
-      --_sort-arrow-width: 8px;
-      --_sort-arrow-right-margin: 7px;
+    & th:has(ens-table-sortable-column-head) {
       padding-left: calc(var(--_left-padding) - var(--_sort-arrow-width) - var(--_sort-arrow-right-margin));
     }
 

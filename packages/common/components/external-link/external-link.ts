@@ -1,16 +1,16 @@
-import {html, css, unsafeCSS, nothing, LitElement } from 'lit';
+import {html, css, nothing, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import icon from '../../icons/icon_xlink.svg?raw';
 
-import resetStyles from '../../styles/resets.css?raw';
+import resetStyles from '../../styles/constructable-stylesheets/resets';
 
 @customElement('ens-external-link')
 export class ExternalLink extends LitElement {
 
   static styles = [
-    unsafeCSS(resetStyles),
+    resetStyles,
     css`
       svg {
         width: var(--external-link-icon-color, 12px);
