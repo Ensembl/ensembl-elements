@@ -42,23 +42,27 @@ export class Select extends LitElement {
         background-color: var(--select-disabled-arrowhead-color, var(--color-grey));
       }
 
-      ::slotted(select) {
-        /* Hide the native select element, and position it right over the custom one, to catch user's clicks */
-        appearance: none;
-        position: relative;
-        z-index: 1;
-        
-        /* Additional resets for further consistency */
-        background-color: transparent;
-        border: var(--select-border, 1px solid var(--color-blue));
-        padding: 3px 25px 3px 10px;
-        margin: 0;
-        width: 100%;
-        cursor: pointer;
-      }
+      @layer ensembl-elements {
 
-      :host[disabled] select {
-        border: var(--select-disabled-border, 1px solid var(--color-grey));
+        ::slotted(select) {
+          /* Hide the native select element, and position it right over the custom one, to catch user's clicks */
+          appearance: none;
+          position: relative;
+          z-index: 1;
+
+          border: var(--select-border, 1px solid var(--color-blue));
+          padding: 6px 25px 6px 10px;
+          margin: 0;
+          background-color: transparent;
+          width: 100%;
+          cursor: pointer;        
+          font-size: inherit; /* otherwise, user agent applies its own font size */
+        }
+
+        :host[disabled] select {
+          border: var(--select-disabled-border, 1px solid var(--color-grey));
+        }
+
       }
     `
   ];

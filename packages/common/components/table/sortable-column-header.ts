@@ -1,7 +1,6 @@
 import {html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import arrowIcon from '../../icons/icon_arrow.svg?raw';
@@ -62,12 +61,6 @@ export class SortableTableColumnHead extends LitElement {
   @property({ type: String })
   'sort-order': 'asc' | 'desc' | null = null;
 
-  #onClick = (event: Event) => {
-    // re-dispatch the change event so that it can cross the shadow boundary
-    const newEvent = new Event(event.type);
-    this.dispatchEvent(newEvent);
-  }
-
   render() {
     const isActive = this['sort-order'] !== null;
     const buttonClasses = {
@@ -80,7 +73,6 @@ export class SortableTableColumnHead extends LitElement {
       <button
         type="button"
         class=${classMap(buttonClasses)}
-        @click=${this.#onClick}
       >
         ${unsafeSVG(arrowIcon)}
         <slot></slot>
