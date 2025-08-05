@@ -1,5 +1,5 @@
 import {html, css, nothing, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { property, customElement } from 'lit/decorators.js';
 
 import resetStyles from '../../styles/constructable-stylesheets/resets';
 import checkboxStyles from './checkbox-styles';
@@ -11,6 +11,7 @@ import checkboxStyles from './checkbox-styles';
 @customElement('ens-checkbox')
 export class Checkbox extends LitElement {
 
+  @property({ type: Boolean })
   checked: boolean;
 
   #internals: ElementInternals;
@@ -59,6 +60,7 @@ export class Checkbox extends LitElement {
       <input
         id="input"
         type="checkbox"
+        ?checked=${this.checked}
         aria-label=${ariaLabel ?? nothing}
         @change=${this.onChange}
       />

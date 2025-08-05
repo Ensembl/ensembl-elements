@@ -15,6 +15,12 @@ export const Default = () => {
       </ens-checkbox>
     </div>
     <div>
+      <p>A checkbox that is ticked from the start</p>
+      <ens-checkbox checked>
+        Hello
+      </ens-checkbox>
+    </div>
+    <div>
       <p>Checkbox without label</p>
       <ens-checkbox-only data-aria-label="Hello from checkbox one"></ens-checkbox-only>
       <ens-checkbox-only aria-label="Hello from checkbox two"></ens-checkbox-only>
