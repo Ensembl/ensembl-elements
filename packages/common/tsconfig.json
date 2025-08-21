@@ -9,6 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true,
-    "declaration": true
+    "declaration": true,
+    "strict": true
   }
 }

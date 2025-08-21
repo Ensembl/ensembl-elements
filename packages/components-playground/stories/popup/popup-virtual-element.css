@@ -1,0 +1,15 @@
+.popup-virtual-element-story {
+  min-height: 195vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 1.5rem;
+
+  .target-area {
+    height: 100px;
+    width: 100px;
+    border: 1px dashed black;
+    position: relative;
+  }
+
+}

@@ -1,0 +1,70 @@
+.popup-varieties-story {
+
+  display: flex;
+  height: 95vh;
+  align-items: center;
+  justify-content: end;
+  /* justify-content: center; */
+
+  .overflow-container {
+    background-color: yellow;
+    height: 100px;
+    overflow: auto;
+  }
+
+  .anchors-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+  }
+
+  .anchor-button {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+  }
+
+  .top-left {
+    left: 10%;
+    top: 0;
+  }
+
+  .top-right {
+    right: 10%;
+    top: 0;
+  }
+
+  .left-top {
+    left: 0;
+    top: 10%;
+  }
+
+  .left-bottom {
+    left: 0;
+    bottom: 10%;
+  }
+
+  .bottom-left {
+    left: 10%;
+    bottom: 0;
+  }
+
+  .bottom-right {
+    right: 10%;
+    bottom: 0;
+  }
+
+  .right-top {
+    right: 0;
+    top: 10%;
+  }
+
+  .right-bottom {
+    right: 0;
+    bottom: 10%;
+  }
+
+}

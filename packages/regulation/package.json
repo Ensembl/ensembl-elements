@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "license": "ISC",
   "type": "module",
-  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./popup-injector": "./region-annotation/popupInjector.ts"
+  },
   "main-for-dist": "./dist/ensembl-regulation.umd.cjs",
   "module-for-dist": "./dist/ensembl-regulation.js",
   "scripts": {

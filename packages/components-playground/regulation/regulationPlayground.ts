@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 // not using the RegionOverview class directly,
 // but importing it so that the component gets initialized
 import { RegionOverview } from '@ensembl/ensembl-regulation';
+import '@ensembl/ensembl-regulation/popup-injector';
 import './zoomButtons';
 
 import dataStore from './services/dataStore';
@@ -53,13 +54,15 @@ export class RegulationPlayground extends LitElement {
         <div>
           ${this.start}-${this.end}
         </div>
-        <ens-reg-region-overview
-          @viewport-change=${this.onViewportChange}
-          .start=${this.start}
-          .end=${this.end}
-          .regionLength=${CHROMOSOME_LENGTH}
-          .data=${data}>
-        </ens-reg-region-overview>
+        <ens-reg-region-overview-popup-injector>
+          <ens-reg-region-overview
+            @viewport-change=${this.onViewportChange}
+            .start=${this.start}
+            .end=${this.end}
+            .regionLength=${CHROMOSOME_LENGTH}
+            .data=${data}>
+          </ens-reg-region-overview>
+        </ens-reg-region-overview-popup-injector>
         <ens-reg-zoom-buttons
           .start=${this.start}
           .end=${this.end}

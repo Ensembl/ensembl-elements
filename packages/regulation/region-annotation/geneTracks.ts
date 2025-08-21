@@ -12,6 +12,7 @@ import { renderTranscriptionStartSites } from './transcriptionStartSites';
 
 import type { FeatureTracks, GeneTrack, GeneInTrack } from './prepareFeatureTracks';
 import type { ExonInRegionOverview, OverlappingCDSFragment } from '../types/regionOverview';
+import type { GeneClickPayload } from '../types/featureClickEvent';
 
 type Intron = {
   start: number;
@@ -221,6 +222,11 @@ const renderGene = ({
         scale,
         color
       })}
+      ${renderInteractiveArea({
+        gene,
+        offsetTop,
+        scale
+      })}
     </g>
   `;
 };
@@ -330,3 +336,51 @@ return introns.map((intron) => {
     `;
   });
 };
+
+const renderInteractiveArea = ({
+  gene,
+  offsetTop,
+  scale,
+}: {
+  gene: GeneInTrack;
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+}) => {
+  const {
+    data: { start: genomicStart, end: genomicEnd }
+  } = gene;
+  const start = scale(genomicStart);
+  const end = scale(genomicEnd);
+  const width = Math.max(end - start, 0.2);
+
+  return svg`
+    <rect
+      data-feature-type="gene"
+      data-feature=${JSON.stringify(prepareGeneInfo({ gene }))}
+      class="interactive-area"
+      x=${start}
+      width=${width}
+      y=${offsetTop}
+      height=${GENE_HEIGHT}
+      fill="transparent"
+    />
+  `;
+}
+
+const prepareGeneInfo = ({
+  gene
+}: {
+  gene: GeneInTrack;
+}): GeneClickPayload['data'] => {
+  const { data: geneData } = gene;
+
+  return {
+    symbol: geneData.symbol,
+    stableId: geneData.stable_id,
+    unversionedStableId: geneData.unversioned_stable_id,
+    biotype: geneData.biotype,
+    start: geneData.start,
+    end: geneData.end,
+    strand: geneData.strand
+  }
+}

@@ -34,6 +34,10 @@ export class RegionOverview extends LitElement {
     svg {
       width: 100%;
     }
+
+    .interactive-area {
+      cursor: pointer;
+    }
   `;
 
   // genomic start
@@ -119,6 +123,27 @@ export class RegionOverview extends LitElement {
     resizeObserver.observe(this);
   }
 
+  handleClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.dataset.feature) {
+      e.stopPropagation();
+
+      const payload = {
+        x: e.clientX,
+        y: e.clientY,
+        featureType: target.dataset.featureType as string,
+        data: JSON.parse(target.dataset.feature)
+      };
+      const event = new CustomEvent('ens-reg-feature-click', {
+        detail: payload,
+        bubbles: true,
+        composed: true
+      });
+
+      this.dispatchEvent(event);
+    }
+  }
+
   render() {
     if (!this.imageWidth || !this.scale || !this.featureTracks) {
       return;
@@ -138,6 +163,7 @@ export class RegionOverview extends LitElement {
       <svg
         viewBox="0 0 ${this.imageWidth} ${imageHeight}"
         style="width: 100%; height: ${imageHeight}px;"
+        @click=${this.handleClick}
       >
         <g>
           ${draggableViewport()}
@@ -147,6 +173,7 @@ export class RegionOverview extends LitElement {
           })}
         </g>
       </svg>
+      <slot name="tooltip"></slot>
     `;
   }
 
