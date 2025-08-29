@@ -59,6 +59,7 @@ export class RegulationPlayground extends LitElement {
             @viewport-change=${this.onViewportChange}
             .start=${this.start}
             .end=${this.end}
+            .regionName=${"1"}
             .regionLength=${CHROMOSOME_LENGTH}
             .data=${data}>
           </ens-reg-region-overview>
@@ -73,12 +74,3 @@ export class RegulationPlayground extends LitElement {
     `;
   }
 }
-
-/**
-        <zoom-buttons
-          .start=${this.start}
-          .end=${this.end}
-          .regionLength=${CHROMOSOME_LENGTH}
-          @viewport-change=${this.onViewportChange}
-        ></zoom-buttons>
- */

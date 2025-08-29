@@ -27,11 +27,13 @@ export class Popup extends LitElement {
     resetStyles,
     css`
       :host {
+        --_popup-color: var(--popup-color, var(--color-black));
         display: contents;
       }
 
       #popup {
-        background-color: red;
+        background-color: var(--_popup-color);
+        color: var(--color-white);
         position: absolute;
         isolation: isolate;
         padding: 6px 12px;
@@ -41,7 +43,7 @@ export class Popup extends LitElement {
         width: 18px;
         height: 13px;
         position: absolute;
-        fill: red;
+        fill: var(--_popup-color);
       }
     `
   ];

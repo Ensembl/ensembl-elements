@@ -41,8 +41,6 @@ export const prepareFeatureTracks = (params: Params) => {
     bins: filteredDataBins
   };
 
-  // const data = params.data;
-
   const geneTracks = prepareGeneTracks({
     data,
     start: params.start,
@@ -77,7 +75,9 @@ const pickBins = (params: Params) => {
 
 const parseBinKey = (key: string) => {
   const regex = /(?<start>\d+)-(?<end>\d+)/;
-  const { start: binStartStr, end: binEndStr } = regex.exec(key).groups;
+  const regExGroups = regex.exec(key)?.groups;
+  const binStartStr = regExGroups!.start!;
+  const binEndStr = regExGroups!.end!;
   const binStart = parseInt(binStartStr);
   const binEnd = parseInt(binEndStr);
   return { binStart, binEnd };

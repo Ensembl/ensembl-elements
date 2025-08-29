@@ -9,6 +9,7 @@ export type GeneClickPayload = {
     unversionedStableId: GeneInRegionOverview['unversioned_stable_id'];
     symbol: GeneInRegionOverview['symbol'];    
     biotype: GeneInRegionOverview['biotype'];
+    regionName: string;
     start: GeneInRegionOverview['start'];
     end: GeneInRegionOverview['end'];
     strand: GeneInRegionOverview['strand'];

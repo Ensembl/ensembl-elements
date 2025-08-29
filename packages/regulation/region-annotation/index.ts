@@ -40,6 +40,9 @@ export class RegionOverview extends LitElement {
     }
   `;
 
+  @property({ type: String })
+  regionName: string = '';
+
   // genomic start
   @property({ type: Number })
   start = 0;
@@ -178,11 +181,16 @@ export class RegionOverview extends LitElement {
   }
 
   renderGeneTracks() {
+    if (!this.featureTracks || !this.scale) {
+      return;
+    }
+
     const { geneTracks } = this.featureTracks;
     return renderGeneTracks({
       scale: this.scale,
       tracks: geneTracks,
       start: this.start,
+      regionName: this.regionName,
       end: this.end,
       width: this.imageWidth
     })
@@ -193,6 +201,10 @@ export class RegionOverview extends LitElement {
   }: {
     offsetTop: number;
   }) {
+    if (!this.featureTracks || !this.data || !this.scale) {
+      return;
+    }
+
     const { regulatoryFeatureTracks } = this.featureTracks;
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,

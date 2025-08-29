@@ -22,12 +22,14 @@ type Intron = {
 export const renderGeneTracks = ({
   tracks,
   scale,
+  regionName,
   start,
   end
 }: {
   tracks: FeatureTracks['geneTracks'];
   scale: ScaleLinear<number, number>;
   width: number;
+  regionName: string;
   start: number;
   end: number;
 }) => {
@@ -70,6 +72,7 @@ export const renderGeneTracks = ({
       trackIndex: index,
       trackOffsetsTop: yCoordLookup,
       scale,
+      regionName,
       start,
       end
     }))
@@ -91,6 +94,7 @@ const renderGeneTrack = ({
   trackIndex,
   trackOffsetsTop,
   scale,
+  regionName,
   start,
   end
 }: {
@@ -100,6 +104,7 @@ const renderGeneTrack = ({
   trackIndex: number;
   trackOffsetsTop: number[];
   scale: ScaleLinear<number, number>;
+  regionName: string;
   start: number;
   end: number;
 }) => {
@@ -121,6 +126,7 @@ const renderGeneTrack = ({
     return svg`
       ${renderGene({
         gene,
+        regionName,
         scale,
         offsetTop: trackOffsetTop,
         color: 'blue'
@@ -176,11 +182,13 @@ const renderGeneLowRes = ({
 
 const renderGene = ({
   gene,
+  regionName,
   scale,
   offsetTop,
   color
 }: {
   gene: GeneInTrack;
+  regionName: string;
   scale: ScaleLinear<number, number>;
   offsetTop: number;
   color: string;
@@ -224,6 +232,7 @@ const renderGene = ({
       })}
       ${renderInteractiveArea({
         gene,
+        regionName,
         offsetTop,
         scale
       })}
@@ -339,10 +348,12 @@ return introns.map((intron) => {
 
 const renderInteractiveArea = ({
   gene,
+  regionName,
   offsetTop,
   scale,
 }: {
   gene: GeneInTrack;
+  regionName: string;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
 }) => {
@@ -356,7 +367,7 @@ const renderInteractiveArea = ({
   return svg`
     <rect
       data-feature-type="gene"
-      data-feature=${JSON.stringify(prepareGeneInfo({ gene }))}
+      data-feature=${JSON.stringify(prepareGeneInfo({ gene, regionName }))}
       class="interactive-area"
       x=${start}
       width=${width}
@@ -368,9 +379,11 @@ const renderInteractiveArea = ({
 }
 
 const prepareGeneInfo = ({
-  gene
+  gene,
+  regionName
 }: {
   gene: GeneInTrack;
+  regionName: string;
 }): GeneClickPayload['data'] => {
   const { data: geneData } = gene;
 
@@ -379,6 +392,7 @@ const prepareGeneInfo = ({
     stableId: geneData.stable_id,
     unversionedStableId: geneData.unversioned_stable_id,
     biotype: geneData.biotype,
+    regionName,
     start: geneData.start,
     end: geneData.end,
     strand: geneData.strand
