@@ -12,7 +12,7 @@ import checkboxStyles from './checkbox-styles';
 export class Checkbox extends LitElement {
 
   @property({ type: Boolean })
-  checked: boolean;
+  checked: boolean = false;
 
   #internals: ElementInternals;
 

@@ -19,6 +19,9 @@ export default defineConfig({
         'components/select/select.ts',
         'components/table/sortable-column-header.ts',
         'components/text-button/text-button.ts',
+        'components/icon-buttons/delete-button/delete-button.ts',
+        'components/icon-buttons/download-button/download-button.ts',
+        'components/button/button.ts',
 
         'styles/constructable-stylesheets/resets.ts',
         'styles/constructable-stylesheets/button-resets.ts',
