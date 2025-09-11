@@ -4,6 +4,12 @@ import { customElement, property } from 'lit/decorators.js';
 import resetStyles from '../../styles/constructable-stylesheets/resets';
 import buttonResetStyles from '../../styles/constructable-stylesheets/button-resets';
 
+/**
+ * The api for this component - a single component with a `variant` attribute -
+ * was inspired by the same approach taken by the Shoelace (Web Awesome) library.
+ * See https://webawesome.com/docs/components/button
+ */
+
 @customElement('ens-button')
 export class EnsButton extends LitElement {
 

@@ -1,5 +1,5 @@
-import {html, css, nothing, LitElement } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
+import {html, css, nothing, LitElement, PropertyValues } from 'lit';
+import { property, query, customElement } from 'lit/decorators.js';
 
 import resetStyles from '../../styles/constructable-stylesheets/resets';
 import checkboxStyles from './checkbox-styles';
@@ -9,10 +9,13 @@ import checkboxStyles from './checkbox-styles';
 // https://github.com/w3c/csswg-drafts/issues/6867
 
 @customElement('ens-checkbox')
-export class Checkbox extends LitElement {
+export class EnsCheckbox extends LitElement {
 
   @property({ type: Boolean })
   checked: boolean = false;
+
+  @query('input')
+  input!: HTMLInputElement;
 
   #internals: ElementInternals;
 
@@ -39,6 +42,12 @@ export class Checkbox extends LitElement {
   constructor() {
     super();
     this.#internals = this.attachInternals();
+  }
+
+  updated(changedProperties: Map<string, unknown>) {
+    if (changedProperties.has('checked')) {
+      this.input.checked = this.checked;
+    }
   }
 
   onChange(event: Event) {
@@ -73,6 +82,6 @@ export class Checkbox extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'ens-checkbox': Checkbox;
+    'ens-checkbox': EnsCheckbox;
   }
 }
