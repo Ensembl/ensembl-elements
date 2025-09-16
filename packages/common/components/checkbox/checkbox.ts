@@ -50,6 +50,10 @@ export class EnsCheckbox extends LitElement {
     }
   }
 
+  focus(options: FocusOptions) {
+    this.input.focus(options);
+  }
+
   onChange(event: Event) {
     const eventTarget = event.target as HTMLInputElement;
     this.checked = eventTarget.checked;

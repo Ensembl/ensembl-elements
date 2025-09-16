@@ -1,5 +1,5 @@
-import {html, css, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, css, LitElement } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 
 import resetStyles from '../../styles/constructable-stylesheets/resets';
 import buttonResetStyles from '../../styles/constructable-stylesheets/button-resets';
@@ -49,6 +49,13 @@ export class EnsButton extends LitElement {
 
   @property({ type: String })
   type: "button" | "submit" | "reset" | "menu" = 'button';
+
+  @query('button')
+  button!: HTMLButtonElement;
+
+  focus(options: FocusOptions) {
+    this.button.focus(options);
+  }
 
   render() {
     return html`

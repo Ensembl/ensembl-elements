@@ -36,6 +36,10 @@ export class CheckboxOnly extends LitElement {
     }
   }
 
+  focus(options: FocusOptions) {
+    this.input.focus(options);
+  }
+
   render() {
     // Idea for passing the aria-label attribute through a data attribute
     // borrowed from the Material Web library
