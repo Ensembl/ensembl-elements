@@ -4,49 +4,32 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import icon from '../../../icons/icon_table.svg?raw';
 
-import resetStyles from '../../../styles/constructable-stylesheets/resets';
-import buttonResetStyles from '../../../styles/constructable-stylesheets/button-resets';
+import '../icon-button/icon-button';
 
 @customElement('ens-table-view-button')
 export class TableViewButton extends LitElement {
 
   static styles = [
-    resetStyles,
-    buttonResetStyles,
     css`
       :host {
-        display: inline-block;
-        line-height: 1;
-        font-size: 0;
-        height: var(--table-view-button-size, 18px);
-        width: var(--table-view-button-size, 18px);
-        fill: var(--table-view-button-color, var(--color-blue));
-      }
-
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      button[disabled] svg {
-        fill: var(--table-view-button-disabled-color, var(--color-grey));
+        display: inline-flex;
       }
     `
   ];
 
   @property({ type: Boolean }) disabled = false;
 
-  render() {
-    const ariaLabel = this.dataset.ariaLabel ?? 'View table';
+  @property({ type: String })
+  label = 'View table';
 
+  render() {
     return html`
-      <button
-        type="button"
+      <ens-icon-button
         ?disabled=${this.disabled}
-        aria-label=${ariaLabel}
+        label=${this.label}
       >
         ${unsafeSVG(icon)}
-      </button>
+      </ens-icon-button>
     `
   }
 }

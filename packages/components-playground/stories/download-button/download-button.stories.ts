@@ -7,7 +7,7 @@ export default {
 export const Default = () => {
   const element = document.createElement('div');
   const innerHtml = `
-    <ens-download-button data-aria-label="This is download button with a custom aria label">
+    <ens-download-button label="This is download button with a custom label">
     </ens-download-button>
   `;
   element.innerHTML = innerHtml;

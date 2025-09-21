@@ -2,51 +2,34 @@ import {html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
-import icon from '../../../icons/icon_delete.svg?raw';
+import '../icon-button/icon-button';
 
-import resetStyles from '../../../styles/constructable-stylesheets/resets';
-import buttonResetStyles from '../../../styles/constructable-stylesheets/button-resets';
+import icon from '../../../icons/icon_delete.svg?raw';
 
 @customElement('ens-delete-button')
 export class DeleteButton extends LitElement {
 
   static styles = [
-    resetStyles,
-    buttonResetStyles,
     css`
       :host {
-        display: inline-block;
-        line-height: 1;
-        font-size: 0;
-        height: var(--delete-button-size, 18px);
-        width: var(--delete-button-size, 18px);
-        fill: var(--delete-button-color, var(--color-blue));
-      }
-
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      button[disabled] svg {
-        fill: var(--delete-button-disabled-color, var(--color-grey));
+        display: inline-flex;
       }
     `
   ];
 
   @property({ type: Boolean }) disabled = false;
 
-  render() {
-    const ariaLabel = this.dataset.ariaLabel ?? 'Delete';
+  @property({ type: String })
+  label = 'Delete';
 
+  render() {
     return html`
-      <button
-        type="button"
+      <ens-icon-button
         ?disabled=${this.disabled}
-        aria-label=${ariaLabel}
+        label=${this.label}
       >
         ${unsafeSVG(icon)}
-      </button>
+      </ens-icon-button>
     `
   }
 }

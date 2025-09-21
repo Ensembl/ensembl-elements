@@ -7,7 +7,7 @@ export default {
 export const Default = () => {
   const element = document.createElement('div');
   const innerHtml = `
-    <ens-table-view-button data-aria-label="This is table view button with a custom aria label">
+    <ens-table-view-button label="This is table view button with a custom label">
     </ens-table-view-button>
   `;
   element.innerHTML = innerHtml;

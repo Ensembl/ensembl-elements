@@ -7,7 +7,7 @@ export default {
 export const Default = () => {
   const element = document.createElement('div');
   const innerHtml = `
-    <ens-delete-button data-aria-label="This is delete button with a custom aria label">
+    <ens-delete-button label="This is delete button with a custom label">
     </ens-delete-button>
   `;
   element.innerHTML = innerHtml;

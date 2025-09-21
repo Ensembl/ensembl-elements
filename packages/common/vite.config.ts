@@ -9,6 +9,7 @@ export default defineConfig({
     //   exclude: ['vite.config.ts']
     // })
   ],
+  base: '',
   build: {
     lib: {
       entry: [
@@ -32,6 +33,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
+        preserveModulesRoot: '.',
         preserveModules: true
       },
       external: /^lit/,
