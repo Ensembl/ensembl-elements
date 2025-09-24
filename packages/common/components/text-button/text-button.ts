@@ -1,4 +1,4 @@
-import {html, css, LitElement } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import resetStyles from '../../styles/constructable-stylesheets/resets';

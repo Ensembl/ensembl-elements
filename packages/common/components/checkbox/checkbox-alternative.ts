@@ -1,7 +1,5 @@
-import {html, css, unsafeCSS, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
-import resetStyles from '../../styles/resets.css?raw';
+import { html, css, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
 // https://dev.to/stuffbreaker/custom-forms-with-web-components-and-elementinternals-4jaj
 
