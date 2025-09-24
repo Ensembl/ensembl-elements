@@ -14,10 +14,21 @@ export class ExpandButton extends LitElement {
       :host {
         display: inline-flex;
       }
+
+      :host([expanded]) svg {
+        transform: rotate(-180deg);
+      }
+
+      svg {
+        transition: transform .3s ease-in-out;
+      }
     `
   ];
 
   @property({ type: Boolean }) disabled = false;
+
+  @property({ type: Boolean, reflect: true })
+  expanded = false;
 
   @property({ type: String })
   label = 'Expand';
