@@ -1,5 +1,5 @@
-import {html, css, LitElement, PropertyValues } from 'lit';
-import { customElement, property, queryAssignedElements  } from 'lit/decorators.js';
+import {html, css, LitElement } from 'lit';
+import { customElement, property  } from 'lit/decorators.js';
 
 import resetStyles from '../../../styles/constructable-stylesheets/resets';
 import buttonResetStyles from '../../../styles/constructable-stylesheets/button-resets';
