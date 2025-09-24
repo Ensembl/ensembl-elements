@@ -35,6 +35,12 @@
 - Uses web components with Lit, and typescript
 - Has a custom-made documentation/demo site, built with Eleventy
 
+## Quiet
+- [Github repository](https://github.com/quietui/quiet)
+- Another project by the creator of Shoelace
+- Uses web components with Lit
+- Uses an Eleventy-based playground / docs site
+
 ## Nord Design System
 - [Documentation site](https://nordhealth.design/)
 - Closed-source; but the build can be accessed over npm (e.g. [@nordhealth/components](https://www.npmjs.com/package/@nordhealth/components)); and the components can be inspected on the documentation site
