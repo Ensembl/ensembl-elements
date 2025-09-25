@@ -51,6 +51,11 @@
 - Made of web components; uses Lit and typescript
 - Has a custom demo site built with Eleventy
 
+## Momentum Design
+- [docs site](https://momentum-design.github.io/momentum-design/en/) and the [github repo](https://github.com/momentum-design/momentum-design)
+- Built with Lit
+- Uses Storybook
+
 ## PIE Web Components, by Just Eat Takeaway
 - [Link to documentation site](https://webc.pie.design/?path=/docs/introduction-getting-started--docs); [link to repo](https://github.com/justeattakeaway/pie)
 - Has various implementations of the design system, one of which is built on top of web components
