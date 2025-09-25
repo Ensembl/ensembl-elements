@@ -23,6 +23,7 @@ export default defineConfig({
         'components/icon-buttons/delete-button/delete-button.ts',
         'components/icon-buttons/download-button/download-button.ts',
         'components/icon-buttons/table-view-button/table-view-button.ts',
+        'components/icon-buttons/expand-button/expand-button.ts',
         'components/button/button.ts',
 
         'styles/constructable-stylesheets/resets.ts',

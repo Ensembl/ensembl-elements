@@ -14,14 +14,20 @@ export class IconButton extends LitElement {
     visuallyHiddenStyles,
     css`
       :host {
-        display: inline-block;
+        display: inline-flex;
         height: var(--icon-button-height, 18px);
         width: var(--icon-button-width, 18px);
       }
 
+      button {
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+      }
+
       ::slotted(svg) {
         width: 100%;
-        height: 100%;
         fill: var(--icon-button-color, var(--color-blue));
       }
 
