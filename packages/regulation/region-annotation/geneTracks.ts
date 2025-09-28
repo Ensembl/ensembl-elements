@@ -196,6 +196,8 @@ const renderGene = ({
   const trackY = offsetTop;
 
   const { merged_exons } = gene.data;
+  const firstMergedExon = merged_exons.at(0) as ExonInRegionOverview;
+  const lastMergedExon = merged_exons.at(-1) as ExonInRegionOverview;
   const introns: Intron[] = [];
 
   for (let i = 1; i < merged_exons.length; i++) {
@@ -207,11 +209,22 @@ const renderGene = ({
     introns.push({ start, end });
   }
 
+  const shouldDrawGeneExtentLeft = gene.data.start < firstMergedExon.start;
+  const shouldDrawGeneExtentRight = gene.data.end > lastMergedExon.end;
+
   return svg`
     <g
       data-name="gene"
       data-stable-id=${gene.data.stable_id}
     >
+      ${ shouldDrawGeneExtentLeft && renderGeneExtent({
+        from: gene.data.start,
+        to: firstMergedExon.start,
+        scale,
+        color,
+        offsetTop,
+        direction: 'left'
+      })}
       ${renderExons({
         exons: merged_exons,
         trackY,
@@ -229,6 +242,14 @@ const renderGene = ({
         trackY,
         scale,
         color
+      })}
+      ${ shouldDrawGeneExtentRight && renderGeneExtent({
+        from: lastMergedExon.end,
+        to: gene.data.end,
+        scale,
+        color,
+        offsetTop,
+        direction: 'right'
       })}
       ${renderInteractiveArea({
         gene,
@@ -345,6 +366,56 @@ return introns.map((intron) => {
     `;
   });
 };
+
+const renderGeneExtent = ({
+  from,
+  to,
+  scale,
+  color,
+  offsetTop,
+  direction
+}: {
+  from: number; // genomic coordinate
+  to: number; // genomic coordinate
+  scale: ScaleLinear<number, number>;
+  color: string;
+  offsetTop: number;
+  direction: 'left' | 'right';
+}) => {
+  const [ scaleGenomicStart ] = scale.domain();
+  const genomicDistance = (to - from);
+  const width = scale(scaleGenomicStart + genomicDistance);
+
+  if (width < 2) {
+    return null;
+  }
+
+  const xStart = scale(from);
+  const xEnd = xStart + width;
+
+  const lineY = offsetTop + GENE_HEIGHT / 2;
+  const geneEndX = direction === 'left' ? xStart : scale(to);
+
+  return svg`
+    <line
+      x1=${xStart}
+      x2=${xEnd}
+      y1=${lineY}
+      y2=${lineY}
+      stroke=${color}
+      stroke-dasharray="2"
+      stroke-width="1"
+    />
+    <line
+      x1=${geneEndX}
+      x2=${geneEndX}
+      y1=${offsetTop}
+      y2=${offsetTop + GENE_HEIGHT}
+      stroke=${color}
+      stroke-width="1"
+    />
+  `;
+}
 
 const renderInteractiveArea = ({
   gene,
