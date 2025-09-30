@@ -145,7 +145,8 @@ export class PageFooter extends LitElement {
             <span class="vf-footer__legal-text">
               <a class="vf-footer__link"
                 href="https://www.google.co.uk/maps/place/Hinxton,+Saffron+Walden+CB10+1SD/@52.0815334,0.1891518,17z/data=!3m1!4b1!4m5!3m4!1s0x47d87ccbfbd2538b:0x7bbdb4cde2779ff3!8m2!3d52.0800838!4d0.186415">EMBL-EBI,
-                Wellcome Genome Campus, Hinxton, Cambridgeshire, CB10 1SD, UK.</a>
+                Wellcome Genome Campus, Hinxton, Cambridgeshire, CB10 1SD, UK.
+              </a>
             </span>
             <span class="vf-footer__legal-text">
               <a class="vf-footer__link" href="tel:00441223494444">Tel: +44 (0)1223 49 44 44</a>
