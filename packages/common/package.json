@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./components/*": "./components/*",
+    "./embl-ebi-components/*": "./embl-ebi-components/*",
     "./icons/*": "./icons/*",
     "./styles/*": "./styles/*"
   },

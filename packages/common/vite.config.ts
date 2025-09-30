@@ -26,6 +26,9 @@ export default defineConfig({
         'components/icon-buttons/expand-button/expand-button.ts',
         'components/button/button.ts',
 
+        'embl-ebi-components/page-header/page-header.ts',
+        'embl-ebi-components/page-footer/page-footer.ts',
+
         'styles/constructable-stylesheets/resets.ts',
         'styles/constructable-stylesheets/button-resets.ts',
         'styles/constructable-stylesheets/table.ts'
