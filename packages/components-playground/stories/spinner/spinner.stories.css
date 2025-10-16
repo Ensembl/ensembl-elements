@@ -1,0 +1,10 @@
+.small-spinner {
+  width: 30px;
+}
+
+.custom-spinner {
+  width: 60px;
+  --track-width: 6;
+  --track-color: red;
+  --indicator-color: blue;
+}

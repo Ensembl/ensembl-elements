@@ -23,7 +23,7 @@ export class EnsButton extends LitElement {
       }
       
       button {
-        color: var(--button-text-color, var(--color-white));
+        color: var(--color-white);
         font-weight: var(--font-weight-bold);
         padding: 7px 18px;
         border-radius: 4px;
@@ -31,15 +31,15 @@ export class EnsButton extends LitElement {
 
       :not(:host([variant])) button,
       :host([variant="brand"]) button {
-        background-color: var(--brand-button-color, var(--color-blue));
+        background-color: var(--color-blue);
       }
 
       :host([variant="action"]) button {
-        background-color: var(--action-button-color, var(--color-green));
+        background-color: var(--color-green);
       }
 
       button[disabled] {
-        background-color: var(--disabled-button-color, var(--color-medium-dark-grey));
+        background-color: var(--color-medium-dark-grey);
       }
     `
   ];
@@ -60,6 +60,7 @@ export class EnsButton extends LitElement {
   render() {
     return html`
       <button
+        part="button"
         type=${this.type}
         ?disabled=${this.disabled}
       >
