@@ -1,17 +1,18 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
+import { ifDefined } from "lit/directives/if-defined.js"
 
 import resetStyles from '../../styles/constructable-stylesheets/resets';
 import buttonResetStyles from '../../styles/constructable-stylesheets/button-resets';
 
 /**
- * The api for this component - a single component with a `variant` attribute -
- * was inspired by the same approach taken by the Shoelace (Web Awesome) library.
- * See https://webawesome.com/docs/components/button
+ * This component looks like ens-button (notice how it borrows its styles),
+ * but instead of a button element renders a link.
+ * The `variant` attribute has the same semantics as for ens-button
  */
 
-@customElement('ens-button')
-export class EnsButton extends LitElement {
+@customElement('ens-button-link')
+export class EnsButtonLink extends LitElement {
 
   static styles = [
     resetStyles,
@@ -22,23 +23,24 @@ export class EnsButton extends LitElement {
         line-height: 1;
       }
       
-      button {
+      a {
+        display: inline-block;
         color: var(--color-white);
         font-weight: var(--font-weight-bold);
         padding: 7px 18px;
         border-radius: 4px;
       }
 
-      :not(:host([variant])) button,
-      :host([variant="brand"]) button {
+      :not(:host([variant])) a,
+      :host([variant="brand"]) a {
         background-color: var(--color-blue);
       }
 
-      :host([variant="action"]) button {
+      :host([variant="action"]) a {
         background-color: var(--color-green);
       }
 
-      :host([disabled]) button {
+      :host([disabled]) a {
         background-color: var(--color-medium-dark-grey);
       }
     `
@@ -48,31 +50,39 @@ export class EnsButton extends LitElement {
   disabled = false;
 
   @property({ type: String })
-  type: "button" | "submit" | "reset" | "menu" = 'button';
+  href: string = '';
 
-  @query('button')
-  button!: HTMLButtonElement;
+  @property({ type: Boolean })
+  download: boolean = false;
+
+  @query('a')
+  link!: HTMLAnchorElement;
 
   focus(options: FocusOptions) {
-    this.button.focus(options);
+    this.link.focus(options);
   }
 
   render() {
+    let href: string | undefined;
+
+    if (this.href && !this.disabled) {
+      href = this.href
+    }
+
     return html`
-      <button
-        part="button"
-        type=${this.type}
-        ?disabled=${this.disabled}
+      <a
+        part="link"
+        href=${ifDefined(href)}
       >
         <slot>
         </slot>
-      </button>
+      </a>
     `
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'ens-button': EnsButton;
+    'ens-button-link': EnsButtonLink;
   }
 }

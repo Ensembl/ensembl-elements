@@ -25,6 +25,7 @@ export default defineConfig({
         'components/icon-buttons/expand-button/expand-button.ts',
         'components/button/button.ts',
         'components/text-button/text-button.ts',
+        'components/button-link/button-link.ts',
         'components/loading-button/loading-button.ts',
         'components/spinner/spinner.ts',
         'components/popup/popup.ts',
