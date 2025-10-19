@@ -28,8 +28,7 @@ export default defineConfig({
       },
       external: [
         /^lit/,
-        /^d3/,
-        /^@ensembl/
+        /^d3/
       ],
     }
   }

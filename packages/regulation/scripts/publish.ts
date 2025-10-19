@@ -18,4 +18,8 @@ if (!PUBLISH_TOKEN) {
 
 process.chdir(buildDirectoryPath);
 
-execSync(`PUBLISH_TOKEN=${PUBLISH_TOKEN} npm publish`);
+try {
+  execSync(`PUBLISH_TOKEN=${PUBLISH_TOKEN} npm publish`);
+} catch {
+  console.error("ERROR: the package has not been published");
+}

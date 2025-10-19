@@ -11,5 +11,8 @@
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "publishConfig": {
+    "@ensembl:registry": "https://gitlab.ebi.ac.uk/api/v4/projects/3500/packages/npm/"
   }
 }
