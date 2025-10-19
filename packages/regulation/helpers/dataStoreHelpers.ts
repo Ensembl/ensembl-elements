@@ -1,4 +1,8 @@
 /**
+ * NOTE: these helpers are not currently used anywhere, and are candidates for removal.
+ */
+
+/**
  * In order to avoid the need to iterate over the whole region when looking for features,
  * features are stored in 1-megabase 'bins'.
  */
@@ -51,4 +55,14 @@ export const createBinKey = ({
   end: number;
 }) => {
   return `${start}-${end}`;
+};
+
+export const parseBinKey = (key: string) => {
+  const regex = /(?<start>\d+)-(?<end>\d+)/;
+  const regExGroups = regex.exec(key)?.groups;
+  const binStartStr = regExGroups!.start!;
+  const binEndStr = regExGroups!.end!;
+  const binStart = parseInt(binStartStr);
+  const binEnd = parseInt(binEndStr);
+  return { binStart, binEnd };
 };

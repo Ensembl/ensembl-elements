@@ -1,7 +1,5 @@
 export * from './region-annotation';
 
-export * as dataStoreHelpers from '../helpers/dataStoreHelpers';
-
 export type {
   OverviewRegion,
   GeneInRegionOverview,
@@ -9,6 +7,5 @@ export type {
   RegulatoryFeatureMetadata
 } from '../types/regionOverview';
 export type {
-  InputData,
-  DataBin
+  InputData
 } from '../types/inputData';

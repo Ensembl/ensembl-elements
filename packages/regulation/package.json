@@ -7,8 +7,6 @@
     "./region-overview": "./region-annotation/index.ts",
     "./popup-injector": "./region-annotation/popupInjector.ts"
   },
-  "main-for-dist": "./dist/ensembl-regulation.umd.cjs",
-  "module-for-dist": "./dist/ensembl-regulation.js",
   "scripts": {
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "test": "echo \"Error: no test specified\" && exit 1"

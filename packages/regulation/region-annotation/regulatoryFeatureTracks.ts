@@ -7,7 +7,7 @@ import {
   REGULATORY_FEATURE_EXTENT_HEIGHT
 } from './constants';
 
-import type { RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
+import type { RegulatoryFeature } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
 
 

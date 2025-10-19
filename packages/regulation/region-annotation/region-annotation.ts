@@ -16,8 +16,6 @@ import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata
 import type { InputData } from '../types/inputData';
 
 export type RegionOverviewData = {
-  // start: number; // <-- genomic start
-  // end: number; // <-- genomic end
   genes: GeneInRegionOverview[];
   regulatory_features: RegulatoryFeature[];
   regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
@@ -156,11 +154,6 @@ export class RegionOverview extends LitElement {
       imageHeight,
       regulatoryFeatureTracksTopOffset
     } = getImageHeightAndTopOffsets(this.featureTracks);
-
-    // - remember that we have two scales: one for immediate viewport; the other for three viewports
-    // - draw gene tracks
-    // - draw regulatory feature tracks
-    // - draw container for translating image contents
 
     return html`
       <svg

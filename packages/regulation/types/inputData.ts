@@ -9,13 +9,8 @@ import type {
   RegulatoryFeatureMetadata
 } from './regionOverview';
 
-
-export type DataBin = {
+export type InputData = {
   genes: GeneInRegionOverview[];
   regulatory_features: RegulatoryFeature[];
-};
-
-export type InputData = {
-  bins: Record<string, DataBin>;
   regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
 };

@@ -7,7 +7,11 @@ import '@ensembl/ensembl-regulation/region-overview';
 import '@ensembl/ensembl-regulation/popup-injector';
 import './zoomButtons';
 
-import dataStore from './services/dataStore';
+import { pickData } from './services/filterData';
+import chromosome1Data from './data/chr1-data.json';
+
+
+import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
 
 // a location on chromosome 1 that has some features
 const INITIAL_START = 58873313;
@@ -46,7 +50,11 @@ export class RegulationPlayground extends LitElement {
   }
 
   render() {
-    const data = dataStore;
+    const data = pickData({
+      data: chromosome1Data as OverviewRegion,
+      start: this.start,
+      end: this.end
+    });
 
     return html`
       <h1>This should test region overview rendering using svg</h1>
