@@ -48,7 +48,7 @@ class ViewportController implements ReactiveController {
   }
 
   isClickOnTooltip = (event: MouseEvent) => {
-    const tooltipSlot = (this.host as RegionOverview).shadowRoot.querySelector('slot[name="tooltip"]');
+    const tooltipSlot = (this.host as RegionOverview).shadowRoot!.querySelector('slot[name="tooltip"]');
     const isTooltipSlotInComposedPath = Boolean(event.composedPath().find(node => node === tooltipSlot));
     return isTooltipSlotInComposedPath;
   }
@@ -73,19 +73,20 @@ class ViewportController implements ReactiveController {
 
   onMouseMove = (event: MouseEvent) => {
     this.isDragging = true;
+    const mouseDownX = this.mouseDownX as number;
 
     const { clientX: x } = event;
 
-    const deltaX = (x - this.mouseDownX);
+    const deltaX = x - mouseDownX;
 
     const directionCoefficient = deltaX >= 0 ? 1 : -1;
 
     const scale = this.#scale;
-    const genomicStart = this.#start;
-    const genomicEnd = this.#end;
-    const regionLength = this.#regionLength;
+    const genomicStart = this.#start as number;
+    const genomicEnd = this.#end as number;
+    const regionLength = this.#regionLength as number;
 
-    let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
+    let genomicDistance = Math.round(scale!.invert(Math.abs(deltaX))) - genomicStart;
 
     genomicDistance = genomicDistance * directionCoefficient;
     
@@ -129,10 +130,10 @@ class ViewportController implements ReactiveController {
 }
 
 
-const debounce = (fn) => {
-  let raf: ReturnType<typeof requestAnimationFrame>;
+const debounce = (fn: Function) => {
+  let raf: ReturnType<typeof requestAnimationFrame> | undefined;
 
-  return (...args) => {
+  return (...args: Array<unknown>) => {
     if (raf) {
       return;
     }

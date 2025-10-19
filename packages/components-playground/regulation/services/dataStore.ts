@@ -4,7 +4,7 @@ import {
   type GeneInRegionOverview,
   type RegulatoryFeature,
   type  RegulatoryFeatureMetadata,
-} from '@ensembl/ensembl-regulation';
+} from '@ensembl/ensembl-regulation/region-overview';
 
 import chromosome1Data from '../data/chr1-data.json';
 
