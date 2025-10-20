@@ -10,3 +10,7 @@ export const REGULATORY_FEATURE_EXTENT_HEIGHT = 4;
 export const REGULATORY_FEATURE_TRACK_HEIGHT = REGULATORY_FEATURE_HEIGHT + 10;
 
 export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 1_000_000;
+
+export const RULER_HEIGHT = 15;
+
+export const COLOR_BLUE = '#0099ff'; // Ensembl brand blue colour

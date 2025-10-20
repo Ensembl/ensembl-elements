@@ -7,6 +7,7 @@ import { prepareFeatureTracks, type FeatureTracks } from './prepareFeatureTracks
 import { getImageHeightAndTopOffsets } from './getImageHeight';
 import { renderGeneTracks } from './geneTracks';
 import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
+import { renderRuler } from './ruler';
 
 import draggableViewport from './draggableViewport';
 
@@ -30,6 +31,7 @@ export class RegionOverview extends LitElement {
     }
 
     svg {
+      display: block;
       width: 100%;
     }
 
@@ -152,6 +154,8 @@ export class RegionOverview extends LitElement {
 
     const {
       imageHeight,
+      geneTracksTopOffset,
+      bottomRulerTopOffset,
       regulatoryFeatureTracksTopOffset
     } = getImageHeightAndTopOffsets(this.featureTracks);
 
@@ -163,9 +167,19 @@ export class RegionOverview extends LitElement {
       >
         <g>
           ${draggableViewport()}
-          ${this.renderGeneTracks()}
+          ${renderRuler({
+            scale: this.scale,
+            offsetTop: 0
+          })}
+          ${this.renderGeneTracks({
+            offsetTop: geneTracksTopOffset
+          })}
           ${this.renderRegulatoryFeatureTracks({
             offsetTop: regulatoryFeatureTracksTopOffset
+          })}
+          ${renderRuler({
+            scale: this.scale,
+            offsetTop: bottomRulerTopOffset
           })}
         </g>
       </svg>
@@ -173,13 +187,18 @@ export class RegionOverview extends LitElement {
     `;
   }
 
-  renderGeneTracks() {
+  renderGeneTracks({
+    offsetTop
+  }: {
+    offsetTop: number;
+  }) {
     if (!this.featureTracks || !this.scale) {
       return;
     }
 
     const { geneTracks } = this.featureTracks;
     return renderGeneTracks({
+      offsetTop,
       scale: this.scale,
       tracks: geneTracks,
       start: this.start,

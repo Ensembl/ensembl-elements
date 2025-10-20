@@ -2,10 +2,10 @@ import { svg } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 import {
-  GENE_TRACKS_TOP_OFFSET,
   GENE_TRACK_HEIGHT,
   GENE_HEIGHT,
-  MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
+  MAX_SLICE_LENGTH_FOR_DETAILED_VIEW,
+  COLOR_BLUE
 } from './constants';
 
 import { renderTranscriptionStartSites } from './transcriptionStartSites';
@@ -24,7 +24,8 @@ export const renderGeneTracks = ({
   scale,
   regionName,
   start,
-  end
+  end,
+  offsetTop
 }: {
   tracks: FeatureTracks['geneTracks'];
   scale: ScaleLinear<number, number>;
@@ -32,9 +33,10 @@ export const renderGeneTracks = ({
   regionName: string;
   start: number;
   end: number;
+  offsetTop: number;
 }) => {
   const { forwardStrandTracks, reverseStrandTracks } = tracks;
-  let tempY = GENE_TRACKS_TOP_OFFSET;
+  let tempY = offsetTop;
 
   // calculate y-coordinates for gene tracks
   const forwardStrandTrackYs: number[] = [];
@@ -42,7 +44,7 @@ export const renderGeneTracks = ({
 
   // Designer's instruction: forward strand genes stack upwards
   for (let i = forwardStrandTracks.length; i > 0; i--) {
-    const y = GENE_TRACKS_TOP_OFFSET + GENE_TRACK_HEIGHT * (i - 1);
+    const y = offsetTop + GENE_TRACK_HEIGHT * (i - 1);
     forwardStrandTrackYs.push(y);
     tempY += GENE_TRACK_HEIGHT;
   }
@@ -119,7 +121,7 @@ const renderGeneTrack = ({
         gene,
         scale,
         offsetTop: trackOffsetTop,
-        color: 'blue'
+        color: COLOR_BLUE
       });
     }
 
@@ -129,7 +131,7 @@ const renderGeneTrack = ({
         regionName,
         scale,
         offsetTop: trackOffsetTop,
-        color: 'blue'
+        color: COLOR_BLUE
       })}
       ${renderTranscriptionStartSites({
         tss: gene.data.tss,

@@ -10,8 +10,10 @@ import './zoomButtons';
 import { pickData } from './services/filterData';
 import chromosome1Data from './data/chr1-data.json';
 
-
 import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
+
+import '@ensembl/ensembl-elements-common/styles/fonts.css';
+
 
 // a location on chromosome 1 that has some features
 const INITIAL_START = 58873313;
