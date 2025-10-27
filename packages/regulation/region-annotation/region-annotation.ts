@@ -9,8 +9,6 @@ import { renderGeneTracks } from './geneTracks';
 import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
 
-import draggableViewport from './draggableViewport';
-
 import ViewportController from './viewportController';
 
 import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
@@ -166,7 +164,6 @@ export class RegionOverview extends LitElement {
         @click=${this.handleClick}
       >
         <g>
-          ${draggableViewport()}
           ${renderRuler({
             scale: this.scale,
             offsetTop: 0
