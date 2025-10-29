@@ -1,5 +1,7 @@
 # Useful examples of design systems
 
+This document contains a list of mature design systems / pattern libraries that are based on web components, and can be consulted for reference / inspiration on component names, techniques for building components, and options for setting up development playgrounds or documentation sites.
+
 ## Red Hat's Design System
 - Has a branded part (RedHat design system, or RHDS), and a generic part (PatternFly)
   - RedHat design system [documentation site](https://ux.redhat.com/) and [repo](https://github.com/RedHat-UX/red-hat-design-system)
@@ -37,7 +39,7 @@
 
 ## Quiet
 - [Github repository](https://github.com/quietui/quiet)
-- Another project by the creator of Shoelace
+- Another component library built by the creator of Shoelace
 - Uses web components with Lit
 - Uses an Eleventy-based playground / docs site
 
