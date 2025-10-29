@@ -1,6 +1,6 @@
-## Challenges
+# Popup/tooltip
 
-### Popup/tooltip
+## Challenges
 
 A click on a feature (a gene or a regulatory feature) should show a popup with the description of this feature.
 

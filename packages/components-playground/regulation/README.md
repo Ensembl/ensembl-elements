@@ -1,0 +1,3 @@
+# Setup
+
+For this playground to work, it will need some test data for the regulatory annotation panel component (`ens-reg-region-overview`). The playground expects this data to be in the `./data/chr1-data.json` file. You can create this file by requesting chromosome annotation payload from the regulation api (for example, you can get the full annotation for chromosome 1 from: https://dev-2020.ensembl.org/api/regulation/annotation/v0.5/release/2025-02/assembly/GCA_000001405.29?location=1:1-248956422). Note that the size of this payload for chromosome 1 will be 28.5MB.
