@@ -32,6 +32,7 @@ export class TextButton extends LitElement {
   render() {
     return html`
       <button
+        part="button"
         type="button"
         ?disabled=${this.disabled}
       >
