@@ -1,0 +1,22 @@
+{
+  "name": "@ensembl/ensembl-elements-common",
+  "version": "0.0.1",
+  "license": "ISC",
+  "type": "module",
+  "exports": {
+    "./components/*": "./components/*",
+    "./embl-ebi-components/*": "./embl-ebi-components/*",
+    "./icons/*": "./icons/*",
+    "./styles/*": "./styles/*"
+  },
+  "description": "Components commonly reused by Ensembl sites",
+  "scripts": {
+    "build": "node --experimental-strip-types ./scripts/build.ts",
+    "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
+    "test": "node --experimental-strip-types --enable-source-maps --test-reporter=spec --test **/*.test.*"
+  },
+  "publishConfig": {
+    "@ensembl:registry": "https://gitlab.ebi.ac.uk/api/v4/projects/3500/packages/npm/"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,3 @@
+.custom-button::part(button) {
+  color: red;
+}

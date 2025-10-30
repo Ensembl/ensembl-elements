@@ -1,0 +1,16 @@
+.popup-positioning-story {
+
+  display: grid;
+  height: 95vh;
+  padding-bottom: 60px;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    height: 50px;
+    width: 70px;
+    border: 1px dashed black;
+  }
+
+}

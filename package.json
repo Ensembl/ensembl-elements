@@ -1,0 +1,27 @@
+{
+  "name": "@ensembl/ensembl-elements",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/components-playground",
+    "storybook": "npm run storybook --workspace=packages/components-playground"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "1.7.4",
+    "d3": "7.9.0",
+    "lit": "3.3.1"
+  },
+  "devDependencies": {
+    "@types/d3": "7.4.3",
+    "@types/node": "24.7.2",
+    "typescript": "5.9.3",
+    "vite": "7.1.10",
+    "vite-plugin-dts": "4.5.4"
+  },
+  "workspaces": [
+    "packages/regulation",
+    "packages/components-playground",
+    "packages/helpers",
+    "packages/common"
+  ]
+}

@@ -1,0 +1,11 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, min-content);
+  column-gap: 20px;
+  row-gap: 20px;
+}
+
+.column-head {
+  font-weight: bold;
+  white-space: nowrap;
+}

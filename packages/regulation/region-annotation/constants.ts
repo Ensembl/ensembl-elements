@@ -1,0 +1,16 @@
+export const GENE_TRACKS_TOP_OFFSET = 40;
+export const GENE_HEIGHT = 8;
+export const GENE_TRACK_HEIGHT = GENE_HEIGHT + 3;
+
+export const REGULATORY_FEATURE_TRACKS_TOP_OFFSET = 38;
+
+export const REGULATORY_FEATURE_HEIGHT = 8;
+export const REGULATORY_FEATURE_CORE_HEIGHT = 8;
+export const REGULATORY_FEATURE_EXTENT_HEIGHT = 4;
+export const REGULATORY_FEATURE_TRACK_HEIGHT = REGULATORY_FEATURE_HEIGHT + 10;
+
+export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 1_000_000;
+
+export const RULER_HEIGHT = 15;
+
+export const COLOR_BLUE = '#0099ff'; // Ensembl brand blue colour
