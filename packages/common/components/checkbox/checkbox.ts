@@ -24,11 +24,14 @@ export class EnsCheckbox extends LitElement {
     checkboxStyles,
     css`
       :host {
-        display: inline-block;
+        display: inline-grid;
+        grid-template-columns: repeat(2, auto);
+        column-gap: 0.4rem;
+        justify-content: start;
+        align-items: baseline;
       }
 
       :host label {
-        margin-left: 0.4rem;
         user-select: none;
         cursor: pointer;
       }
@@ -71,13 +74,14 @@ export class EnsCheckbox extends LitElement {
 
     return html`
       <input
+        part="input"
         id="input"
         type="checkbox"
         ?checked=${this.checked}
         aria-label=${ariaLabel ?? nothing}
         @change=${this.onChange}
       />
-      <label for="input">
+      <label part="label" for="input">
         <slot></slot>
       </label>
     `

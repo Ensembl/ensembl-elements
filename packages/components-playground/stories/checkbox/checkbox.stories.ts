@@ -5,6 +5,8 @@ import '@ensembl/ensembl-elements-common/components/button/button.js';
 
 import { EnsCheckbox } from '@ensembl/ensembl-elements-common/components/checkbox/checkbox.js';
 
+import './checkbox.stories.css';
+
 export default {
   title: 'Common/Checkbox'
 };
@@ -28,6 +30,12 @@ export const Default = () => {
       <p>Checkbox without label</p>
       <ens-checkbox-only data-aria-label="Hello from checkbox one"></ens-checkbox-only>
       <ens-checkbox-only aria-label="Hello from checkbox two"></ens-checkbox-only>
+    </div>
+    <div>
+      <p>Checkbox with a wrapping label</p>
+      <ens-checkbox class="checkbox-with-wrapping">
+        United Kingdom of Great Britain and Northern Ireland
+      </ens-checkbox>
     </div>
     <div>
       <p>Programmatically controlled checkbox</p>
