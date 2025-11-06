@@ -8,8 +8,11 @@ import { getImageHeightAndTopOffsets } from './getImageHeight';
 import { renderGeneTracks } from './geneTracks';
 import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
+import { areaSelection } from './selection/area-selection-directive';
+import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
 
 import ViewportController from './viewportController';
+import AreaSelectionController from './selection/area-selection-controller';
 
 import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
@@ -62,10 +65,12 @@ export class RegionOverview extends LitElement {
   imageWidth = 0;
 
   scale: ScaleLinear<number, number> | null = null;
+  areaSelection: AreaSelectionController;
 
   constructor() {
     super();
     new ViewportController(this);
+    this.areaSelection = new AreaSelectionController(this);
   }
 
   connectedCallback(): void {
@@ -163,7 +168,8 @@ export class RegionOverview extends LitElement {
         style="width: 100%; height: ${imageHeight}px;"
         @click=${this.handleClick}
       >
-        <g>
+        ${unselectedBackgroundFilter()}
+        <g filter="url(#unselected-background)">
           ${renderRuler({
             scale: this.scale,
             offsetTop: 0
@@ -178,6 +184,7 @@ export class RegionOverview extends LitElement {
             scale: this.scale,
             offsetTop: bottomRulerTopOffset
           })}
+          ${areaSelection()}
         </g>
       </svg>
       <slot name="tooltip"></slot>

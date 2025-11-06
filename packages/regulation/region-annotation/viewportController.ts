@@ -47,6 +47,11 @@ class ViewportController implements ReactiveController {
     this.#regionLength = host.regionLength;
   }
 
+  isSelectionTrigger = (event: MouseEvent) => {
+    const clickedElement = event.composedPath()[0] as HTMLElement;
+    return Boolean(clickedElement.dataset.selectorTrigger);
+  }
+
   isClickOnTooltip = (event: MouseEvent) => {
     const tooltipSlot = (this.host as RegionOverview).shadowRoot!.querySelector('slot[name="tooltip"]');
     const isTooltipSlotInComposedPath = Boolean(event.composedPath().find(node => node === tooltipSlot));
@@ -54,8 +59,8 @@ class ViewportController implements ReactiveController {
   }
 
   onMouseDown = (event: MouseEvent) => {
-    if (this.isClickOnTooltip(event)) {
-      // ignore if click was within the tooltip
+    if (this.isClickOnTooltip(event) || this.isSelectionTrigger(event)) {
+      // ignore
       return;
     }
 
