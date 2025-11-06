@@ -1,11 +1,10 @@
 {
-  "name": "@ensembl/ensembl-regulation",
-  "version": "0.0.2",
+  "name": "@ensembl/ensembl-structural-variants",
+  "version": "0.0.1",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    "./region-overview": "./region-annotation/index.ts",
-    "./popup-injector": "./region-annotation/popupInjector.ts"
+    "./alignments": "./alignments/index.ts"
   },
   "scripts": {
     "build": "node --experimental-strip-types ./scripts/build.ts",
