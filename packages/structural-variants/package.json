@@ -7,6 +7,7 @@
     "./alignments": "./alignments/index.ts"
   },
   "scripts": {
+    "dev": "vite serve alignments-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
