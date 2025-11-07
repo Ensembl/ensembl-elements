@@ -8,7 +8,7 @@ export type Variant = {
   }
 };
 
-export type ClickedVariantPayload = {
+export type VariantClickPayload = {
   variantType: string;
   variantName: string;
   variantStart: string;

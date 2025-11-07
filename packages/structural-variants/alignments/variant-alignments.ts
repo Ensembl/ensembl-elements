@@ -11,7 +11,7 @@ import { renderVariants } from './parts/variants';
 import { renderAlignments } from './parts/alignments';
 import { renderRuler } from './parts/ruler';
 
-import type { Variant, ClickedVariantPayload } from './types/variant';
+import type { Variant, VariantClickPayload } from './types/variant';
 import type { Alignment } from './types/alignment';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
@@ -88,7 +88,7 @@ export class VariantAlignments extends LitElement {
   imageWidth = 0;
 
   @state()
-  selectedVariant: ClickedVariantPayload | null = null;
+  selectedVariant: VariantClickPayload | null = null;
 
   scale: ScaleLinear<number, number> | null = null;
   targetSequenceScale: ScaleLinear<number, number> | null = null;
@@ -122,7 +122,7 @@ export class VariantAlignments extends LitElement {
           variantEnd
         } = elementData;
 
-        const payload: ClickedVariantPayload = {
+        const payload: VariantClickPayload = {
             variantType,
             variantName: name,
             variantStart,
@@ -132,7 +132,7 @@ export class VariantAlignments extends LitElement {
 
         this.selectedVariant = payload;
 
-        const customEvent = new CustomEvent<ClickedVariantPayload>('variant-clicked', {
+        const customEvent = new CustomEvent<VariantClickPayload>('variant-clicked', {
           detail: payload
         });
         this.dispatchEvent(customEvent);
