@@ -4,13 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { DataService, AlignmentsLoader } from '../alignments-data';
 
 import '../alignments/variant-alignments';
-// import './controlButtons';
-// import './regionSelector';
+import './control-buttons';
 
 import type { InputData as VariantAlignmentsData } from '../alignments/variant-alignments';
 import type { Variant, VariantClickPayload } from '../alignments/types/variant';
-// import type { ViewportChangePayload } from './controlButtons';
-// import type { RegionChangePayload } from './regionSelector';
+import type { ViewportChangePayload } from './control-buttons';
 
 // a location on chromosome 1 that has some features
 // const INITIAL_START = 1;
@@ -20,8 +18,8 @@ import type { Variant, VariantClickPayload } from '../alignments/types/variant';
 // const INITIAL_END = 80_000;
 
 const INITIAL_REGION_NAME = '1';
-const INITIAL_START = 1_000_000;
-const INITIAL_END = 2_001_582;
+const INITIAL_START = 142_500_000;
+const INITIAL_END = 145_500_000;
 
 @customElement('alignments-playground')
 export class StructuralVariantsPlayground extends LitElement {
@@ -127,16 +125,16 @@ export class StructuralVariantsPlayground extends LitElement {
   //   this.fetchData();
   // }
 
-  // onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
-  //   const payload = event.detail;
+  onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
+    const payload = event.detail;
 
-  //   this.start = payload.reference.start;
-  //   this.end = payload.reference.end;
-  //   this.alignmentTargetStart = payload.target.start;
-  //   this.alignmentTargetEnd = payload.target.end;
+    this.start = payload.reference.start;
+    this.end = payload.reference.end;
+    this.alignmentTargetStart = payload.target.start;
+    this.alignmentTargetEnd = payload.target.end;
 
-  //   this.fetchData();
-  // }
+    this.fetchData();
+  }
 
   onLocationUpdated = (event: CustomEvent) => {
     const {
@@ -174,6 +172,14 @@ export class StructuralVariantsPlayground extends LitElement {
 
     return html`
       <div class="controls-wrapper">
+        <control-buttons
+          @viewport-change=${this.onViewportChange}
+          .start=${this.start}
+          .end=${this.end}
+          .alignmentTargetStart=${this.alignmentTargetStart}
+          .alignmentTargetEnd=${this.alignmentTargetEnd}
+        >
+        </control-buttons>
       </div>
       <ens-sv-alignments
         @location-updated=${this.onLocationUpdated}
@@ -182,6 +188,8 @@ export class StructuralVariantsPlayground extends LitElement {
         .end=${this.end}
         .alignmentTargetStart=${this.alignmentTargetStart}
         .alignmentTargetEnd=${this.alignmentTargetEnd}
+        .regionLength=${Infinity}
+        .regionName=${"1"}
         .data=${this.data}
       ></ens-sv-alignments>
       <div class="variant-message"></div>

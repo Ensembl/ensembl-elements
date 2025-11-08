@@ -98,10 +98,6 @@ export class VariantAlignments extends LitElement {
     new DragController(this);
   }
 
-  #onVariantTooltipDismiss = () => {
-    this.selectedVariant = null;
-  };
-
   connectedCallback(): void {
     super.connectedCallback();
     this.setListeners();
@@ -168,13 +164,6 @@ export class VariantAlignments extends LitElement {
     if (!this.imageWidth || !this.scale || !this.data) {
       return;
     }
-
-    // - remember that we have two scales: one for immediate viewport; the other for three viewports
-    // - draw gene tracks
-    // - draw regulatory feature tracks
-    // - draw container for translating image contents
-
-    // ${this.renderAlignments()}
 
     return html`
       <svg
