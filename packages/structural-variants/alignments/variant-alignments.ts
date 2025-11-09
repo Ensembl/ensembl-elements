@@ -14,8 +14,6 @@ import { renderRuler } from './parts/ruler';
 import type { Variant, VariantClickPayload } from './types/variant';
 import type { Alignment } from './types/alignment';
 
-import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
-
 export type InputData = {
   variants: Variant[];
   alignments: Alignment[];
@@ -31,7 +29,6 @@ export class VariantAlignments extends LitElement {
     svg {
       display: block;
       user-select: none;
-      cursor: ew-resize;
     }
 
     .variant {
@@ -40,22 +37,6 @@ export class VariantAlignments extends LitElement {
 
     .variant:hover {
       fill: pink;
-    }
-
-    .variant-popup {
-      font-family: var(--font-family-body);
-      font-size: var(--body-font-size);
-      line-height: var(--body-line-height);
-      color: var(--color-white);
-    }
-
-    .variant-popup .row span + span {
-      margin-left: 1ch;
-      font-weight: 500;
-    }
-
-    .variant-popup .light {
-      font-weight: 300;
     }
   `;
 
@@ -105,25 +86,23 @@ export class VariantAlignments extends LitElement {
   }
 
   setListeners() {
-    this.shadowRoot.addEventListener('click', (event) => {
+    this.shadowRoot!.addEventListener('click', (event) => {
       const element = event.target as HTMLElement;
       const elementData = element.dataset;
       const { featureType } = elementData;
 
       if (featureType === 'variant') {
-        const {
-          variantType,
-          name,
-          variantStart,
-          variantEnd
-        } = elementData;
+        const variantType = elementData.variantType as string;
+        const variantName = elementData.name as string;
+        const variantStart = elementData.variantStart as string;
+        const variantEnd = elementData.variantEnd as string;
 
         const payload: VariantClickPayload = {
-            variantType,
-            variantName: name,
-            variantStart,
-            variantEnd,
-            anchor: element
+          variantType,
+          variantName,
+          variantStart,
+          variantEnd,
+          anchor: element
         };
 
         this.selectedVariant = payload;
@@ -184,8 +163,8 @@ export class VariantAlignments extends LitElement {
 
   renderVariants() {
     return renderVariants({
-      variants: this.data.variants,
-      scale: this.scale
+      variants: this.data!.variants,
+      scale: this.scale as ScaleLinear<number, number>
     });
   }
 
@@ -193,27 +172,27 @@ export class VariantAlignments extends LitElement {
     const scale = this.targetSequenceScale;
 
     return renderAlignments({
-      alignments: this.data.alignments,
-      referenceScale: this.scale,
-      targetScale: scale
+      alignments: this.data!.alignments,
+      referenceScale: this.scale as ScaleLinear<number, number>,
+      targetScale: scale as ScaleLinear<number, number>
     });
   }
 
   renderTopRuler() {
-    const [ start, end ] = this.scale.domain();
+    const [ start, end ] = this.scale!.domain();
 
     return renderRuler({
       offsetTop: 0,
-      scale: this.scale
+      scale: this.scale as ScaleLinear<number, number>
     });
   }
 
   renderBottomRuler() {
-    const [ start, end ] = this.targetSequenceScale.domain();
+    const [ start, end ] = this.targetSequenceScale!.domain();
 
     return renderRuler({
       offsetTop: RULER_HEIGHT + ALIGNMENT_AREA_HEIGHT,
-      scale: this.targetSequenceScale
+      scale: this.targetSequenceScale as ScaleLinear<number, number>
     });
   }
 

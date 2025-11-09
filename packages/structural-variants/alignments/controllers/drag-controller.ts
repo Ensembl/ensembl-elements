@@ -58,8 +58,9 @@ class DragController implements ReactiveController {
     this.isDragging = true;
 
     const { clientX: x } = event;
+    const mouseDownX = this.mouseDownX as number;
 
-    const deltaX = (x - this.mouseDownX);
+    const deltaX = x - mouseDownX;
 
     const directionCoefficient = deltaX >= 0 ? 1 : -1;
 
@@ -90,10 +91,10 @@ class DragController implements ReactiveController {
       }
     }
 
-    const scale = this.#referenceSequenceScale;
-    const genomicStart = this.#alignmentReferenceStart;
-    const genomicEnd = this.#alignmentReferenceEnd;
-    const regionLength = this.#regionLength;
+    const scale = this.#referenceSequenceScale as ScaleLinear<number, number>;
+    const genomicStart = this.#alignmentReferenceStart as number;
+    const genomicEnd = this.#alignmentReferenceEnd as number;
+    const regionLength = this.#regionLength as number;
 
     let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
 
@@ -123,10 +124,10 @@ class DragController implements ReactiveController {
       }
     }
 
-    const scale = this.#targetSequenceScale;
-    const genomicStart = this.#alignmentTargetStart;
-    const genomicEnd = this.#alignmentTargetEnd;
-    const regionLength = this.#regionLength;
+    const scale = this.#targetSequenceScale as ScaleLinear<number, number>;
+    const genomicStart = this.#alignmentTargetStart as number;
+    const genomicEnd = this.#alignmentTargetEnd as number;
+    const regionLength = this.#regionLength as number;
 
     let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
 

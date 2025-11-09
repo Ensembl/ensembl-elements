@@ -10,6 +10,8 @@ import type { InputData as VariantAlignmentsData } from '../alignments/variant-a
 import type { Variant, VariantClickPayload } from '../alignments/types/variant';
 import type { ViewportChangePayload } from './control-buttons';
 
+import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
+
 // a location on chromosome 1 that has some features
 // const INITIAL_START = 1;
 // const INITIAL_END = 1_000_000;
@@ -56,7 +58,7 @@ export class StructuralVariantsPlayground extends LitElement {
   alignmentTargetEnd = 0;
 
   @state()
-  data: VariantAlignmentsData;
+  data!: VariantAlignmentsData;
 
   variantDataService: ReturnType<typeof createVariantDataService> | null = null;
   alignmentsDataService: AlignmentsLoader | null = null;
@@ -158,11 +160,11 @@ export class StructuralVariantsPlayground extends LitElement {
     }} = event;
 
     const numberFormatter = new Intl.NumberFormat('en-GB');
-    const messageContainer = this.shadowRoot.querySelector('.variant-message');
+    const messageContainer = this.shadowRoot!.querySelector('.variant-message');
     const start = numberFormatter.format(parseInt(variantStart));
     const end = numberFormatter.format(parseInt(variantEnd));
     const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
-    messageContainer.textContent = message;
+    messageContainer!.textContent = message;
   }
 
   render() {
@@ -203,8 +205,8 @@ export class StructuralVariantsPlayground extends LitElement {
       return;
     }
 
-    let genomicStart: number;
-    let genomicEnd: number;
+    let genomicStart: number = 0;
+    let genomicEnd: number = 0;
     const { alignments } = data;
 
     for (const alignment of alignments) {
@@ -222,7 +224,6 @@ export class StructuralVariantsPlayground extends LitElement {
 
     this.alignmentTargetStart = genomicStart;
     this.alignmentTargetEnd = genomicEnd;
-    // return { start: genomicStart, end: genomicEnd };
   };
 
 }
