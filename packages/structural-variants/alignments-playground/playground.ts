@@ -111,6 +111,10 @@ export class StructuralVariantsPlayground extends LitElement {
         .alignmentTargetEnd=${this.alignmentTargetEnd}
         .regionLength=${Infinity}
         .regionName=${"1"}
+        .endpoints=${{
+          alignments: '/api/alignments',
+          variants: '/api/variants'
+        }}
       ></ens-sv-alignments>
       <div class="variant-message"></div>
     `;

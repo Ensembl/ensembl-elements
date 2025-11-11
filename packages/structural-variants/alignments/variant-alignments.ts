@@ -8,6 +8,11 @@ import './variant-alignments-image';
 import type { Variant } from './types/variant';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
+type Endpoints = {
+  variants?: string;
+  alignments?: string;
+};
+
 /**
  * The purpose of this component is to fetch and provide data to ens-sv-alignments
  */
@@ -42,6 +47,9 @@ export class VariantAlignments extends LitElement {
 
   @property({ type: String })
   regionName = '';
+
+  @property({ type: Object })
+  endpoints: Endpoints | null = null;
 
   @state()
   data!: VariantAlignmentsData;
@@ -88,7 +96,9 @@ export class VariantAlignments extends LitElement {
 
   #fetchVariantsData = async () => {
     if (!this.variantDataService) {
-      this.variantDataService = createVariantDataService();
+      this.variantDataService = createVariantDataService({
+        endpoint: this.endpoints?.variants
+      });
     }
 
     return await this.variantDataService.get({
@@ -100,7 +110,9 @@ export class VariantAlignments extends LitElement {
 
   #fetchAlignmentsData = async () => {
     if (!this.alignmentsDataService) {
-      this.alignmentsDataService = new AlignmentsLoader();
+      this.alignmentsDataService = new AlignmentsLoader({
+        endpoint: this.endpoints?.alignments
+      });
     }
 
     return this.alignmentsDataService.get({
@@ -156,7 +168,12 @@ export class VariantAlignments extends LitElement {
 
 }
 
-const createVariantDataService = () => {
+
+const createVariantDataService = (params: {
+  endpoint?: string
+} = {}) => {
+  const { endpoint = '/api/variants' } = params;
+
   const dataService = new DataService<Variant, {
     regionName: string;
     start: number;
@@ -165,7 +182,7 @@ const createVariantDataService = () => {
     loader: async (params) => {
       const { regionName, start, end } = params;
       const viewportStr = `viewport=${regionName}:${start}-${end}`;
-      const url = `/api/variants?${viewportStr}`;
+      const url = `${endpoint}?${viewportStr}`;
       const data = await fetch(url).then(response => response.json());
       return data;
     },

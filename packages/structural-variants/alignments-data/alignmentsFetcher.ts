@@ -14,14 +14,18 @@ type LoaderParams = {
 
 export class AlignmentsLoader {
   binSize: number;
+  endpoint: string;
 
   #loadedLocations = new Set<string>();
   #ongoingRequests = new Map<string, Promise<Alignment[]>>;
 
   #state: Alignment[] = [];
 
-  constructor() {
+  constructor(params: {
+    endpoint?: string;
+  }) {
     this.binSize = DEFAULT_BIN_SIZE;
+    this.endpoint = params.endpoint ?? '/api/alignments';
   }
 
   async get(params: LoaderParams) {
@@ -76,9 +80,10 @@ export class AlignmentsLoader {
   }
 
   #loadData = async (params: LoaderParams) => {
+    const paramsWithEndpoint = { ...params, endpoint: this.endpoint };
     const requestPromises = Promise.all([
-      fetchAlignments(params),
-      fetchAlignmentsFromAltSequence(params)
+      fetchAlignments(paramsWithEndpoint),
+      fetchAlignmentsFromAltSequence(paramsWithEndpoint)
     ]);
     const [alignments1, alignments2] = await requestPromises;
 
@@ -183,18 +188,18 @@ export class AlignmentsLoader {
 
 
 
-const fetchAlignments = async (params: LoaderParams) => {
-  const { regionName, start, end } = params;
+const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {
+  const { endpoint, regionName, start, end } = params;
   const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `/api/alignments?${viewportStr}`;
+  const url = `${endpoint}?${viewportStr}`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };
 
-const fetchAlignmentsFromAltSequence = async (params: LoaderParams) => {
-  const { regionName, start, end } = params;
+const fetchAlignmentsFromAltSequence = async (params: LoaderParams & { endpoint: string }) => {
+  const { endpoint,  regionName, start, end } = params;
   const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `/api/alignments?${viewportStr}&mode=alternate`;
+  const url = `${endpoint}?${viewportStr}&mode=alternate`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };
