@@ -2,7 +2,7 @@ import { DEFAULT_BIN_SIZE } from './constants';
 
 import type { Alignment } from '../alignments';
 
-import { createBins, createBinKey, combineLoadingLocations } from './dataBinHelpers';
+import { createBins, createBinKey, combineLoadingLocations } from './data-bin-helpers';
 
 type LoaderParams = {
   regionName: string;
@@ -120,8 +120,6 @@ export class AlignmentsLoader {
     targetStart,
     targetEnd
   }: LoaderParams) => {
-    const startTime = performance.now();
-
     const storedAlignments = this.#state;
 
     const alignments: Alignment[] = [];
@@ -141,11 +139,7 @@ export class AlignmentsLoader {
       }
     }
 
-    const endTime = performance.now()
-    //console.log(`it took ${endTime - startTime} ms to pick ${alignments.length} out of ${this.#state.length} alignments`);
     return alignments;
-
-    // return features;
   }
 
   #saveData = async ({
@@ -181,11 +175,9 @@ export class AlignmentsLoader {
     }
 
     this.#state = newState;
-
   }
 
 }
-
 
 
 const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {

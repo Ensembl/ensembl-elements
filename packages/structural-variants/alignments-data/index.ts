@@ -1,2 +1,2 @@
-export { DataService } from './dataService';
-export { AlignmentsLoader } from './alignmentsFetcher';
+export { DataService } from './data-service';
+export { AlignmentsLoader } from './alignments-fetcher';

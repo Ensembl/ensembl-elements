@@ -24,10 +24,6 @@ app.use('/assets/*', serveStatic({ root: './client-static' }));
 
 app.use('/', serveStatic({ path: './client-static/index.html' }));
 
-// app.all('/', (c) => {
-//   return c.json({ success: true })
-// });
-
 
 // uses port 3000 by default
 serve(app);

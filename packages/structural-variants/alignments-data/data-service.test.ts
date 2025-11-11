@@ -1,7 +1,7 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert';
 
-import { DataService } from './dataService';
+import { DataService } from './data-service';
 
 type Feature = {
   id: string;

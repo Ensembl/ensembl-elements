@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 
 import { parseViewportString } from './helpers.ts';
 
-import type { Alignment } from '@ensembl/structural-variants';
+import type { Alignment } from '../../alignments/types/alignment.ts';
 
 const alignments = new Hono();
 
@@ -150,7 +150,5 @@ const generateAlignmentWithId = (alignment: Omit<Alignment, 'id'>) => {
   };
 }
 
-
-//  select * from alignments where reference_region_name = 'chr1' and reference_start > 585419;
 
 export default alignments;

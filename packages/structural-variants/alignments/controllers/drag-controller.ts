@@ -23,8 +23,6 @@ class DragController implements ReactiveController {
   #referenceSequenceScale: ScaleLinear<number, number> | null = null;
   #targetSequenceScale: ScaleLinear<number, number> | null = null;
 
-  // #start: number | null = null;
-  // #end: number | null = null;
   #regionLength: number| null = null;
   #draggingMode: DraggingMode | null = null;
 

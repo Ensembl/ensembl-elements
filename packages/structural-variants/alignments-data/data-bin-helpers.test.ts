@@ -1,7 +1,7 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert';
 
-import { combineLoadingLocations } from './dataBinHelpers';
+import { combineLoadingLocations } from './data-bin-helpers';
 
 describe('combineLoadingLocations', () => {
 

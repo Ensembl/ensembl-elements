@@ -1,30 +1,6 @@
 import { DEFAULT_BIN_SIZE } from './constants';
 
-import { createBins, createBinKey, combineLoadingLocations } from './dataBinHelpers';
-
-
-/**
- * Design ideas for data service
- * 
- * - Can fetch data for multiple genomes / multiple regions
- * - Should not fetch data that is already available
- * - Maybe createDataService to 
- * 
- * 
- * .get() 
- * - Returns a promise?
- * - Loading state?
- * - Error state?
- * 
- * 
- */
-
-
-/**
- * Problems to solve:
- * - Avoid unnecessary requests
- * - Reasonable time to access features (do not iterate over the whole array)
- */
+import { createBins, createBinKey, combineLoadingLocations } from './data-bin-helpers';
 
 
 type DataState<Feature> = {
