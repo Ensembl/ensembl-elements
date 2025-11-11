@@ -1,44 +1,25 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { scaleLinear, type ScaleLinear } from 'd3';
-import { yieldToMain } from '@ensembl/ensembl-elements-helpers';
 
-import { RULER_HEIGHT, ALIGNMENT_AREA_HEIGHT, IMAGE_HEIGHT } from './constants/constants';
+import { DataService, AlignmentsLoader } from '../alignments-data';
 
-import DragController from './controllers/drag-controller';
+import './variant-alignments-image';
 
-import { renderVariants } from './parts/variants';
-import { renderAlignments } from './parts/alignments';
-import { renderRuler } from './parts/ruler';
+import type { Variant } from './types/variant';
+import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
-import type { Variant, VariantClickPayload } from './types/variant';
-import type { Alignment } from './types/alignment';
-
-export type InputData = {
-  variants: Variant[];
-  alignments: Alignment[];
-};
+/**
+ * The purpose of this component is to fetch and provide data to ens-sv-alignments
+ */
 
 @customElement('ens-sv-alignments')
 export class VariantAlignments extends LitElement {
+
   static styles = css`
     :host {
       display: block;
     }
-
-    svg {
-      display: block;
-      user-select: none;
-    }
-
-    .variant {
-      cursor: pointer;
-    }
-
-    .variant:hover {
-      fill: pink;
-    }
-  `;
+  `
 
   // genomic start
   @property({ type: Number })
@@ -62,158 +43,144 @@ export class VariantAlignments extends LitElement {
   @property({ type: String })
   regionName = '';
 
-  @property({ type: Object })
-  data: InputData | null = null;
-
   @state()
-  imageWidth = 0;
+  data!: VariantAlignmentsData;
 
-  @state()
-  selectedVariant: VariantClickPayload | null = null;
-
-  scale: ScaleLinear<number, number> | null = null;
-  targetSequenceScale: ScaleLinear<number, number> | null = null;
-
-  constructor() {
-    super();
-    new DragController(this);
-  }
+  variantDataService: ReturnType<typeof createVariantDataService> | null = null;
+  alignmentsDataService: AlignmentsLoader | null = null;
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.setListeners();
-    this.observeHostSize();
-  }
-
-  setListeners() {
-    this.shadowRoot!.addEventListener('click', (event) => {
-      const element = event.target as HTMLElement;
-      const elementData = element.dataset;
-      const { featureType } = elementData;
-
-      if (featureType === 'variant') {
-        const variantType = elementData.variantType as string;
-        const variantName = elementData.name as string;
-        const variantStart = elementData.variantStart as string;
-        const variantEnd = elementData.variantEnd as string;
-
-        const payload: VariantClickPayload = {
-          variantType,
-          variantName,
-          variantStart,
-          variantEnd,
-          anchor: element
-        };
-
-        this.selectedVariant = payload;
-
-        const customEvent = new CustomEvent<VariantClickPayload>('variant-clicked', {
-          detail: payload
-        });
-        this.dispatchEvent(customEvent);
-      }
-    });
+    this.#fetchData();
   }
 
   willUpdate(changedProperties: PropertyValues) {
-    this.#updateReferenceScale();
-    this.#updateTargetSequenceScale();
-
-    if (changedProperties.has('data') && this.selectedVariant) {
-      this.selectedVariant = null;
+    if (
+      changedProperties.has('start') ||
+      changedProperties.has('end') || 
+      changedProperties.has('alignmentTargetStart') ||
+      changedProperties.has('alignmentTargetEnd')
+    ) {
+      this.#onLocationUpdated();
     }
   }
 
-  async scheduleUpdate(): Promise<void> {
-    await yieldToMain();
-    super.scheduleUpdate();
+  #onLocationUpdated = () => {
+    this.#fetchData();
   }
 
-  observeHostSize = () => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      const [hostElementEntry] = entries;
-      const { width: hostWidth } = hostElementEntry.contentRect;
-      this.imageWidth = hostWidth;
+  #fetchData = async () => {
+    const alignmentsData = await this.#fetchAlignmentsData();
+    const variantsData = await this.#fetchVariantsData();
+
+    this.data = {
+      alignments: alignmentsData,
+      variants: variantsData
+    };
+
+    if (
+      !this.alignmentTargetStart &&
+      !this.alignmentTargetEnd
+    ) {
+      this.#getInitialTargetSequenceCoords();
+    }
+  }
+
+  #fetchVariantsData = async () => {
+    if (!this.variantDataService) {
+      this.variantDataService = createVariantDataService();
+    }
+
+    return await this.variantDataService.get({
+      regionName: this.regionName,
+      start: this.start,
+      end: this.end,
     });
-
-    resizeObserver.observe(this);
   }
 
-  render() {
-    if (!this.imageWidth || !this.scale || !this.data) {
+  #fetchAlignmentsData = async () => {
+    if (!this.alignmentsDataService) {
+      this.alignmentsDataService = new AlignmentsLoader();
+    }
+
+    return this.alignmentsDataService.get({
+      regionName: this.regionName,
+      start: this.start,
+      end: this.end,
+      targetStart: this.alignmentTargetStart,
+      targetEnd: this.alignmentTargetEnd
+    });
+  }
+
+  #getInitialTargetSequenceCoords() {
+    const data = this.data;
+
+    if (!data) {
       return;
     }
 
+    let genomicStart: number = 0;
+    let genomicEnd: number = 0;
+    const { alignments } = data;
+
+    for (const alignment of alignments) {
+      const targetStart = alignment.target.start;
+      const targetEnd = alignment.target.start + alignment.target.length - 1;
+
+      if (!genomicStart || targetStart < genomicStart) {
+        genomicStart = targetStart;
+      }
+
+      if (!genomicEnd || targetEnd > genomicEnd) {
+        genomicEnd = targetEnd;
+      }
+    }
+
+    this.alignmentTargetStart = genomicStart;
+    this.alignmentTargetEnd = genomicEnd;
+  };
+
+  render() {
     return html`
-      <svg
-        viewBox="0 0 ${this.imageWidth} ${IMAGE_HEIGHT}"
-        style="width: 100%; height: ${IMAGE_HEIGHT}px;"
-      >
-        <g>
-          ${this.renderTopRuler()}
-          ${this.renderAlignments()}
-          ${this.renderVariants()}
-          ${this.renderBottomRuler()}
-        </g>
-      </svg>
-      <slot name="tooltip">
-      </slot>
+      <ens-sv-alignments-image
+        .start=${this.start}
+        .end=${this.end}
+        .alignmentTargetStart=${this.alignmentTargetStart}
+        .alignmentTargetEnd=${this.alignmentTargetEnd}
+        .regionLength=${Infinity}
+        .regionName=${this.regionName}
+        .data=${this.data}
+      ></ens-sv-alignments-image>
     `;
   }
 
-  renderVariants() {
-    return renderVariants({
-      variants: this.data!.variants,
-      scale: this.scale as ScaleLinear<number, number>
-    });
+}
+
+const createVariantDataService = () => {
+  const dataService = new DataService<Variant, {
+    regionName: string;
+    start: number;
+    end: number;
+  }>({
+    loader: async (params) => {
+      const { regionName, start, end } = params;
+      const viewportStr = `viewport=${regionName}:${start}-${end}`;
+      const url = `/api/variants?${viewportStr}`;
+      const data = await fetch(url).then(response => response.json());
+      return data;
+    },
+    featureStartFieldPath: 'location.start',
+    featureEndFieldPath: 'location.end',
+    getFeatureId: (variant: Variant) => {
+      return variant.name;
+    }
+  });
+
+  return dataService;
+};
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'ens-sv-alignments': VariantAlignments;
   }
-
-  renderAlignments() {
-    const scale = this.targetSequenceScale;
-
-    return renderAlignments({
-      alignments: this.data!.alignments,
-      referenceScale: this.scale as ScaleLinear<number, number>,
-      targetScale: scale as ScaleLinear<number, number>
-    });
-  }
-
-  renderTopRuler() {
-    const [ start, end ] = this.scale!.domain();
-
-    return renderRuler({
-      offsetTop: 0,
-      scale: this.scale as ScaleLinear<number, number>
-    });
-  }
-
-  renderBottomRuler() {
-    const [ start, end ] = this.targetSequenceScale!.domain();
-
-    return renderRuler({
-      offsetTop: RULER_HEIGHT + ALIGNMENT_AREA_HEIGHT,
-      scale: this.targetSequenceScale as ScaleLinear<number, number>
-    });
-  }
-
-  #updateReferenceScale() {
-    this.scale = scaleLinear().domain([
-      this.start,
-      this.end
-    ]).rangeRound([
-      0,
-      this.imageWidth
-    ]);
-  }
-
-  #updateTargetSequenceScale() {
-    this.targetSequenceScale = scaleLinear().domain([
-      this.alignmentTargetStart,
-      this.alignmentTargetEnd
-    ]).rangeRound([
-      0,
-      this.imageWidth
-    ]);
-  }
-
 }

@@ -3,12 +3,12 @@ import { RULER_HEIGHT } from '../constants/constants';
 import type { ReactiveController } from 'lit';
 import type { ScaleLinear } from 'd3';
 
-import type { VariantAlignments } from '../variant-alignments';
+import type { VariantAlignmentsImage } from '../variant-alignments-image';
 
 type DraggingMode = 'reference' | 'target' | 'both';
 
 class DragController implements ReactiveController {
-  private host: VariantAlignments;
+  private host: VariantAlignmentsImage;
 
   isMouseDown = false;
   isDragging = false;
@@ -28,7 +28,7 @@ class DragController implements ReactiveController {
   #regionLength: number| null = null;
   #draggingMode: DraggingMode | null = null;
 
-  constructor(host: VariantAlignments) {
+  constructor(host: VariantAlignmentsImage) {
     this.host = host;
     host.addController(this);
   }
@@ -71,6 +71,7 @@ class DragController implements ReactiveController {
 
     const positionUpdatedEvent = new CustomEvent('location-updated', {
       bubbles: true,
+      composed: true,
       detail: eventData
     });
     this.host.dispatchEvent(positionUpdatedEvent);

@@ -1,13 +1,10 @@
-import { html, css, LitElement, type PropertyValues } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { DataService, AlignmentsLoader } from '../alignments-data';
 
 import '../alignments/variant-alignments';
 import './control-buttons';
 
-import type { InputData as VariantAlignmentsData } from '../alignments/variant-alignments';
-import type { Variant, VariantClickPayload } from '../alignments/types/variant';
+import type { VariantClickPayload } from '../alignments/types/variant';
 import type { ViewportChangePayload } from './control-buttons';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
@@ -57,76 +54,6 @@ export class StructuralVariantsPlayground extends LitElement {
   @state()
   alignmentTargetEnd = 0;
 
-  @state()
-  data!: VariantAlignmentsData;
-
-  variantDataService: ReturnType<typeof createVariantDataService> | null = null;
-  alignmentsDataService: AlignmentsLoader | null = null;
-
-  connectedCallback(): void {
-    this.fetchData();
-    super.connectedCallback();
-  }
-
-  willUpdate(changedProperties: PropertyValues) {
-    if (
-      changedProperties.has('data') &&
-      !this.alignmentTargetStart &&
-      !this.alignmentTargetEnd
-    ) {
-      this.#getInitialTargetSequenceCoords();
-    }
-  }
-
-  fetchData = async () => {
-    const alignmentsData = await this.fetchAlignmentsData();
-    const variantsData = await this.fetchVariantsData();
-
-
-    this.data = {
-      alignments: alignmentsData,
-      variants: variantsData
-    };
-  }
-
-  fetchVariantsData = async () => {
-    if (!this.variantDataService) {
-      this.variantDataService = createVariantDataService();
-    }
-
-    return await this.variantDataService.get({
-      regionName: '1',
-      start: this.start,
-      end: this.end,
-    });
-  }
-
-  fetchAlignmentsData = async () => {
-    if (!this.alignmentsDataService) {
-      this.alignmentsDataService = new AlignmentsLoader();
-    }
-
-    return this.alignmentsDataService.get({
-      regionName: this.regionName,
-      start: this.start,
-      end: this.end,
-      targetStart: this.alignmentTargetStart,
-      targetEnd: this.alignmentTargetEnd
-    });
-  }
-
-  // onRegionChange = (event: CustomEvent<RegionChangePayload>) => {
-  //   this.regionName = event.detail.regionName;
-  //   this.variantDataService = null;
-  //   this.alignmentsDataService = null;
-  //   this.start = INITIAL_START;
-  //   this.end = INITIAL_END;
-  //   this.alignmentTargetStart = 0;
-  //   this.alignmentTargetEnd = 0;
-
-  //   this.fetchData();
-  // }
-
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     const payload = event.detail;
 
@@ -134,8 +61,6 @@ export class StructuralVariantsPlayground extends LitElement {
     this.end = payload.reference.end;
     this.alignmentTargetStart = payload.target.start;
     this.alignmentTargetEnd = payload.target.end;
-
-    this.fetchData();
   }
 
   onLocationUpdated = (event: CustomEvent) => {
@@ -147,8 +72,6 @@ export class StructuralVariantsPlayground extends LitElement {
     this.end = refEnd;
     this.alignmentTargetStart = targetStart;
     this.alignmentTargetEnd = targetEnd;
-
-    this.fetchData();
   }
 
   onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
@@ -168,10 +91,6 @@ export class StructuralVariantsPlayground extends LitElement {
   }
 
   render() {
-    if (!this.data) {
-      return null;
-    }
-
     return html`
       <div class="controls-wrapper">
         <control-buttons
@@ -192,64 +111,10 @@ export class StructuralVariantsPlayground extends LitElement {
         .alignmentTargetEnd=${this.alignmentTargetEnd}
         .regionLength=${Infinity}
         .regionName=${"1"}
-        .data=${this.data}
       ></ens-sv-alignments>
       <div class="variant-message"></div>
     `;
   }
 
-  #getInitialTargetSequenceCoords() {
-    const data = this.data;
-
-    if (!data) {
-      return;
-    }
-
-    let genomicStart: number = 0;
-    let genomicEnd: number = 0;
-    const { alignments } = data;
-
-    for (const alignment of alignments) {
-      const targetStart = alignment.target.start;
-      const targetEnd = alignment.target.start + alignment.target.length - 1;
-
-      if (!genomicStart || targetStart < genomicStart) {
-        genomicStart = targetStart;
-      }
-
-      if (!genomicEnd || targetEnd > genomicEnd) {
-        genomicEnd = targetEnd;
-      }
-    }
-
-    this.alignmentTargetStart = genomicStart;
-    this.alignmentTargetEnd = genomicEnd;
-  };
 
 }
-
-
-
-
-const createVariantDataService = () => {
-  const dataService = new DataService<Variant, {
-    regionName: string;
-    start: number;
-    end: number;
-  }>({
-    loader: async (params) => {
-      const { regionName, start, end } = params;
-      const viewportStr = `viewport=${regionName}:${start}-${end}`;
-      const url = `/api/variants?${viewportStr}`;
-      const data = await fetch(url).then(response => response.json());
-      return data;
-    },
-    featureStartFieldPath: 'location.start',
-    featureEndFieldPath: 'location.end',
-    getFeatureId: (variant: Variant) => {
-      return variant.name;
-    }
-  });
-
-  return dataService;
-};

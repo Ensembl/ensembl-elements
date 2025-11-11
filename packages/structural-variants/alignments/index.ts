@@ -1,4 +1,4 @@
-import './variant-alignments';
+import './variant-alignments-image';
 
 export type {
   Variant,
@@ -9,4 +9,4 @@ export type {
 } from './types/alignment';
 export type {
   InputData as VariantAlignmentsData
-} from './variant-alignments';
+} from './variant-alignments-image';
