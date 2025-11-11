@@ -1,6 +1,6 @@
 import { DEFAULT_BIN_SIZE } from './constants';
 
-import type { Alignment } from '@ensembl/structural-variants';
+import type { Alignment } from '../alignments';
 
 import { createBins, createBinKey, combineLoadingLocations } from './dataBinHelpers';
 

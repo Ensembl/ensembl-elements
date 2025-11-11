@@ -75,7 +75,7 @@ const getReducedAlignments = ({
       continue;
     }
 
-    const lastAlignment = reducedAlignments.at(-1);
+    const lastAlignment = reducedAlignments.at(-1) as Alignment;
     
     if (
       !isInversion(lastAlignment) && isInversion(alignment) ||

@@ -275,7 +275,7 @@ export class DataService<
   #getFeatureStart = (feature: Feature) => {
     const pathToStart = this.featureStartFieldPath.split('.');
 
-    const featureStart = pathToStart.reduce((acc, key) => acc?.[key] ?? null, feature);
+    const featureStart: unknown = pathToStart.reduce((acc: any, key) => acc?.[key] ?? null, feature);
 
     if (typeof featureStart !== 'number') {
       throw new Error('Incorrect path to feature start');
@@ -287,7 +287,7 @@ export class DataService<
   #getFeatureEnd = (feature: Feature) => {
     const pathToEnd = this.featureEndFieldPath.split('.');
 
-    const featureEnd = pathToEnd.reduce((acc, key) => acc?.[key] ?? null, feature);
+    const featureEnd: unknown = pathToEnd.reduce((acc: any, key) => acc?.[key] ?? null, feature);
 
     if (typeof featureEnd !== 'number') {
       throw new Error('Incorrect path to feature end');

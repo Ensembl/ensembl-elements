@@ -40,7 +40,7 @@ const renderVariant = ({
   const x = scale(genomicStart);
   const y = RULER_HEIGHT;
   let width = scale(genomicEnd + 1) - scale(genomicStart);
-  let color = COLORS[variant.type] || '#000000';
+  let color = COLORS[variant.type as keyof typeof COLORS] || '#000000';
 
   if (!width) {
     if (viewportGenomicDistance > 100_000) {

@@ -1,4 +1,4 @@
-import './variant-alignments-image';
+import './variant-alignments';
 
 export type {
   Variant,
