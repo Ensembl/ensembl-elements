@@ -417,7 +417,7 @@ const renderGeneExtent = ({
       stroke-width="1"
     />
   `;
-}
+};
 
 const renderInteractiveArea = ({
   gene,
@@ -449,7 +449,7 @@ const renderInteractiveArea = ({
       fill="transparent"
     />
   `;
-}
+};
 
 const prepareGeneInfo = ({
   gene,
@@ -470,4 +470,4 @@ const prepareGeneInfo = ({
     end: geneData.end,
     strand: geneData.strand
   }
-}
+};

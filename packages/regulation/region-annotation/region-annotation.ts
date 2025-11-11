@@ -226,6 +226,7 @@ export class RegionOverview extends LitElement {
       tracks: regulatoryFeatureTracks,
       featureTypes: this.data.regulatory_feature_types,
       scale: this.scale,
+      regionName: this.regionName,
       offsetTop
     });
   }

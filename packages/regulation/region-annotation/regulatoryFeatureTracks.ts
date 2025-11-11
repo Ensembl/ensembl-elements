@@ -4,22 +4,26 @@ import type { ScaleLinear } from 'd3';
 import {
   REGULATORY_FEATURE_TRACK_HEIGHT,
   REGULATORY_FEATURE_CORE_HEIGHT,
-  REGULATORY_FEATURE_EXTENT_HEIGHT
+  REGULATORY_FEATURE_EXTENT_HEIGHT,
+  MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 
 import type { RegulatoryFeature } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
+import type { RegulatoryFeatureClickPayload } from '../types/featureClickEvent';
 
 
 export const renderRegulatoryFeatureTracks = ({
   tracks,
   featureTypes,
   scale,
+  regionName,
   offsetTop
 }: {
   tracks: RegulatoryFeature[][];
   featureTypes: InputData['regulatory_feature_types'];
   scale: ScaleLinear<number, number>;
+  regionName: string;
   offsetTop: number;
 }) => {
   return svg`
@@ -28,6 +32,7 @@ export const renderRegulatoryFeatureTracks = ({
         track,
         featureTypes,
         scale,
+        regionName,
         offsetTop: offsetTop + index * REGULATORY_FEATURE_TRACK_HEIGHT
       }))}
     </g>
@@ -38,13 +43,20 @@ const renderTrack = ({
   track,
   featureTypes,
   scale,
+  regionName,
   offsetTop
 }: {
   track: RegulatoryFeature[];
   featureTypes: InputData['regulatory_feature_types'];
   scale: ScaleLinear<number, number>;
+  regionName: string;
   offsetTop: number;
 }) => {
+  const [viewportGenomicStart, viewportGenomicEnd] = scale.domain();
+  const viewportGenomicDistance = viewportGenomicEnd - viewportGenomicStart + 1;
+
+  const shouldRenderLowRes = viewportGenomicDistance > MAX_SLICE_LENGTH_FOR_DETAILED_VIEW;
+
   const featureElements = track.map((feature, index) => {
     const prevFeature = index > 0 ? track[index - 1] : null;
 
@@ -74,7 +86,9 @@ const renderTrack = ({
       feature,
       featureTypes,
       offsetTop,
-      scale
+      regionName,
+      scale,
+      isLowRes: shouldRenderLowRes
     });
   });
 
@@ -89,6 +103,47 @@ const renderRegulatoryFeature = (params: {
   feature: RegulatoryFeature;
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
+  regionName: string;
+  scale: ScaleLinear<number, number>;
+  isLowRes: boolean;
+}) => {
+  if (params.isLowRes) {
+    return renderFeatureLowRes(params);
+  } else {
+    return renderFeatureHiRes(params);
+  }
+};
+
+const renderFeatureLowRes = (params: {
+  feature: RegulatoryFeature;
+  featureTypes: InputData['regulatory_feature_types'];
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+}) => {
+  const { feature, featureTypes, offsetTop, scale } = params;
+  const genomicStart = feature.extended_start ?? feature.start;
+  const genomicEnd = feature.extended_end ?? feature.end;
+  const x1 = scale(genomicStart);
+  const x2 = scale(genomicEnd);
+  const width = Math.max(x2 - x1, 2);
+  const color = featureTypes[feature.feature_type].color;
+
+  return svg`
+    <rect
+      x=${x1}
+      width=${width}
+      y=${offsetTop}
+      height=${REGULATORY_FEATURE_CORE_HEIGHT}
+      fill=${color}
+    />
+  `;
+};
+
+const renderFeatureHiRes = (params: {
+  feature: RegulatoryFeature;
+  featureTypes: InputData['regulatory_feature_types'];
+  offsetTop: number;
+  regionName: string;
   scale: ScaleLinear<number, number>;
 }) => {
   return svg`
@@ -96,6 +151,7 @@ const renderRegulatoryFeature = (params: {
       ${renderBoundsRegion({...params, side: 'left'})}
       ${renderCoreRegion(params)}
       ${renderBoundsRegion({...params, side: 'right'})}
+      ${renderInteractiveArea({ ...params })}
     </g>
   `;
 };
@@ -173,4 +229,51 @@ const renderBoundsRegion = ({
       fill=${color}
     />
   `;
+};
+
+const renderInteractiveArea = (params: {
+  feature: RegulatoryFeature;
+  regionName: string;
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+}) => {
+  const { feature, regionName, offsetTop, scale } = params;
+  const genomicStart = feature.extended_start ?? feature.start;
+  const genomicEnd = feature.extended_end ?? feature.end;
+  const x1 = scale(genomicStart);
+  const x2 = scale(genomicEnd);
+  const width = Math.max(x2 - x1, 2);
+
+  return svg`
+    <rect
+      data-feature-type="regulatory-feature"
+      data-feature=${JSON.stringify(prepareFeatureInfo({feature, regionName }))}
+      class="interactive-area"
+      x=${x1}
+      width=${width}
+      y=${offsetTop}
+      height=${REGULATORY_FEATURE_CORE_HEIGHT}
+      fill="transparent"
+    />
+  `;
+};
+
+
+const prepareFeatureInfo = ({
+  feature,
+  regionName
+}: {
+  feature: RegulatoryFeature;
+  regionName: string;
+}): RegulatoryFeatureClickPayload['data'] => {
+  return {
+    id: feature.id,
+    feature_type: feature.feature_type,
+    start: feature.start,
+    end: feature.end,
+    extended_start: feature.extended_start,
+    extended_end: feature.extended_end,
+    strand: feature.strand,
+    regionName
+  }
 };

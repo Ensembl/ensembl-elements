@@ -1,4 +1,4 @@
-import type { GeneInRegionOverview } from './regionOverview';
+import type { GeneInRegionOverview, RegulatoryFeature } from './regionOverview';
 
 export type GeneClickPayload = {
   x: number;
@@ -16,5 +16,15 @@ export type GeneClickPayload = {
   };
 };
 
+export type RegulatoryFeatureClickPayload = {
+  x: number;
+  y: number;
+  featureType: 'regulatory-feature';
+  data: Omit<RegulatoryFeature, 'associated_genes'> & {
+    regionName: string;
+  };
+};
+
 export type FeatureClickPayload =
-  | GeneClickPayload;
+  | GeneClickPayload
+  | RegulatoryFeatureClickPayload;
