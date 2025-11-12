@@ -194,7 +194,8 @@ export class RegionOverview extends LitElement {
       imageHeight,
       geneTracksTopOffset,
       bottomRulerTopOffset,
-      regulatoryFeatureTracksTopOffset
+      regulatoryFeatureTracksTopOffset,
+      strandDividerTopOffset
     } = calculatedHeightsAndOffsets;
     this.#onTrackPositionsCalculated(calculatedHeightsAndOffsets); // as a side effect, report calculated track positions
 
@@ -211,7 +212,8 @@ export class RegionOverview extends LitElement {
             offsetTop: 0
           })}
           ${this.renderGeneTracks({
-            offsetTop: geneTracksTopOffset
+            offsetTop: geneTracksTopOffset,
+            strandDividerTopOffset
           })}
           ${this.renderRegulatoryFeatureTracks({
             offsetTop: regulatoryFeatureTracksTopOffset
@@ -228,9 +230,11 @@ export class RegionOverview extends LitElement {
   }
 
   renderGeneTracks({
-    offsetTop
+    offsetTop,
+    strandDividerTopOffset
   }: {
     offsetTop: number;
+    strandDividerTopOffset: number;
   }) {
     if (!this.featureTracks || !this.scale) {
       return;
@@ -244,6 +248,7 @@ export class RegionOverview extends LitElement {
       start: this.start,
       regionName: this.regionName,
       end: this.end,
+      strandDividerTopOffset,
       width: this.imageWidth
     })
   }

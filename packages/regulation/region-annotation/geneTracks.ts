@@ -5,7 +5,8 @@ import {
   GENE_TRACK_HEIGHT,
   GENE_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW,
-  COLOR_BLUE
+  COLOR_BLUE,
+  GENE_STRAND_DIVIDER_COLOR
 } from './constants';
 
 import { renderTranscriptionStartSites } from './transcriptionStartSites';
@@ -25,7 +26,9 @@ export const renderGeneTracks = ({
   regionName,
   start,
   end,
-  offsetTop
+  offsetTop,
+  strandDividerTopOffset,
+  width
 }: {
   tracks: FeatureTracks['geneTracks'];
   scale: ScaleLinear<number, number>;
@@ -34,6 +37,7 @@ export const renderGeneTracks = ({
   start: number;
   end: number;
   offsetTop: number;
+  strandDividerTopOffset: number;
 }) => {
   const { forwardStrandTracks, reverseStrandTracks } = tracks;
   let tempY = offsetTop;
@@ -84,6 +88,14 @@ export const renderGeneTracks = ({
     <g>
       ${forwardStrandTrackElements}
     </g>
+    <line
+      x1="0"
+      x2=${width}
+      y1=${strandDividerTopOffset}
+      y2=${strandDividerTopOffset}
+      stroke-dasharray="2"
+      stroke=${GENE_STRAND_DIVIDER_COLOR}
+    />
     <g>
       ${reverseStrandTrackElements}
     </g>

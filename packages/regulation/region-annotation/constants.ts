@@ -14,3 +14,4 @@ export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 1_000_000;
 export const RULER_HEIGHT = 15;
 
 export const COLOR_BLUE = '#0099ff'; // Ensembl brand blue colour
+export const GENE_STRAND_DIVIDER_COLOR = '#ccd3d8';
