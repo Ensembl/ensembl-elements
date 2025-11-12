@@ -51,6 +51,10 @@ export class RegulationPlayground extends LitElement {
     this.end = end;
   }
 
+  onTrackPositionsChange = (event: CustomEvent) => {
+    console.log('track positions:', event.detail);
+  }
+
   render() {
     const data = pickData({
       data: chromosome1Data as OverviewRegion,
@@ -67,6 +71,7 @@ export class RegulationPlayground extends LitElement {
         <ens-reg-region-overview-popup-injector>
           <ens-reg-region-overview
             @viewport-change=${this.onViewportChange}
+            @ens-reg-track-positions=${this.onTrackPositionsChange}
             .start=${this.start}
             .end=${this.end}
             .regionName=${"1"}

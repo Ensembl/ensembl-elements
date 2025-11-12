@@ -23,6 +23,13 @@ export type RegionOverviewData = {
   regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
 };
 
+type CalculatedTrackPositions = {
+  genesForwardStrand: number[];
+  genesReverseStrand: number[];
+  genesStrandDivider: number;
+  regulatoryFeatures: number[];
+};
+
 @customElement('ens-reg-region-overview')
 export class RegionOverview extends LitElement {
   static styles = css`
@@ -66,6 +73,8 @@ export class RegionOverview extends LitElement {
 
   scale: ScaleLinear<number, number> | null = null;
   areaSelection: AreaSelectionController;
+
+  #calculatedTrackPositions: CalculatedTrackPositions | null = null;
 
   constructor() {
     super();
@@ -150,17 +159,44 @@ export class RegionOverview extends LitElement {
     }
   }
 
+  #onTrackPositionsCalculated(positions: ReturnType<typeof getImageHeightAndTopOffsets>) {
+    const newPositions = {
+      genesForwardStrand: positions.forwardStrandGeneTrackOffsets,
+      genesReverseStrand: positions.reverseStrandGeneTrackOffsets,
+      genesStrandDivider: positions.strandDividerTopOffset,
+      regulatoryFeatures: positions.regulatoryFeatureTrackOffsets
+    }
+    if (!this.#calculatedTrackPositions) {
+      this.#calculatedTrackPositions = newPositions;
+      this.#reportCalculatedTrackPositions();
+    } else if (JSON.stringify(newPositions) !== JSON.stringify(this.#calculatedTrackPositions)) {
+      this.#calculatedTrackPositions = newPositions;
+      this.#reportCalculatedTrackPositions();
+    }
+  }
+
+  #reportCalculatedTrackPositions() {
+    const event = new CustomEvent('ens-reg-track-positions', {
+      detail: this.#calculatedTrackPositions as CalculatedTrackPositions,
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+
   render() {
     if (!this.imageWidth || !this.scale || !this.featureTracks) {
       return;
     }
 
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
     const {
       imageHeight,
       geneTracksTopOffset,
       bottomRulerTopOffset,
       regulatoryFeatureTracksTopOffset
-    } = getImageHeightAndTopOffsets(this.featureTracks);
+    } = calculatedHeightsAndOffsets;
+    this.#onTrackPositionsCalculated(calculatedHeightsAndOffsets); // as a side effect, report calculated track positions
 
     return html`
       <svg
