@@ -8,8 +8,11 @@ import { getImageHeightAndTopOffsets } from './getImageHeight';
 import { renderGeneTracks } from './geneTracks';
 import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
+import { areaSelection } from './selection/area-selection-directive';
+import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
 
 import ViewportController from './viewportController';
+import AreaSelectionController from './selection/area-selection-controller';
 
 import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
@@ -18,6 +21,13 @@ export type RegionOverviewData = {
   genes: GeneInRegionOverview[];
   regulatory_features: RegulatoryFeature[];
   regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
+};
+
+type CalculatedTrackPositions = {
+  genesForwardStrand: number[];
+  genesReverseStrand: number[];
+  genesStrandDivider: number;
+  regulatoryFeatures: number[];
 };
 
 @customElement('ens-reg-region-overview')
@@ -62,10 +72,14 @@ export class RegionOverview extends LitElement {
   imageWidth = 0;
 
   scale: ScaleLinear<number, number> | null = null;
+  areaSelection: AreaSelectionController;
+
+  #calculatedTrackPositions: CalculatedTrackPositions | null = null;
 
   constructor() {
     super();
     new ViewportController(this);
+    this.areaSelection = new AreaSelectionController(this);
   }
 
   connectedCallback(): void {
@@ -145,17 +159,45 @@ export class RegionOverview extends LitElement {
     }
   }
 
+  #onTrackPositionsCalculated(positions: ReturnType<typeof getImageHeightAndTopOffsets>) {
+    const newPositions = {
+      genesForwardStrand: positions.forwardStrandGeneTrackOffsets,
+      genesReverseStrand: positions.reverseStrandGeneTrackOffsets,
+      genesStrandDivider: positions.strandDividerTopOffset,
+      regulatoryFeatures: positions.regulatoryFeatureTrackOffsets
+    }
+    if (!this.#calculatedTrackPositions) {
+      this.#calculatedTrackPositions = newPositions;
+      this.#reportCalculatedTrackPositions();
+    } else if (JSON.stringify(newPositions) !== JSON.stringify(this.#calculatedTrackPositions)) {
+      this.#calculatedTrackPositions = newPositions;
+      this.#reportCalculatedTrackPositions();
+    }
+  }
+
+  #reportCalculatedTrackPositions() {
+    const event = new CustomEvent('ens-reg-track-positions', {
+      detail: this.#calculatedTrackPositions as CalculatedTrackPositions,
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+
   render() {
     if (!this.imageWidth || !this.scale || !this.featureTracks) {
       return;
     }
 
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
     const {
       imageHeight,
       geneTracksTopOffset,
       bottomRulerTopOffset,
-      regulatoryFeatureTracksTopOffset
-    } = getImageHeightAndTopOffsets(this.featureTracks);
+      regulatoryFeatureTracksTopOffset,
+      strandDividerTopOffset
+    } = calculatedHeightsAndOffsets;
+    this.#onTrackPositionsCalculated(calculatedHeightsAndOffsets); // as a side effect, report calculated track positions
 
     return html`
       <svg
@@ -163,13 +205,15 @@ export class RegionOverview extends LitElement {
         style="width: 100%; height: ${imageHeight}px;"
         @click=${this.handleClick}
       >
-        <g>
+        ${unselectedBackgroundFilter()}
+        <g filter="url(#unselected-background)">
           ${renderRuler({
             scale: this.scale,
             offsetTop: 0
           })}
           ${this.renderGeneTracks({
-            offsetTop: geneTracksTopOffset
+            offsetTop: geneTracksTopOffset,
+            strandDividerTopOffset
           })}
           ${this.renderRegulatoryFeatureTracks({
             offsetTop: regulatoryFeatureTracksTopOffset
@@ -178,6 +222,7 @@ export class RegionOverview extends LitElement {
             scale: this.scale,
             offsetTop: bottomRulerTopOffset
           })}
+          ${areaSelection()}
         </g>
       </svg>
       <slot name="tooltip"></slot>
@@ -185,9 +230,11 @@ export class RegionOverview extends LitElement {
   }
 
   renderGeneTracks({
-    offsetTop
+    offsetTop,
+    strandDividerTopOffset
   }: {
     offsetTop: number;
+    strandDividerTopOffset: number;
   }) {
     if (!this.featureTracks || !this.scale) {
       return;
@@ -201,6 +248,7 @@ export class RegionOverview extends LitElement {
       start: this.start,
       regionName: this.regionName,
       end: this.end,
+      strandDividerTopOffset,
       width: this.imageWidth
     })
   }
@@ -219,6 +267,7 @@ export class RegionOverview extends LitElement {
       tracks: regulatoryFeatureTracks,
       featureTypes: this.data.regulatory_feature_types,
       scale: this.scale,
+      regionName: this.regionName,
       offsetTop
     });
   }

@@ -45,7 +45,7 @@ export class RegionOverviewPopupInjector extends LitElement {
 
     const slot = element.shadowRoot!.querySelector('slot[name="tooltip"]') as HTMLElement;
     const x = render(tooltip, slot);
-    console.log('x', x.parentNode.getRootNode());
+    console.log('clicked feature', payload);
   }
 
   #handleOutsideClick = (event: Event) => {

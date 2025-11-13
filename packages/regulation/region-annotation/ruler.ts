@@ -21,9 +21,21 @@ export const renderRuler = ({
     numberFormatter
   }));
 
+  const width = scale.range()[1];
+
   return svg`
-    <g style="font-weight: 300; font-family: 'IBM Plex Mono', 'Liberation Mono', Courier, monospace">
+    <g
+      style="font-weight: 300; font-family: 'IBM Plex Mono', 'Liberation Mono', Courier, monospace"
+    >
       ${tickElements}
+      <rect
+        width=${width}
+        height=${RULER_HEIGHT}
+        y=${offsetTop}
+        fill="transparent"
+        data-type="ruler"
+        data-selector-trigger="true"
+      />
     </g>
   `;
 }
