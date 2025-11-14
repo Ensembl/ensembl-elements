@@ -1,0 +1,1 @@
+export const DEFAULT_BIN_SIZE = 1_000_000;

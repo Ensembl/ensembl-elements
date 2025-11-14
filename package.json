@@ -22,6 +22,7 @@
     "packages/regulation",
     "packages/components-playground",
     "packages/helpers",
-    "packages/common"
+    "packages/common",
+    "packages/structural-variants"
   ]
 }

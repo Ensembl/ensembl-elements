@@ -1,0 +1,228 @@
+import { html, css, LitElement, type PropertyValues } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { scaleLinear, type ScaleLinear } from 'd3';
+import { yieldToMain } from '@ensembl/ensembl-elements-helpers';
+
+import { RULER_HEIGHT, ALIGNMENT_AREA_HEIGHT, IMAGE_HEIGHT } from './constants/constants';
+
+import DragController from './controllers/drag-controller';
+
+import { renderVariants } from './parts/variants';
+import { renderAlignments } from './parts/alignments';
+import { renderRuler } from './parts/ruler';
+
+import type { Variant, VariantClickPayload } from './types/variant';
+import type { Alignment } from './types/alignment';
+
+export type InputData = {
+  variants: Variant[];
+  alignments: Alignment[];
+};
+
+@customElement('ens-sv-alignments-image')
+export class VariantAlignmentsImage extends LitElement {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    svg {
+      display: block;
+      user-select: none;
+    }
+
+    .variant {
+      cursor: pointer;
+    }
+
+    .variant:hover {
+      fill: pink;
+    }
+  `;
+
+  // genomic start
+  @property({ type: Number })
+  start = 0;
+
+  // genomic end
+  @property({ type: Number })
+  end = 0;
+
+  @property({ type: Number })
+  regionLength = 0;
+
+  // genomic start
+  @property({ type: Number })
+  alignmentTargetStart = 0;
+
+  // genomic end
+  @property({ type: Number })
+  alignmentTargetEnd = 0;
+
+  @property({ type: String })
+  regionName = '';
+
+  @property({ type: Object })
+  data: InputData | null = null;
+
+  @state()
+  imageWidth = 0;
+
+  @state()
+  selectedVariant: VariantClickPayload | null = null;
+
+  scale: ScaleLinear<number, number> | null = null;
+  targetSequenceScale: ScaleLinear<number, number> | null = null;
+
+  constructor() {
+    super();
+    new DragController(this);
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.setListeners();
+    this.observeHostSize();
+  }
+
+  setListeners() {
+    this.shadowRoot!.addEventListener('click', (event) => {
+      const element = event.target as HTMLElement;
+      const elementData = element.dataset;
+      const { featureType } = elementData;
+
+      if (featureType === 'variant') {
+        const variantType = elementData.variantType as string;
+        const variantName = elementData.name as string;
+        const variantStart = elementData.variantStart as string;
+        const variantEnd = elementData.variantEnd as string;
+
+        const payload: VariantClickPayload = {
+          variantType,
+          variantName,
+          variantStart,
+          variantEnd,
+          anchor: element
+        };
+
+        this.selectedVariant = payload;
+
+        const customEvent = new CustomEvent<VariantClickPayload>('variant-clicked', {
+          detail: payload,
+          composed: true,
+          bubbles: true
+        });
+        this.dispatchEvent(customEvent);
+      }
+    });
+  }
+
+  willUpdate(changedProperties: PropertyValues) {
+    this.#updateReferenceScale();
+    this.#updateTargetSequenceScale();
+
+    if (changedProperties.has('data') && this.selectedVariant) {
+      this.selectedVariant = null;
+    }
+  }
+
+  async scheduleUpdate(): Promise<void> {
+    await yieldToMain();
+    super.scheduleUpdate();
+  }
+
+  observeHostSize = () => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      const [hostElementEntry] = entries;
+      const { width: hostWidth } = hostElementEntry.contentRect;
+      this.imageWidth = hostWidth;
+    });
+
+    resizeObserver.observe(this);
+  }
+
+  render() {
+    if (!this.imageWidth || !this.scale || !this.data) {
+      return;
+    }
+
+    return html`
+      <svg
+        viewBox="0 0 ${this.imageWidth} ${IMAGE_HEIGHT}"
+        style="width: 100%; height: ${IMAGE_HEIGHT}px;"
+      >
+        <g>
+          ${this.renderTopRuler()}
+          ${this.renderAlignments()}
+          ${this.renderVariants()}
+          ${this.renderBottomRuler()}
+        </g>
+      </svg>
+      <slot name="tooltip">
+      </slot>
+    `;
+  }
+
+  renderVariants() {
+    return renderVariants({
+      variants: this.data!.variants,
+      scale: this.scale as ScaleLinear<number, number>
+    });
+  }
+
+  renderAlignments() {
+    const scale = this.targetSequenceScale;
+
+    return renderAlignments({
+      alignments: this.data!.alignments,
+      referenceScale: this.scale as ScaleLinear<number, number>,
+      targetScale: scale as ScaleLinear<number, number>
+    });
+  }
+
+  renderTopRuler() {
+    const [ start, end ] = this.scale!.domain();
+
+    return renderRuler({
+      offsetTop: 0,
+      scale: this.scale as ScaleLinear<number, number>
+    });
+  }
+
+  renderBottomRuler() {
+    const [ start, end ] = this.targetSequenceScale!.domain();
+
+    return renderRuler({
+      offsetTop: RULER_HEIGHT + ALIGNMENT_AREA_HEIGHT,
+      scale: this.targetSequenceScale as ScaleLinear<number, number>
+    });
+  }
+
+  #updateReferenceScale() {
+    this.scale = scaleLinear().domain([
+      this.start,
+      this.end
+    ]).rangeRound([
+      0,
+      this.imageWidth
+    ]);
+  }
+
+  #updateTargetSequenceScale() {
+    this.targetSequenceScale = scaleLinear().domain([
+      this.alignmentTargetStart,
+      this.alignmentTargetEnd
+    ]).rangeRound([
+      0,
+      this.imageWidth
+    ]);
+  }
+
+}
+
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'ens-sv-alignments-image': VariantAlignmentsImage;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "alignments-dev-server",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "start": "node --experimental-transform-types src/index.ts"
+  },
+  "dependencies": {
+    "@gmod/bbi": "7.0.5",
+    "@gmod/bed": "2.1.7",
+    "@hono/node-server": "1.19.6",
+    "hono": "4.10.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0"
+  }
+}
