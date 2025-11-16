@@ -69,6 +69,12 @@ export class RegionOverview extends LitElement {
   @property({ type: Object })
   colors: Partial<Colors> | null = null;
 
+  @property({ type: String })
+  focusGeneId: string | null = null;
+
+  @property({ type: String })
+  focusRegulatoryFeatureId: string | null = null;
+
   @state()
   featureTracks: FeatureTracks | null = null;
 
@@ -266,6 +272,7 @@ export class RegionOverview extends LitElement {
       start: this.start,
       regionName: this.regionName,
       end: this.end,
+      focusGeneId: this.focusGeneId,
       strandDividerTopOffset,
       width: this.imageWidth,
       colors
@@ -289,6 +296,7 @@ export class RegionOverview extends LitElement {
       featureTypes: this.data.regulatory_feature_types,
       scale: this.scale,
       regionName: this.regionName,
+      focusRegulatoryFeatureId: this.focusRegulatoryFeatureId,
       offsetTop
     });
   }

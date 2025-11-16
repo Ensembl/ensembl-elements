@@ -25,6 +25,7 @@ export const renderGeneTracks = ({
   regionName,
   start,
   end,
+  focusGeneId,
   offsetTop,
   strandDividerTopOffset,
   width,
@@ -36,6 +37,7 @@ export const renderGeneTracks = ({
   regionName: string;
   start: number;
   end: number;
+  focusGeneId: string | null;
   offsetTop: number;
   strandDividerTopOffset: number;
   colors: Colors;
@@ -82,6 +84,7 @@ export const renderGeneTracks = ({
       regionName,
       start,
       end,
+      focusGeneId,
       colors
     }))
   });
@@ -113,6 +116,7 @@ const renderGeneTrack = ({
   regionName,
   start,
   end,
+  focusGeneId,
   colors
 }: {
   // passing a whole bunch of tracks and their offsets in a single track renderer,
@@ -124,6 +128,7 @@ const renderGeneTrack = ({
   regionName: string;
   start: number;
   end: number;
+  focusGeneId: string | null;
   colors: Colors;
 }) => {
   const track = tracks[trackIndex];
@@ -132,12 +137,14 @@ const renderGeneTrack = ({
     end - start > MAX_SLICE_LENGTH_FOR_DETAILED_VIEW;
 
   const geneElements = track.map((gene) => {
+    const isFocusGene = gene.data.stable_id === focusGeneId;
+    
     if (shouldDisplayLowResGenes) {
       return renderGeneLowRes({
         gene,
         scale,
         offsetTop: trackOffsetTop,
-        color: colors.gene
+        color: isFocusGene ? colors.geneFocused : colors.gene
       });
     }
 
@@ -147,7 +154,7 @@ const renderGeneTrack = ({
         regionName,
         scale,
         offsetTop: trackOffsetTop,
-        color: colors.gene
+        color: isFocusGene ? colors.geneFocused : colors.gene
       })}
       ${renderTranscriptionStartSites({
         tss: gene.data.tss,
