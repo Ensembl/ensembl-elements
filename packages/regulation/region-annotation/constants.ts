@@ -13,11 +13,6 @@ export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 1_000_000;
 
 export const RULER_HEIGHT = 15;
 
-// TODO: remove these two colours
-export const COLOR_BLUE = '#0099ff'; // Ensembl brand blue colour
-export const GENE_STRAND_DIVIDER_COLOR = '#ccd3d8';
-
-
 export const COLORS = {
   gene: '#0099ff', // Ensembl brand blue colour
   geneFocused: '#1b2c39', // Ensembl black colour
