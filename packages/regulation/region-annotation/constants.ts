@@ -26,3 +26,5 @@ export const COLORS = {
   rulerLabel: '#1b2c39', // Ensembl black colour
   transcriptionStartSite: '#1b2c39', // Ensembl black colour
 } as const;
+
+export type Colors = typeof COLORS;
