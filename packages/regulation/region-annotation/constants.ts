@@ -13,5 +13,16 @@ export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 1_000_000;
 
 export const RULER_HEIGHT = 15;
 
+// TODO: remove these two colours
 export const COLOR_BLUE = '#0099ff'; // Ensembl brand blue colour
 export const GENE_STRAND_DIVIDER_COLOR = '#ccd3d8';
+
+
+export const COLORS = {
+  gene: '#0099ff', // Ensembl brand blue colour
+  geneFocused: '#1b2c39', // Ensembl black colour
+  geneStrandDivider: '#ccd3d8', // a shade of grey outside the Ensembl palette
+  rulerTick: '#d4d9df', // medium-light-grey
+  rulerLabel: '#1b2c39', // Ensembl black colour
+  transcriptionStartSite: '#1b2c39', // Ensembl black colour
+} as const;

@@ -4,9 +4,7 @@ import type { ScaleLinear } from 'd3';
 import {
   GENE_TRACK_HEIGHT,
   GENE_HEIGHT,
-  MAX_SLICE_LENGTH_FOR_DETAILED_VIEW,
-  COLOR_BLUE,
-  GENE_STRAND_DIVIDER_COLOR
+  MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 
 import { renderTranscriptionStartSites } from './transcriptionStartSites';
@@ -14,6 +12,7 @@ import { renderTranscriptionStartSites } from './transcriptionStartSites';
 import type { FeatureTracks, GeneTrack, GeneInTrack } from './prepareFeatureTracks';
 import type { ExonInRegionOverview, OverlappingCDSFragment } from '../types/regionOverview';
 import type { GeneClickPayload } from '../types/featureClickEvent';
+import type { Colors } from './constants';
 
 type Intron = {
   start: number;
@@ -28,7 +27,8 @@ export const renderGeneTracks = ({
   end,
   offsetTop,
   strandDividerTopOffset,
-  width
+  width,
+  colors
 }: {
   tracks: FeatureTracks['geneTracks'];
   scale: ScaleLinear<number, number>;
@@ -38,6 +38,7 @@ export const renderGeneTracks = ({
   end: number;
   offsetTop: number;
   strandDividerTopOffset: number;
+  colors: Colors;
 }) => {
   const { forwardStrandTracks, reverseStrandTracks } = tracks;
   let tempY = offsetTop;
@@ -80,7 +81,8 @@ export const renderGeneTracks = ({
       scale,
       regionName,
       start,
-      end
+      end,
+      colors
     }))
   });
 
@@ -94,7 +96,7 @@ export const renderGeneTracks = ({
       y1=${strandDividerTopOffset}
       y2=${strandDividerTopOffset}
       stroke-dasharray="2"
-      stroke=${GENE_STRAND_DIVIDER_COLOR}
+      stroke=${colors.geneStrandDivider}
     />
     <g>
       ${reverseStrandTrackElements}
@@ -110,7 +112,8 @@ const renderGeneTrack = ({
   scale,
   regionName,
   start,
-  end
+  end,
+  colors
 }: {
   // passing a whole bunch of tracks and their offsets in a single track renderer,
   // because they will be needed to render transcription start sites
@@ -121,6 +124,7 @@ const renderGeneTrack = ({
   regionName: string;
   start: number;
   end: number;
+  colors: Colors;
 }) => {
   const track = tracks[trackIndex];
   const trackOffsetTop = trackOffsetsTop[trackIndex];
@@ -133,7 +137,7 @@ const renderGeneTrack = ({
         gene,
         scale,
         offsetTop: trackOffsetTop,
-        color: COLOR_BLUE
+        color: colors.gene
       });
     }
 
@@ -143,7 +147,7 @@ const renderGeneTrack = ({
         regionName,
         scale,
         offsetTop: trackOffsetTop,
-        color: COLOR_BLUE
+        color: colors.gene
       })}
       ${renderTranscriptionStartSites({
         tss: gene.data.tss,
@@ -151,7 +155,8 @@ const renderGeneTrack = ({
         geneTracks: tracks,
         trackIndex,
         scale,
-        trackOffsetsTop
+        trackOffsetsTop,
+        color: colors.transcriptionStartSite
       })}
     `;
   });
