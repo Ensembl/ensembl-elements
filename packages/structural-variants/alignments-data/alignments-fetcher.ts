@@ -5,6 +5,8 @@ import type { Alignment } from '../alignments';
 import { createBins, createBinKey, combineLoadingLocations } from './data-bin-helpers';
 
 type LoaderParams = {
+  referenceGenomeId: string;
+  queryGenomeId: string;
   regionName: string;
   start: number;
   end: number;
@@ -181,17 +183,25 @@ export class AlignmentsLoader {
 
 
 const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint, regionName, start, end } = params;
-  const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `${endpoint}?${viewportStr}`;
+  const { endpoint, referenceGenomeId, queryGenomeId, regionName, start, end } = params;
+  const searchParams = new URLSearchParams();
+  searchParams.append('reference_genome_id', referenceGenomeId);
+  searchParams.append('query_genome_id', queryGenomeId);
+  searchParams.append('viewport', `${regionName}:${start}-${end}`);
+  const queryString = decodeURIComponent(searchParams.toString());
+  const url = `${endpoint}?${queryString}`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };
 
 const fetchAlignmentsFromAltSequence = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint,  regionName, start, end } = params;
-  const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `${endpoint}?${viewportStr}&mode=alternate`;
+  const { endpoint, referenceGenomeId, queryGenomeId, regionName, start, end } = params;
+  const searchParams = new URLSearchParams();
+  searchParams.append('reference_genome_id', queryGenomeId); // <-- difference from fetchAlignments
+  searchParams.append('query_genome_id', referenceGenomeId); // <-- another difference from fetchAlignments
+  searchParams.append('viewport', `${regionName}:${start}-${end}`);
+  const queryString = decodeURIComponent(searchParams.toString());
+  const url = `${endpoint}?${queryString}`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };

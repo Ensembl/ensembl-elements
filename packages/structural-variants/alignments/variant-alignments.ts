@@ -26,6 +26,14 @@ export class VariantAlignments extends LitElement {
     }
   `
 
+  // uuid of the reference genome
+  @property({ type: String })
+  referenceGenomeId: string | null = null;
+
+  // uuid of the genome that is being compared to the reference
+  @property({ type: String })
+  queryGenomeId: string | null = null;
+
   // genomic start
   @property({ type: Number })
   start = 0;
@@ -95,8 +103,12 @@ export class VariantAlignments extends LitElement {
   }
 
   #fetchVariantsData = async () => {
+    if (!this.referenceGenomeId || !this.queryGenomeId) {
+      return [];
+    }
     if (!this.variantDataService) {
       this.variantDataService = createVariantDataService({
+        genomeId: this.referenceGenomeId,
         endpoint: this.endpoints?.variants
       });
     }
@@ -113,9 +125,13 @@ export class VariantAlignments extends LitElement {
       this.alignmentsDataService = new AlignmentsLoader({
         endpoint: this.endpoints?.alignments
       });
+    } if (!this.referenceGenomeId || !this.queryGenomeId) {
+      return [];
     }
 
     return this.alignmentsDataService.get({
+      referenceGenomeId: this.referenceGenomeId,
+      queryGenomeId: this.queryGenomeId,
       regionName: this.regionName,
       start: this.start,
       end: this.end,
@@ -170,9 +186,10 @@ export class VariantAlignments extends LitElement {
 
 
 const createVariantDataService = (params: {
+  genomeId: string;
   endpoint?: string
-} = {}) => {
-  const { endpoint = '/api/variants' } = params;
+}) => {
+  const { genomeId, endpoint = '/api/variants' } = params;
 
   const dataService = new DataService<Variant, {
     regionName: string;
@@ -181,8 +198,11 @@ const createVariantDataService = (params: {
   }>({
     loader: async (params) => {
       const { regionName, start, end } = params;
-      const viewportStr = `viewport=${regionName}:${start}-${end}`;
-      const url = `${endpoint}?${viewportStr}`;
+      const searchParams = new URLSearchParams();
+      searchParams.append('genome_id', genomeId);
+      searchParams.append('viewport', `${regionName}:${start}-${end}`);
+      const queryString = decodeURIComponent(searchParams.toString()); // do not escape the colon in the viewport
+      const url = `${endpoint}?${queryString}`;
       const data = await fetch(url).then(response => response.json());
       return data;
     },

@@ -105,12 +105,14 @@ export class StructuralVariantsPlayground extends LitElement {
       <ens-sv-alignments
         @location-updated=${this.onLocationUpdated}
         @variant-clicked=${this.onVariantClicked}
+        .referenceGenomeId=${"a7335667-93e7-11ec-a39d-005056b38ce3"}
+        .queryGenomeId=${"4c07817b-c7c5-463f-8624-982286bc4355"}
+        .regionName=${"1"}
         .start=${this.start}
         .end=${this.end}
         .alignmentTargetStart=${this.alignmentTargetStart}
         .alignmentTargetEnd=${this.alignmentTargetEnd}
         .regionLength=${Infinity}
-        .regionName=${"1"}
         .endpoints=${{
           alignments: '/api/alignments',
           variants: '/api/variants'
