@@ -5,11 +5,13 @@ import type { Alignment } from '../alignments';
 import { createBins, createBinKey, combineLoadingLocations } from './data-bin-helpers';
 
 type LoaderParams = {
+  referenceGenomeId: string;
+  altGenomeId: string;
   regionName: string;
   start: number;
   end: number;
-  targetStart?: number;
-  targetEnd?: number;
+  altStart?: number;
+  altEnd?: number;
 };
 
 export class AlignmentsLoader {
@@ -117,8 +119,8 @@ export class AlignmentsLoader {
   #getDataFromState = async ({
     start,
     end,
-    targetStart,
-    targetEnd
+    altStart,
+    altEnd
   }: LoaderParams) => {
     const storedAlignments = this.#state;
 
@@ -127,12 +129,12 @@ export class AlignmentsLoader {
     for (let i = 0; i < storedAlignments.length; i++) {
       const alignment = storedAlignments[i];
       const alignmentReferenceEnd = alignment.reference.start + alignment.reference.length;
-      const alignmentTargetEnd = alignment.target.start + alignment.target.length;
+      const altEnd = alignment.alt.start + alignment.alt.length;
 
       const isMatch = (alignment.reference.start <= end && alignmentReferenceEnd >= start) ||
-        (targetStart && targetEnd && alignment.target.start <= targetEnd && alignmentTargetEnd >= targetStart) ||
-        (alignment.reference.start < start && targetEnd && alignment.target.start > targetEnd) ||
-        (alignmentReferenceEnd > end && targetStart && alignmentTargetEnd < targetStart);
+        (altStart && altEnd && alignment.alt.start <= altEnd && altEnd >= altStart) ||
+        (alignment.reference.start < start && altEnd && alignment.alt.start > altEnd) ||
+        (alignmentReferenceEnd > end && altStart && altEnd < altStart);
 
       if (isMatch) {
         alignments.push(alignment);
@@ -181,17 +183,25 @@ export class AlignmentsLoader {
 
 
 const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint, regionName, start, end } = params;
-  const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `${endpoint}?${viewportStr}`;
+  const { endpoint, referenceGenomeId, altGenomeId, regionName, start, end } = params;
+  const searchParams = new URLSearchParams();
+  searchParams.append('reference_genome_id', referenceGenomeId);
+  searchParams.append('alt_genome_id', altGenomeId);
+  searchParams.append('viewport', `${regionName}:${start}-${end}`);
+  const queryString = decodeURIComponent(searchParams.toString());
+  const url = `${endpoint}?${queryString}`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };
 
 const fetchAlignmentsFromAltSequence = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint,  regionName, start, end } = params;
-  const viewportStr = `viewport=${regionName}:${start}-${end}`;
-  const url = `${endpoint}?${viewportStr}&mode=alternate`;
+  const { endpoint, referenceGenomeId, altGenomeId, regionName, start, end } = params;
+  const searchParams = new URLSearchParams();
+  searchParams.append('reference_genome_id', altGenomeId); // <-- difference from fetchAlignments
+  searchParams.append('alt_genome_id', referenceGenomeId); // <-- another difference from fetchAlignments
+  searchParams.append('viewport', `${regionName}:${start}-${end}`);
+  const queryString = decodeURIComponent(searchParams.toString());
+  const url = `${endpoint}?${queryString}`;
   const data: Alignment[] = await fetch(url).then(response => response.json());
   return data;
 };

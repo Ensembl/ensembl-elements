@@ -46,32 +46,30 @@ export class StructuralVariantsPlayground extends LitElement {
   @state()
   end = INITIAL_END;
 
-  // genomic end
   @state()
-  alignmentTargetStart = 0;
+  altStart = 0;
 
-  // genomic end
   @state()
-  alignmentTargetEnd = 0;
+  altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     const payload = event.detail;
 
     this.start = payload.reference.start;
     this.end = payload.reference.end;
-    this.alignmentTargetStart = payload.target.start;
-    this.alignmentTargetEnd = payload.target.end;
+    this.altStart = payload.alt.start;
+    this.altEnd = payload.alt.end;
   }
 
   onLocationUpdated = (event: CustomEvent) => {
     const {
       reference: { start: refStart, end: refEnd },
-      target: { start: targetStart, end: targetEnd }
+      alt: { start: altStart, end: altEnd }
     } = event.detail;
     this.start = refStart;
     this.end = refEnd;
-    this.alignmentTargetStart = targetStart;
-    this.alignmentTargetEnd = targetEnd;
+    this.altStart = altStart;
+    this.altEnd = altEnd;
   }
 
   onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
@@ -97,20 +95,22 @@ export class StructuralVariantsPlayground extends LitElement {
           @viewport-change=${this.onViewportChange}
           .start=${this.start}
           .end=${this.end}
-          .alignmentTargetStart=${this.alignmentTargetStart}
-          .alignmentTargetEnd=${this.alignmentTargetEnd}
+          .altStart=${this.altStart}
+          .altEnd=${this.altEnd}
         >
         </control-buttons>
       </div>
       <ens-sv-alignments
         @location-updated=${this.onLocationUpdated}
         @variant-clicked=${this.onVariantClicked}
+        .referenceGenomeId=${"a7335667-93e7-11ec-a39d-005056b38ce3"}
+        .altGenomeId=${"4c07817b-c7c5-463f-8624-982286bc4355"}
+        .regionName=${"1"}
         .start=${this.start}
         .end=${this.end}
-        .alignmentTargetStart=${this.alignmentTargetStart}
-        .alignmentTargetEnd=${this.alignmentTargetEnd}
+        .altStart=${this.altStart}
+        .altEnd=${this.altEnd}
         .regionLength=${Infinity}
-        .regionName=${"1"}
         .endpoints=${{
           alignments: '/api/alignments',
           variants: '/api/variants'
