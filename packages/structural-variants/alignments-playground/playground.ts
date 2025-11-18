@@ -46,21 +46,19 @@ export class StructuralVariantsPlayground extends LitElement {
   @state()
   end = INITIAL_END;
 
-  // genomic end
   @state()
-  alignmentAltStart = 0;
+  altStart = 0;
 
-  // genomic end
   @state()
-  alignmentAltEnd = 0;
+  altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     const payload = event.detail;
 
     this.start = payload.reference.start;
     this.end = payload.reference.end;
-    this.alignmentAltStart = payload.alt.start;
-    this.alignmentAltEnd = payload.alt.end;
+    this.altStart = payload.alt.start;
+    this.altEnd = payload.alt.end;
   }
 
   onLocationUpdated = (event: CustomEvent) => {
@@ -70,8 +68,8 @@ export class StructuralVariantsPlayground extends LitElement {
     } = event.detail;
     this.start = refStart;
     this.end = refEnd;
-    this.alignmentAltStart = altStart;
-    this.alignmentAltEnd = altEnd;
+    this.altStart = altStart;
+    this.altEnd = altEnd;
   }
 
   onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
@@ -97,8 +95,8 @@ export class StructuralVariantsPlayground extends LitElement {
           @viewport-change=${this.onViewportChange}
           .start=${this.start}
           .end=${this.end}
-          .alignmentAltStart=${this.alignmentAltStart}
-          .alignmentAltEnd=${this.alignmentAltEnd}
+          .altStart=${this.altStart}
+          .altEnd=${this.altEnd}
         >
         </control-buttons>
       </div>
@@ -110,8 +108,8 @@ export class StructuralVariantsPlayground extends LitElement {
         .regionName=${"1"}
         .start=${this.start}
         .end=${this.end}
-        .alignmentAltStart=${this.alignmentAltStart}
-        .alignmentAltEnd=${this.alignmentAltEnd}
+        .altStart=${this.altStart}
+        .altEnd=${this.altEnd}
         .regionLength=${Infinity}
         .endpoints=${{
           alignments: '/api/alignments',

@@ -40,27 +40,29 @@ export class VariantAlignmentsImage extends LitElement {
     }
   `;
 
-  // genomic start
+  // genomic start of the reference genome region
   @property({ type: Number })
   start = 0;
 
-  // genomic end
+  // genomic end of the reference genome region
   @property({ type: Number })
   end = 0;
 
+  // name of the reference genome region
+  @property({ type: String })
+  regionName = '';
+
+  // length of the reference genome region
   @property({ type: Number })
   regionLength = 0;
 
-  // genomic start
+  // genomic start of the alternative genome region
   @property({ type: Number })
-  alignmentAltStart = 0;
+  altStart = 0;
 
-  // genomic end
+  // genomic end of the alternative genome region
   @property({ type: Number })
-  alignmentAltEnd = 0;
-
-  @property({ type: String })
-  regionName = '';
+  altEnd = 0;
 
   @property({ type: Object })
   data: InputData | null = null;
@@ -210,8 +212,8 @@ export class VariantAlignmentsImage extends LitElement {
 
   #updateAltSequenceScale() {
     this.altSequenceScale = scaleLinear().domain([
-      this.alignmentAltStart,
-      this.alignmentAltEnd
+      this.altStart,
+      this.altEnd
     ]).rangeRound([
       0,
       this.imageWidth

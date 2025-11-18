@@ -18,8 +18,8 @@ class DragController implements ReactiveController {
 
   #alignmentReferenceStart: number | null = null;
   #alignmentReferenceEnd: number | null = null;
-  #alignmentAltStart: number | null = null;
-  #alignmentAltEnd: number | null = null;
+  #altStart: number | null = null;
+  #altEnd: number | null = null;
   #referenceSequenceScale: ScaleLinear<number, number> | null = null;
   #altSequenceScale: ScaleLinear<number, number> | null = null;
 
@@ -118,14 +118,14 @@ class DragController implements ReactiveController {
     if (this.#draggingMode === 'reference') {
       // report unchanged coordinates for target
       return {
-        start: this.#alignmentAltStart,
-        end: this.#alignmentAltEnd
+        start: this.#altStart,
+        end: this.#altEnd
       }
     }
 
     const scale = this.#altSequenceScale as ScaleLinear<number, number>;
-    const genomicStart = this.#alignmentAltStart as number;
-    const genomicEnd = this.#alignmentAltEnd as number;
+    const genomicStart = this.#altStart as number;
+    const genomicEnd = this.#altEnd as number;
     const regionLength = this.#regionLength as number;
 
     let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
@@ -172,8 +172,8 @@ class DragController implements ReactiveController {
   #syncDataFromHost = () => {
     this.#alignmentReferenceStart = this.host.start;
     this.#alignmentReferenceEnd = this.host.end;
-    this.#alignmentAltStart = this.host.alignmentAltStart;
-    this.#alignmentAltEnd = this.host.alignmentAltEnd;
+    this.#altStart = this.host.altStart;
+    this.#altEnd = this.host.altEnd;
     this.#referenceSequenceScale = this.host.scale;
     this.#altSequenceScale = this.host.altSequenceScale;
     this.#regionLength = this.host.regionLength;

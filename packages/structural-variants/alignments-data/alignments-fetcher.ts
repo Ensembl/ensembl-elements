@@ -129,12 +129,12 @@ export class AlignmentsLoader {
     for (let i = 0; i < storedAlignments.length; i++) {
       const alignment = storedAlignments[i];
       const alignmentReferenceEnd = alignment.reference.start + alignment.reference.length;
-      const alignmentAltEnd = alignment.alt.start + alignment.alt.length;
+      const altEnd = alignment.alt.start + alignment.alt.length;
 
       const isMatch = (alignment.reference.start <= end && alignmentReferenceEnd >= start) ||
-        (altStart && altEnd && alignment.alt.start <= altEnd && alignmentAltEnd >= altStart) ||
+        (altStart && altEnd && alignment.alt.start <= altEnd && altEnd >= altStart) ||
         (alignment.reference.start < start && altEnd && alignment.alt.start > altEnd) ||
-        (alignmentReferenceEnd > end && altStart && alignmentAltEnd < altStart);
+        (alignmentReferenceEnd > end && altStart && altEnd < altStart);
 
       if (isMatch) {
         alignments.push(alignment);

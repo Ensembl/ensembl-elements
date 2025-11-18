@@ -34,27 +34,29 @@ export class VariantAlignments extends LitElement {
   @property({ type: String })
   altGenomeId: string | null = null;
 
-  // genomic start
+  // genomic start on the reference genome region
   @property({ type: Number })
   start = 0;
 
-  // genomic end
+  // genomic end on the reference genome region
   @property({ type: Number })
   end = 0;
 
+  // name of the reference genome region
+  @property({ type: String })
+  regionName = '';
+
+  // length of the reference genome region
   @property({ type: Number })
   regionLength = 0;
 
-  // genomic start
+  // genomic start on the alternative genome region
   @property({ type: Number })
-  alignmentAltStart = 0;
+  altStart = 0;
 
-  // genomic end
+  // genomic end on the alternative genome region
   @property({ type: Number })
-  alignmentAltEnd = 0;
-
-  @property({ type: String })
-  regionName = '';
+  altEnd = 0;
 
   @property({ type: Object })
   endpoints: Endpoints | null = null;
@@ -74,8 +76,8 @@ export class VariantAlignments extends LitElement {
     if (
       changedProperties.has('start') ||
       changedProperties.has('end') || 
-      changedProperties.has('alignmentAltStart') ||
-      changedProperties.has('alignmentAltEnd')
+      changedProperties.has('altStart') ||
+      changedProperties.has('altEnd')
     ) {
       this.#onLocationUpdated();
     }
@@ -95,8 +97,8 @@ export class VariantAlignments extends LitElement {
     };
 
     if (
-      !this.alignmentAltStart &&
-      !this.alignmentAltEnd
+      !this.altStart &&
+      !this.altEnd
     ) {
       this.#getInitialAltSequenceCoords();
     }
@@ -135,8 +137,8 @@ export class VariantAlignments extends LitElement {
       regionName: this.regionName,
       start: this.start,
       end: this.end,
-      altStart: this.alignmentAltStart,
-      altEnd: this.alignmentAltEnd
+      altStart: this.altStart,
+      altEnd: this.altEnd
     });
   }
 
@@ -164,8 +166,8 @@ export class VariantAlignments extends LitElement {
       }
     }
 
-    this.alignmentAltStart = genomicStart;
-    this.alignmentAltEnd = genomicEnd;
+    this.altStart = genomicStart;
+    this.altEnd = genomicEnd;
   };
 
   render() {
@@ -173,8 +175,8 @@ export class VariantAlignments extends LitElement {
       <ens-sv-alignments-image
         .start=${this.start}
         .end=${this.end}
-        .alignmentAltStart=${this.alignmentAltStart}
-        .alignmentAltEnd=${this.alignmentAltEnd}
+        .altStart=${this.altStart}
+        .altEnd=${this.altEnd}
         .regionLength=${Infinity}
         .regionName=${this.regionName}
         .data=${this.data}

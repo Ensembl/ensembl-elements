@@ -35,11 +35,11 @@ export class ControlButtons extends LitElement {
   end = 0;
 
   @property({ type: Number })
-  alignmentAltStart = 0;
+  altStart = 0;
 
   // genomic end
   @property({ type: Number })
-  alignmentAltEnd = 0;
+  altEnd = 0;
 
   @property({ type: Number })
   regionLength = Infinity;
@@ -56,8 +56,8 @@ export class ControlButtons extends LitElement {
     // For the alternative sequence
     const quarterNewAltDistance = quarterNewDistance;
 
-    const newAltStart = Math.max(this.alignmentAltStart - quarterNewAltDistance, 1);
-    const newAltEnd = Math.min(this.alignmentAltStart + newViewportDistance, this.regionLength);
+    const newAltStart = Math.max(this.altStart - quarterNewAltDistance, 1);
+    const newAltEnd = Math.min(this.altStart + newViewportDistance, this.regionLength);
 
     this.dispatchNewLocation({
       reference: {
@@ -85,7 +85,7 @@ export class ControlButtons extends LitElement {
 
     const quarterNewAltViewportDistance = quarterViewportDistance;
 
-    const newAltStart = this.alignmentAltStart + quarterNewAltViewportDistance;
+    const newAltStart = this.altStart + quarterNewAltViewportDistance;
     const newAltEnd = newAltStart + quarterNewAltViewportDistance * 2;
 
     this.dispatchNewLocation({
