@@ -6,12 +6,12 @@ import { createBins, createBinKey, combineLoadingLocations } from './data-bin-he
 
 type LoaderParams = {
   referenceGenomeId: string;
-  queryGenomeId: string;
+  altGenomeId: string;
   regionName: string;
   start: number;
   end: number;
-  targetStart?: number;
-  targetEnd?: number;
+  altStart?: number;
+  altEnd?: number;
 };
 
 export class AlignmentsLoader {
@@ -119,8 +119,8 @@ export class AlignmentsLoader {
   #getDataFromState = async ({
     start,
     end,
-    targetStart,
-    targetEnd
+    altStart,
+    altEnd
   }: LoaderParams) => {
     const storedAlignments = this.#state;
 
@@ -129,12 +129,12 @@ export class AlignmentsLoader {
     for (let i = 0; i < storedAlignments.length; i++) {
       const alignment = storedAlignments[i];
       const alignmentReferenceEnd = alignment.reference.start + alignment.reference.length;
-      const alignmentTargetEnd = alignment.target.start + alignment.target.length;
+      const alignmentAltEnd = alignment.alt.start + alignment.alt.length;
 
       const isMatch = (alignment.reference.start <= end && alignmentReferenceEnd >= start) ||
-        (targetStart && targetEnd && alignment.target.start <= targetEnd && alignmentTargetEnd >= targetStart) ||
-        (alignment.reference.start < start && targetEnd && alignment.target.start > targetEnd) ||
-        (alignmentReferenceEnd > end && targetStart && alignmentTargetEnd < targetStart);
+        (altStart && altEnd && alignment.alt.start <= altEnd && alignmentAltEnd >= altStart) ||
+        (alignment.reference.start < start && altEnd && alignment.alt.start > altEnd) ||
+        (alignmentReferenceEnd > end && altStart && alignmentAltEnd < altStart);
 
       if (isMatch) {
         alignments.push(alignment);
@@ -183,10 +183,10 @@ export class AlignmentsLoader {
 
 
 const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint, referenceGenomeId, queryGenomeId, regionName, start, end } = params;
+  const { endpoint, referenceGenomeId, altGenomeId, regionName, start, end } = params;
   const searchParams = new URLSearchParams();
   searchParams.append('reference_genome_id', referenceGenomeId);
-  searchParams.append('query_genome_id', queryGenomeId);
+  searchParams.append('alt_genome_id', altGenomeId);
   searchParams.append('viewport', `${regionName}:${start}-${end}`);
   const queryString = decodeURIComponent(searchParams.toString());
   const url = `${endpoint}?${queryString}`;
@@ -195,10 +195,10 @@ const fetchAlignments = async (params: LoaderParams & { endpoint: string }) => {
 };
 
 const fetchAlignmentsFromAltSequence = async (params: LoaderParams & { endpoint: string }) => {
-  const { endpoint, referenceGenomeId, queryGenomeId, regionName, start, end } = params;
+  const { endpoint, referenceGenomeId, altGenomeId, regionName, start, end } = params;
   const searchParams = new URLSearchParams();
-  searchParams.append('reference_genome_id', queryGenomeId); // <-- difference from fetchAlignments
-  searchParams.append('query_genome_id', referenceGenomeId); // <-- another difference from fetchAlignments
+  searchParams.append('reference_genome_id', altGenomeId); // <-- difference from fetchAlignments
+  searchParams.append('alt_genome_id', referenceGenomeId); // <-- another difference from fetchAlignments
   searchParams.append('viewport', `${regionName}:${start}-${end}`);
   const queryString = decodeURIComponent(searchParams.toString());
   const url = `${endpoint}?${queryString}`;

@@ -75,7 +75,7 @@ const readAlignments = ({
         length: item.reference_length,
         strand: item.reference_strand === '+' ? 'forward' : 'reverse'
       },
-      target: {
+      alt: {
         region_name: item.target_region_name,
         start: targetStart,
         length: item.target_length,
@@ -120,7 +120,7 @@ const readAlignmentsFromAltSequence = ({
         length: item.reference_length,
         strand: item.reference_strand === '+' ? 'forward' : 'reverse'
       },
-      target: {
+      alt: {
         region_name: item.target_region_name,
         start: item.target_start,
         length: item.target_length,
@@ -139,9 +139,9 @@ const generateAlignmentWithId = (alignment: Omit<Alignment, 'id'>) => {
   }-${
     alignment.reference.length
   }-${
-    alignment.target.start
+    alignment.alt.start
   }-${
-    alignment.target.length
+    alignment.alt.length
   }`
 
   return {

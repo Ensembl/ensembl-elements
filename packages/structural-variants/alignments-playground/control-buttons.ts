@@ -7,7 +7,7 @@ export type ViewportChangePayload = {
     start: number;
     end: number;
   },
-  target: {
+  alt: {
     start: number;
     end: number;
   }
@@ -35,11 +35,11 @@ export class ControlButtons extends LitElement {
   end = 0;
 
   @property({ type: Number })
-  alignmentTargetStart = 0;
+  alignmentAltStart = 0;
 
   // genomic end
   @property({ type: Number })
-  alignmentTargetEnd = 0;
+  alignmentAltEnd = 0;
 
   @property({ type: Number })
   regionLength = Infinity;
@@ -53,20 +53,20 @@ export class ControlButtons extends LitElement {
     const newStart = Math.max(this.start - quarterNewDistance, 1);
     const newEnd = Math.min(this.end + quarterNewDistance, this.regionLength);
   
-    // For target sequence
-    const quarterNewTargetDistance = quarterNewDistance;
+    // For the alternative sequence
+    const quarterNewAltDistance = quarterNewDistance;
 
-    const newTargetStart = Math.max(this.alignmentTargetStart - quarterNewTargetDistance, 1);
-    const newTargetEnd = Math.min(this.alignmentTargetStart + newViewportDistance, this.regionLength);
+    const newAltStart = Math.max(this.alignmentAltStart - quarterNewAltDistance, 1);
+    const newAltEnd = Math.min(this.alignmentAltStart + newViewportDistance, this.regionLength);
 
     this.dispatchNewLocation({
       reference: {
         start: newStart,
         end: newEnd
       },
-      target: {
-        start: newTargetStart,
-        end: newTargetEnd
+      alt: {
+        start: newAltStart,
+        end: newAltEnd
       }
     });
   }
@@ -79,23 +79,23 @@ export class ControlButtons extends LitElement {
     const newStart = this.start + quarterViewportDistance;
     const newEnd = newStart + quarterViewportDistance * 2;
 
-    // For target sequence
+    // For the alternative sequence
     // const targetViewportDistance = this.alignmentTargetEnd - this.alignmentTargetStart;
     // const quarterNewTargetViewportDistance = Math.round(targetViewportDistance / 4);
 
-    const quarterNewTargetViewportDistance = quarterViewportDistance;
+    const quarterNewAltViewportDistance = quarterViewportDistance;
 
-    const newTargetStart = this.alignmentTargetStart + quarterNewTargetViewportDistance;
-    const newTargetEnd = newTargetStart + quarterNewTargetViewportDistance * 2;
+    const newAltStart = this.alignmentAltStart + quarterNewAltViewportDistance;
+    const newAltEnd = newAltStart + quarterNewAltViewportDistance * 2;
 
     this.dispatchNewLocation({
       reference: {
         start: newStart,
         end: newEnd
       },
-      target: {
-        start: newTargetStart,
-        end: newTargetEnd
+      alt: {
+        start: newAltStart,
+        end: newAltEnd
       }
     });
   }

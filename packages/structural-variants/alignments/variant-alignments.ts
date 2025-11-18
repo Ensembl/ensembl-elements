@@ -32,7 +32,7 @@ export class VariantAlignments extends LitElement {
 
   // uuid of the genome that is being compared to the reference
   @property({ type: String })
-  queryGenomeId: string | null = null;
+  altGenomeId: string | null = null;
 
   // genomic start
   @property({ type: Number })
@@ -47,11 +47,11 @@ export class VariantAlignments extends LitElement {
 
   // genomic start
   @property({ type: Number })
-  alignmentTargetStart = 0;
+  alignmentAltStart = 0;
 
   // genomic end
   @property({ type: Number })
-  alignmentTargetEnd = 0;
+  alignmentAltEnd = 0;
 
   @property({ type: String })
   regionName = '';
@@ -74,8 +74,8 @@ export class VariantAlignments extends LitElement {
     if (
       changedProperties.has('start') ||
       changedProperties.has('end') || 
-      changedProperties.has('alignmentTargetStart') ||
-      changedProperties.has('alignmentTargetEnd')
+      changedProperties.has('alignmentAltStart') ||
+      changedProperties.has('alignmentAltEnd')
     ) {
       this.#onLocationUpdated();
     }
@@ -95,15 +95,15 @@ export class VariantAlignments extends LitElement {
     };
 
     if (
-      !this.alignmentTargetStart &&
-      !this.alignmentTargetEnd
+      !this.alignmentAltStart &&
+      !this.alignmentAltEnd
     ) {
-      this.#getInitialTargetSequenceCoords();
+      this.#getInitialAltSequenceCoords();
     }
   }
 
   #fetchVariantsData = async () => {
-    if (!this.referenceGenomeId || !this.queryGenomeId) {
+    if (!this.referenceGenomeId || !this.altGenomeId) {
       return [];
     }
     if (!this.variantDataService) {
@@ -125,22 +125,22 @@ export class VariantAlignments extends LitElement {
       this.alignmentsDataService = new AlignmentsLoader({
         endpoint: this.endpoints?.alignments
       });
-    } if (!this.referenceGenomeId || !this.queryGenomeId) {
+    } if (!this.referenceGenomeId || !this.altGenomeId) {
       return [];
     }
 
     return this.alignmentsDataService.get({
       referenceGenomeId: this.referenceGenomeId,
-      queryGenomeId: this.queryGenomeId,
+      altGenomeId: this.altGenomeId,
       regionName: this.regionName,
       start: this.start,
       end: this.end,
-      targetStart: this.alignmentTargetStart,
-      targetEnd: this.alignmentTargetEnd
+      altStart: this.alignmentAltStart,
+      altEnd: this.alignmentAltEnd
     });
   }
 
-  #getInitialTargetSequenceCoords() {
+  #getInitialAltSequenceCoords() {
     const data = this.data;
 
     if (!data) {
@@ -152,20 +152,20 @@ export class VariantAlignments extends LitElement {
     const { alignments } = data;
 
     for (const alignment of alignments) {
-      const targetStart = alignment.target.start;
-      const targetEnd = alignment.target.start + alignment.target.length - 1;
+      const altStart = alignment.alt.start;
+      const altEnd = alignment.alt.start + alignment.alt.length - 1;
 
-      if (!genomicStart || targetStart < genomicStart) {
-        genomicStart = targetStart;
+      if (!genomicStart || altStart < genomicStart) {
+        genomicStart = altStart;
       }
 
-      if (!genomicEnd || targetEnd > genomicEnd) {
-        genomicEnd = targetEnd;
+      if (!genomicEnd || altEnd > genomicEnd) {
+        genomicEnd = altEnd;
       }
     }
 
-    this.alignmentTargetStart = genomicStart;
-    this.alignmentTargetEnd = genomicEnd;
+    this.alignmentAltStart = genomicStart;
+    this.alignmentAltEnd = genomicEnd;
   };
 
   render() {
@@ -173,8 +173,8 @@ export class VariantAlignments extends LitElement {
       <ens-sv-alignments-image
         .start=${this.start}
         .end=${this.end}
-        .alignmentTargetStart=${this.alignmentTargetStart}
-        .alignmentTargetEnd=${this.alignmentTargetEnd}
+        .alignmentAltStart=${this.alignmentAltStart}
+        .alignmentAltEnd=${this.alignmentAltEnd}
         .regionLength=${Infinity}
         .regionName=${this.regionName}
         .data=${this.data}

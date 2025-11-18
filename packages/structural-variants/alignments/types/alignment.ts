@@ -8,7 +8,7 @@ export type Alignment = {
     strand: Strand;
     length: number;
   },
-  target: {
+  alt: {
     region_name: string;
     start: number;
     strand: Strand;

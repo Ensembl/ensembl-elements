@@ -8,17 +8,17 @@ import type { Alignment } from '../types/alignment';
 export const renderAlignments = ({
   alignments,
   referenceScale,
-  targetScale
+  altScale
 }: {
   alignments: Alignment[];
   referenceScale: ScaleLinear<number, number>; // <-- scale used for the reference genome
-  targetScale: ScaleLinear<number, number>;
+  altScale: ScaleLinear<number, number>;
 }) => {
   if (alignments.length > 200) {
     alignments = getReducedAlignments({
       alignments,
       referenceScale,
-      targetScale
+      altScale
     });
   }
 
@@ -35,7 +35,7 @@ export const renderAlignments = ({
     return renderAlignment({
       alignment,
       referenceScale,
-      targetScale,
+      altScale,
       color
     });
   });
@@ -44,7 +44,7 @@ export const renderAlignments = ({
     return renderInvertedAlignment({
       alignment,
       referenceScale,
-      targetScale
+      altScale
     });
   })
 
@@ -59,11 +59,11 @@ export const renderAlignments = ({
 const getReducedAlignments = ({
   alignments,
   referenceScale,
-  targetScale,
+  altScale,
 }: {
   alignments: Alignment[];
   referenceScale: ScaleLinear<number, number>;
-  targetScale: ScaleLinear<number, number>;
+  altScale: ScaleLinear<number, number>;
 }) => {
   const reducedAlignments: Alignment[] = [];
 
@@ -88,24 +88,24 @@ const getReducedAlignments = ({
     const lastAlignmentReferenceXEnd = referenceScale(lastAlignment.reference.start + lastAlignment.reference.length - 1);
     const alignmentReferenceXStart = referenceScale(alignment.reference.start);
 
-    const lastAlignmentTargetXEnd = targetScale(lastAlignment.target.start + lastAlignment.target.length - 1);
-    const alignmentTargetXStart = targetScale(alignment.target.start);
+    const lastAlignmentAltXEnd = altScale(lastAlignment.alt.start + lastAlignment.alt.length - 1);
+    const alignmentAltXStart = altScale(alignment.alt.start);
 
     const canResolveReferenceAxis = alignmentReferenceXStart - lastAlignmentReferenceXEnd >= resolvingDistanceInPixels;
-    const canResolveTargetAxis = alignmentTargetXStart - lastAlignmentTargetXEnd >= resolvingDistanceInPixels;
+    const canResolveAltAxis = alignmentAltXStart - lastAlignmentAltXEnd >= resolvingDistanceInPixels;
 
-    if (canResolveReferenceAxis || canResolveTargetAxis) {
+    if (canResolveReferenceAxis || canResolveAltAxis) {
       reducedAlignments.push(structuredClone(alignment));
     } else {
       const updatedReferenceLength = alignment.reference.start + alignment.reference.length - lastAlignment.reference.start;
-      const updatedTargetLength = alignment.target.start + alignment.target.length - lastAlignment.target.start;
+      const updatedAltLength = alignment.alt.start + alignment.alt.length - lastAlignment.alt.start;
 
-      if (updatedReferenceLength < 0 || updatedTargetLength < 0) {
+      if (updatedReferenceLength < 0 || updatedAltLength < 0) {
         // something has gone wrong;
         continue;
       } else {
         lastAlignment.reference.length = updatedReferenceLength;
-        lastAlignment.target.length = updatedTargetLength;
+        lastAlignment.alt.length = updatedAltLength;
       }
     }
   }
@@ -116,20 +116,19 @@ const getReducedAlignments = ({
 const renderAlignment = ({
   alignment,
   referenceScale,
-  targetScale,
+  altScale,
   color
 }: {
   alignment: Alignment;
   referenceScale: ScaleLinear<number, number>;
-  targetScale: ScaleLinear<number, number>;
+  altScale: ScaleLinear<number, number>;
   color: string;
 }) => {
   if (isInversion(alignment)) {
-    console.log("INVERSION", alignment);
     return renderInvertedAlignment({
       alignment,
       referenceScale,
-      targetScale
+      altScale
     });
   }
 
@@ -138,15 +137,15 @@ const renderAlignment = ({
 
   const offsetY = RULER_HEIGHT;
 
-  const targetX1 = targetScale(alignment.target.start);
-  const targetX2 = targetScale(alignment.target.start + alignment.target.length - 1);
-  const targetY = ALIGNMENT_AREA_HEIGHT + RULER_HEIGHT;
+  const altX1 = altScale(alignment.alt.start);
+  const altX2 = altScale(alignment.alt.start + alignment.alt.length - 1);
+  const altY = ALIGNMENT_AREA_HEIGHT + RULER_HEIGHT;
 
   const points: number[][] = [
     [referenceX1, offsetY],
     [referenceX2, offsetY],
-    [targetX2, targetY],
-    [targetX1, targetY],
+    [altX2, altY],
+    [altX1, altY],
   ];
 
   const pointsString = points.map(pair => pair.join(' ')).join(', ');
@@ -157,8 +156,8 @@ const renderAlignment = ({
       fill=${color}
       data-reference-start=${alignment.reference.start}
       data-reference-end=${alignment.reference.start + alignment.reference.length - 1}
-      data-target-start=${alignment.target.start}
-      data-target-end=${alignment.target.start + alignment.target.length - 1}
+      data-alt-start=${alignment.alt.start}
+      data-alt-end=${alignment.alt.start + alignment.alt.length - 1}
     />
   `;
 };
@@ -166,26 +165,26 @@ const renderAlignment = ({
 const renderInvertedAlignment = ({
   alignment,
   referenceScale,
-  targetScale
+  altScale
 }: {
   alignment: Alignment;
   referenceScale: ScaleLinear<number, number>;
-  targetScale: ScaleLinear<number, number>;
+  altScale: ScaleLinear<number, number>;
 }) => {
   const referenceX1 = referenceScale(alignment.reference.start);
   const referenceX2 = referenceScale(alignment.reference.start + alignment.reference.length - 1);
   const color = COLORS.inversion;
   const offsetY = RULER_HEIGHT;
 
-  const targetX1 = targetScale(alignment.target.start);
-  const targetX2 = targetScale(alignment.target.start + alignment.target.length - 1);
-  const targetY = ALIGNMENT_AREA_HEIGHT + RULER_HEIGHT;
+  const altX1 = altScale(alignment.alt.start);
+  const altX2 = altScale(alignment.alt.start + alignment.alt.length - 1);
+  const altY = ALIGNMENT_AREA_HEIGHT + RULER_HEIGHT;
 
   const points: number[][] = [
     [referenceX1, offsetY],
     [referenceX2, offsetY],
-    [targetX1, targetY],
-    [targetX2, targetY],
+    [altX1, altY],
+    [altX2, altY],
   ];
 
   const pointsString = points.map(pair => pair.join(' ')).join(', ');
@@ -197,8 +196,8 @@ const renderInvertedAlignment = ({
       fill-opacity="0.6"
       data-reference-start=${alignment.reference.start}
       data-reference-end=${alignment.reference.start + alignment.reference.length - 1}
-      data-target-start=${alignment.target.start}
-      data-target-end=${alignment.target.start + alignment.target.length - 1}
+      data-alt-start=${alignment.alt.start}
+      data-alt-end=${alignment.alt.start + alignment.alt.length - 1}
       data-type="inverted-alignment"
     />
   `;
@@ -206,5 +205,5 @@ const renderInvertedAlignment = ({
 
 
 const isInversion = (alignment: Alignment) => {
-  return alignment.reference.strand !== alignment.target.strand;
+  return alignment.reference.strand !== alignment.alt.strand;
 }

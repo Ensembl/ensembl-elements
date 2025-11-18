@@ -5,7 +5,7 @@ import type { ScaleLinear } from 'd3';
 
 import type { VariantAlignmentsImage } from '../variant-alignments-image';
 
-type DraggingMode = 'reference' | 'target' | 'both';
+type DraggingMode = 'reference' | 'alt' | 'both';
 
 class DragController implements ReactiveController {
   private host: VariantAlignmentsImage;
@@ -18,10 +18,10 @@ class DragController implements ReactiveController {
 
   #alignmentReferenceStart: number | null = null;
   #alignmentReferenceEnd: number | null = null;
-  #alignmentTargetStart: number | null = null;
-  #alignmentTargetEnd: number | null = null;
+  #alignmentAltStart: number | null = null;
+  #alignmentAltEnd: number | null = null;
   #referenceSequenceScale: ScaleLinear<number, number> | null = null;
-  #targetSequenceScale: ScaleLinear<number, number> | null = null;
+  #altSequenceScale: ScaleLinear<number, number> | null = null;
 
   #regionLength: number| null = null;
   #draggingMode: DraggingMode | null = null;
@@ -64,7 +64,7 @@ class DragController implements ReactiveController {
 
     const eventData = {
       reference: this.#calculateCoordsForReference({ deltaX, directionCoefficient }),
-      target: this.#calculateCoordsForTarget({ deltaX, directionCoefficient })
+      alt: this.#calculateCoordsForAlt({ deltaX, directionCoefficient })
     }
 
     const positionUpdatedEvent = new CustomEvent('location-updated', {
@@ -82,7 +82,7 @@ class DragController implements ReactiveController {
     deltaX: number;
     directionCoefficient: number;
   }) => {
-    if (this.#draggingMode === 'target') {
+    if (this.#draggingMode === 'alt') {
       // report unchanged coordinates for reference
       return {
         start: this.#alignmentReferenceStart,
@@ -108,7 +108,7 @@ class DragController implements ReactiveController {
     }
   }
 
-  #calculateCoordsForTarget = ({
+  #calculateCoordsForAlt = ({
     deltaX,
     directionCoefficient
   }: {
@@ -118,14 +118,14 @@ class DragController implements ReactiveController {
     if (this.#draggingMode === 'reference') {
       // report unchanged coordinates for target
       return {
-        start: this.#alignmentTargetStart,
-        end: this.#alignmentTargetEnd
+        start: this.#alignmentAltStart,
+        end: this.#alignmentAltEnd
       }
     }
 
-    const scale = this.#targetSequenceScale as ScaleLinear<number, number>;
-    const genomicStart = this.#alignmentTargetStart as number;
-    const genomicEnd = this.#alignmentTargetEnd as number;
+    const scale = this.#altSequenceScale as ScaleLinear<number, number>;
+    const genomicStart = this.#alignmentAltStart as number;
+    const genomicEnd = this.#alignmentAltEnd as number;
     const regionLength = this.#regionLength as number;
 
     let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
@@ -161,7 +161,7 @@ class DragController implements ReactiveController {
     if (eventY <= RULER_HEIGHT) {
       draggingMode = 'reference';
     } else if (elementHeight - eventY <= RULER_HEIGHT) {
-      draggingMode = 'target';
+      draggingMode = 'alt';
     } else {
       draggingMode = 'both';
     }
@@ -172,10 +172,10 @@ class DragController implements ReactiveController {
   #syncDataFromHost = () => {
     this.#alignmentReferenceStart = this.host.start;
     this.#alignmentReferenceEnd = this.host.end;
-    this.#alignmentTargetStart = this.host.alignmentTargetStart;
-    this.#alignmentTargetEnd = this.host.alignmentTargetEnd;
+    this.#alignmentAltStart = this.host.alignmentAltStart;
+    this.#alignmentAltEnd = this.host.alignmentAltEnd;
     this.#referenceSequenceScale = this.host.scale;
-    this.#targetSequenceScale = this.host.targetSequenceScale;
+    this.#altSequenceScale = this.host.altSequenceScale;
     this.#regionLength = this.host.regionLength;
   }
 

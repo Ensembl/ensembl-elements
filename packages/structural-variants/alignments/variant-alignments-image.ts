@@ -53,11 +53,11 @@ export class VariantAlignmentsImage extends LitElement {
 
   // genomic start
   @property({ type: Number })
-  alignmentTargetStart = 0;
+  alignmentAltStart = 0;
 
   // genomic end
   @property({ type: Number })
-  alignmentTargetEnd = 0;
+  alignmentAltEnd = 0;
 
   @property({ type: String })
   regionName = '';
@@ -72,7 +72,7 @@ export class VariantAlignmentsImage extends LitElement {
   selectedVariant: VariantClickPayload | null = null;
 
   scale: ScaleLinear<number, number> | null = null;
-  targetSequenceScale: ScaleLinear<number, number> | null = null;
+  altSequenceScale: ScaleLinear<number, number> | null = null;
 
   constructor() {
     super();
@@ -119,7 +119,7 @@ export class VariantAlignmentsImage extends LitElement {
 
   willUpdate(changedProperties: PropertyValues) {
     this.#updateReferenceScale();
-    this.#updateTargetSequenceScale();
+    this.#updateAltSequenceScale();
 
     if (changedProperties.has('data') && this.selectedVariant) {
       this.selectedVariant = null;
@@ -171,12 +171,12 @@ export class VariantAlignmentsImage extends LitElement {
   }
 
   renderAlignments() {
-    const scale = this.targetSequenceScale;
+    const scale = this.altSequenceScale;
 
     return renderAlignments({
       alignments: this.data!.alignments,
       referenceScale: this.scale as ScaleLinear<number, number>,
-      targetScale: scale as ScaleLinear<number, number>
+      altScale: scale as ScaleLinear<number, number>
     });
   }
 
@@ -190,11 +190,11 @@ export class VariantAlignmentsImage extends LitElement {
   }
 
   renderBottomRuler() {
-    const [ start, end ] = this.targetSequenceScale!.domain();
+    const [ start, end ] = this.altSequenceScale!.domain();
 
     return renderRuler({
       offsetTop: RULER_HEIGHT + ALIGNMENT_AREA_HEIGHT,
-      scale: this.targetSequenceScale as ScaleLinear<number, number>
+      scale: this.altSequenceScale as ScaleLinear<number, number>
     });
   }
 
@@ -208,10 +208,10 @@ export class VariantAlignmentsImage extends LitElement {
     ]);
   }
 
-  #updateTargetSequenceScale() {
-    this.targetSequenceScale = scaleLinear().domain([
-      this.alignmentTargetStart,
-      this.alignmentTargetEnd
+  #updateAltSequenceScale() {
+    this.altSequenceScale = scaleLinear().domain([
+      this.alignmentAltStart,
+      this.alignmentAltEnd
     ]).rangeRound([
       0,
       this.imageWidth
