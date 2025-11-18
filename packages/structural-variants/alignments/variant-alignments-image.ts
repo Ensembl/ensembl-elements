@@ -40,11 +40,11 @@ export class VariantAlignmentsImage extends LitElement {
     }
   `;
 
-  // genomic start of the reference genome region
+  // genomic start on the reference genome region
   @property({ type: Number })
   start = 0;
 
-  // genomic end of the reference genome region
+  // genomic end on the reference genome region
   @property({ type: Number })
   end = 0;
 
@@ -56,11 +56,11 @@ export class VariantAlignmentsImage extends LitElement {
   @property({ type: Number })
   regionLength = 0;
 
-  // genomic start of the alternative genome region
+  // genomic start on the alternative genome region
   @property({ type: Number })
   altStart = 0;
 
-  // genomic end of the alternative genome region
+  // genomic end on the alternative genome region
   @property({ type: Number })
   altEnd = 0;
 
