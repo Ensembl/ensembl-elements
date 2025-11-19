@@ -33,6 +33,8 @@ Example usage:
 
 ```ts
 const alignmentsElement = document.createElement('ens-sv-alignments');
+alignmentsElement.referenceGenomeId = '4c07817b-c7c5-463f-8624-982286bc4355';
+alignmentsElement.altGenomeId = 'a7335667-93e7-11ec-a39d-005056b38ce3';
 alignmentsElement.start = 142_500_000;
 alignmentsElement.end = 145_500_000;
 alignmentsElement.regionName = '1';
