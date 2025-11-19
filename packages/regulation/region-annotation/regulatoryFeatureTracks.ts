@@ -1,4 +1,5 @@
 import { svg } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import type { ScaleLinear } from 'd3';
 
 import {
@@ -134,10 +135,11 @@ const renderFeatureLowRes = (params: {
   const x1 = scale(genomicStart);
   const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
-  let color = featureTypes[feature.feature_type].color;
+  const color = featureTypes[feature.feature_type].color;
+  let filter;
 
   if (params.focusRegulatoryFeatureId && feature.id !== params.focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    filter = 'url(#unselecterRegulatoryFeature)';
   }
 
   return svg`
@@ -147,6 +149,7 @@ const renderFeatureLowRes = (params: {
       y=${offsetTop}
       height=${REGULATORY_FEATURE_CORE_HEIGHT}
       fill=${color}
+      filter=${ifDefined(filter)}
     />
   `;
 };
@@ -185,10 +188,11 @@ const renderCoreRegion = ({
   const x1 = scale(feature.start);
   const x2 = scale(feature.end);
   const width = Math.max(x2 - x1, 2);
-  let color = featureTypes[feature.feature_type].color;
+  const color = featureTypes[feature.feature_type].color;
+  let filter;
 
   if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    filter = 'url(#unselecterRegulatoryFeature)';
   }
 
   return svg`
@@ -198,6 +202,7 @@ const renderCoreRegion = ({
       y=${offsetTop}
       height=${REGULATORY_FEATURE_CORE_HEIGHT}
       fill=${color}
+      filter=${ifDefined(filter)}
     />
   `;
 };
@@ -240,9 +245,10 @@ const renderBoundsRegion = ({
 
   const start = side === 'left' ? extentX : scale(feature.end);
   let color = featureTypes[feature.feature_type].color;
+  let filter;
 
   if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    filter = 'url(#unselecterRegulatoryFeature)';
   }
 
   return svg`
@@ -252,6 +258,7 @@ const renderBoundsRegion = ({
       y=${offsetTop + REGULATORY_FEATURE_CORE_HEIGHT / 4}
       height=${REGULATORY_FEATURE_EXTENT_HEIGHT}
       fill=${color}
+      filter=${ifDefined(filter)}
     />
   `;
 };
