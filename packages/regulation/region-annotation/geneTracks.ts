@@ -4,6 +4,7 @@ import type { ScaleLinear } from 'd3';
 import {
   GENE_TRACK_HEIGHT,
   GENE_HEIGHT,
+  GENE_LABEL_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 
@@ -144,7 +145,8 @@ const renderGeneTrack = ({
         gene,
         scale,
         offsetTop: trackOffsetTop,
-        color: isFocusGene ? colors.geneFocused : colors.gene
+        colors,
+        isFocusGene
       });
     }
 
@@ -154,7 +156,8 @@ const renderGeneTrack = ({
         regionName,
         scale,
         offsetTop: trackOffsetTop,
-        color: isFocusGene ? colors.geneFocused : colors.gene
+        colors,
+        isFocusGene
       })}
       ${renderTranscriptionStartSites({
         tss: gene.data.tss,
@@ -179,12 +182,14 @@ const renderGeneLowRes = ({
   gene,
   scale,
   offsetTop,
-  color
+  colors,
+  isFocusGene
 }: {
   gene: GeneInTrack;
   scale: ScaleLinear<number, number>;
   offsetTop: number;
-  color: string;
+  colors: Colors;
+  isFocusGene: boolean;
 }) => {
   const {
     data: { start: genomicStart, end: genomicEnd }
@@ -192,8 +197,7 @@ const renderGeneLowRes = ({
   const start = scale(genomicStart);
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
-
-  // <text x=${start} y=${offsetTop}>${gene.data.stable_id}</text>
+  const color = isFocusGene ? colors.geneFocused : colors.gene
 
   return svg`
     <rect
@@ -211,13 +215,15 @@ const renderGene = ({
   regionName,
   scale,
   offsetTop,
-  color
+  colors,
+  isFocusGene
 }: {
   gene: GeneInTrack;
   regionName: string;
   scale: ScaleLinear<number, number>;
   offsetTop: number;
-  color: string;
+  colors: Colors;
+  isFocusGene: boolean;
 }) => {
   const trackY = offsetTop;
 
@@ -225,6 +231,7 @@ const renderGene = ({
   const firstMergedExon = merged_exons.at(0) as ExonInRegionOverview;
   const lastMergedExon = merged_exons.at(-1) as ExonInRegionOverview;
   const introns: Intron[] = [];
+  const color = isFocusGene ? colors.geneFocused : colors.gene
 
   for (let i = 1; i < merged_exons.length; i++) {
     const prevExon = merged_exons[i - 1];
@@ -276,6 +283,12 @@ const renderGene = ({
         color,
         offsetTop,
         direction: 'right'
+      })}
+      ${renderGeneLabel({
+        gene,
+        offsetTop,
+        scale,
+        colors
       })}
       ${renderInteractiveArea({
         gene,
@@ -440,6 +453,42 @@ const renderGeneExtent = ({
       stroke=${color}
       stroke-width="1"
     />
+  `;
+};
+
+const renderGeneLabel = ({
+  gene,
+  offsetTop,
+  scale,
+  colors
+}: {
+  gene: GeneInTrack;
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+  colors: Colors;
+}) => {
+  const labelText = gene.data.symbol ?? gene.data.stable_id;
+  const geneStrand = gene.data.strand;
+  const labelX = scale(gene.data.start);
+  const labelY = geneStrand === 'forward'
+    ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT
+    : offsetTop - 2;
+
+  const textColor = colors.geneLabel;
+
+  const style = 'font-family: "IBM Plex Mono"; user-select: none';
+
+  // At this font size, the width of a letter in this monospace font is 6
+  return svg`
+    <text
+      x=${labelX}
+      y=${labelY}
+      font-size="10"
+      style=${style}
+      fill=${textColor}
+    >
+      ${labelText}
+    </text>
   `;
 };
 
