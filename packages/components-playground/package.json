@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@storybook/web-components-vite": "10.0.5",
-    "storybook": "10.0.5"
+    "@storybook/web-components-vite": "10.0.8",
+    "storybook": "10.0.8"
   }
 }
