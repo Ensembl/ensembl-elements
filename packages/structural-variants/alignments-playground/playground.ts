@@ -20,6 +20,9 @@ const INITIAL_REGION_NAME = '1';
 const INITIAL_START = 142_500_000;
 const INITIAL_END = 145_500_000;
 
+const chm13T2TGenomeId = '4c07817b-c7c5-463f-8624-982286bc4355';
+const grch38GenomeId = 'a7335667-93e7-11ec-a39d-005056b38ce3';
+
 @customElement('alignments-playground')
 export class StructuralVariantsPlayground extends LitElement {
   static styles = css`
@@ -103,8 +106,8 @@ export class StructuralVariantsPlayground extends LitElement {
       <ens-sv-alignments
         @location-updated=${this.onLocationUpdated}
         @variant-clicked=${this.onVariantClicked}
-        .referenceGenomeId=${"a7335667-93e7-11ec-a39d-005056b38ce3"}
-        .altGenomeId=${"4c07817b-c7c5-463f-8624-982286bc4355"}
+        .referenceGenomeId=${chm13T2TGenomeId}
+        .altGenomeId=${grch38GenomeId}
         .regionName=${"1"}
         .start=${this.start}
         .end=${this.end}
@@ -112,8 +115,8 @@ export class StructuralVariantsPlayground extends LitElement {
         .altEnd=${this.altEnd}
         .regionLength=${Infinity}
         .endpoints=${{
-          alignments: '/api/alignments',
-          variants: '/api/variants'
+          alignments: 'https://dev-2020.ensembl.org/api/structural-variants/alignments',
+          variants: 'https://dev-2020.ensembl.org/api/structural-variants/variants'
         }}
       ></ens-sv-alignments>
       <div class="variant-message"></div>
