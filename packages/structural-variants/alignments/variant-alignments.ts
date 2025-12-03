@@ -216,6 +216,24 @@ export class VariantAlignments extends LitElement {
 
     this.altStart = genomicStart;
     this.altEnd = genomicEnd;
+
+    const eventData = {
+      reference: {
+        start: this.start,
+        end: this.end
+      },
+      alt: {
+        start: this.altStart,
+        end: this.altEnd
+      }
+    }
+
+    const positionUpdatedEvent = new CustomEvent('location-updated', {
+      bubbles: true,
+      composed: true,
+      detail: eventData
+    });
+    this.dispatchEvent(positionUpdatedEvent);
   };
 
   render() {

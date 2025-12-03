@@ -50,10 +50,10 @@ export class StructuralVariantsPlayground extends LitElement {
   end = INITIAL_END;
 
   @state()
-  altStart = INITIAL_START;
+  altStart = 0;
 
   @state()
-  altEnd = INITIAL_END;
+  altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     const payload = event.detail;
