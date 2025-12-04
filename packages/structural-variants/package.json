@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./alignments": "./alignments/index.ts",
-    "./genome-browser": "./genome-browser/index.ts"
+    "./genome-browser": "./genome-browser/index.ts",
+    "./sv-browser": "./sv-browser/index.ts"
   },
   "dependencies": {
     "@ensembl/ensembl-elements-common": "0.0.3"
@@ -15,6 +16,7 @@
   },
   "scripts": {
     "dev-alignments": "vite serve alignments-playground",
+    "dev-sv": "vite serve sv-browser-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test:watch": "node --import=tsx --experimental-test-module-mocks --enable-source-maps --test-only --test --watch **/*.test.*",
