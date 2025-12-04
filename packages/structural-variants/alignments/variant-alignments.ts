@@ -10,7 +10,7 @@ import type { Variant } from './types/variant';
 import type { Alignment } from './types/alignment';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
-type Endpoints = {
+export type Endpoints = {
   variants?: string;
   alignments?: string;
 };
