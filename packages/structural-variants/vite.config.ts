@@ -9,7 +9,8 @@ export default defineConfig({
         'vite.config.ts',
         'scripts/*',
         'alignments-playground',
-        'alignments-dev-server'
+        'alignments-dev-server',
+        'sv-browser-playground'
       ]
     })
   ],
@@ -17,7 +18,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: [
-        'alignments/index.ts'
+        'alignments/index.ts',
+        'genome-browser/index.ts',
+        'sv-browser/index.ts'
       ],
       formats: ['es'],
     },
@@ -28,7 +31,9 @@ export default defineConfig({
       },
       external: [
         /^lit/,
-        /^d3/
+        /^d3/,
+        /^@ensembl\/ensembl-genome-browser/,
+        /^@ensembl\/ensembl-elements-common/
       ],
     }
   }

@@ -53,6 +53,15 @@ class DragController implements ReactiveController {
   }
 
   #onMouseMove = (event: MouseEvent) => {
+    if (!this.isMouseDown || this.mouseDownX === null) {
+      return;
+    }
+
+    if (event.buttons === 0) {
+      this.#onMouseUp();
+      return;
+    }
+
     this.isDragging = true;
 
     const { clientX: x } = event;
@@ -67,12 +76,12 @@ class DragController implements ReactiveController {
       alt: this.#calculateCoordsForAlt({ deltaX, directionCoefficient })
     }
 
-    const positionUpdatedEvent = new CustomEvent('location-updated', {
+    const locationChangeEvent = new CustomEvent('viewport-change', {
       bubbles: true,
       composed: true,
       detail: eventData
     });
-    this.host.dispatchEvent(positionUpdatedEvent);
+    this.host.dispatchEvent(locationChangeEvent);
   }
 
   #calculateCoordsForReference = ({
@@ -149,6 +158,7 @@ class DragController implements ReactiveController {
     this.#draggingMode = null;
 
     document.removeEventListener('mousemove', this.#onMouseMove);
+    document.removeEventListener('mouseup', this.#onMouseUp);
   }
 
   #setDraggingMode = (event: MouseEvent) => {

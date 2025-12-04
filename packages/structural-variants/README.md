@@ -49,3 +49,38 @@ alignmentsElement.endpoints = endpoints;
 alignmentsElement.addEventListener('viewport-change', (event) => console.log("Heard viewport change event", (event as CustomEvent).detail));
 alignmentsElement.addEventListener('ens-reg-feature-click', (event) => console.log("Heard feature click event", (event as CustomEvent).detail));
 ```
+
+## Genome browser
+
+The `ens-sv-genome-browser` element is a version of Ensembl genome browser component (imported from `@ensembl/ensembl-genome-browser`), packaged as a web component for integration with Ensembl structural variants browser. In addition to rendering genomic tracks it exposes events for genome browser messages (tracks and hostpot).
+
+Example setup:
+```ts
+import '@ensembl/ensembl-structural-variants/genome-browser';
+const genomeBrowser = document.createElement('ens-sv-genome-browser');
+genomeBrowser.genomeId = '4c07817b-c7c5-463f-8624-982286bc4355';
+genomeBrowser.regionName = '1';
+genomeBrowser.regionLength = 248_956_422;
+genomeBrowser.start = 142_500_000;
+genomeBrowser.end = 145_500_000;
+genomeBrowser.tracks = ['sv-gene', 'my-track-uuid'];
+genomeBrowser.endpoint = 'https://dev-2020.ensembl.org/api/browser/data';
+
+genomeBrowser.addEventListener('track-message', (event) => {
+  console.log('Loaded genome browser tracks:', (event as CustomEvent).detail);
+});
+genomeBrowser.addEventListener('hotspot-message', (event) => {
+  console.log('Clicked genome browser hotspot:', (event as CustomEvent).detail);
+});
+```
+
+## Structural variants browser
+
+`ens-sv-browser` is a wrapper element that stacks two `ens-sv-genome-browser` instances around `ens-sv-alignments` and synchronises viewport location changes between the subcomponents.
+
+```
+import '@ensembl/ensembl-structural-variants/sv-browser';
+```
+
+The component accepts the same properties as its standalone pieces (genome IDs, tracks list, endpoint URLs).
+For local testing and development, run `npm run dev` inside `packages/structural-variants` to launch the structural variants playground.

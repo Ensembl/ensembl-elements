@@ -1,17 +1,7 @@
 import { html, css, LitElement } from 'lit';
 
 import { customElement, property } from 'lit/decorators.js';
-
-export type ViewportChangePayload = {
-  reference: {
-    start: number;
-    end: number;
-  },
-  alt: {
-    start: number;
-    end: number;
-  }
-};
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 
 @customElement('control-buttons')
 export class ControlButtons extends LitElement {

@@ -109,7 +109,7 @@ export class VariantAlignmentsImage extends LitElement {
 
         this.selectedVariant = payload;
 
-        const customEvent = new CustomEvent<VariantClickPayload>('variant-clicked', {
+        const customEvent = new CustomEvent<VariantClickPayload>('variant-click', {
           detail: payload,
           composed: true,
           bubbles: true

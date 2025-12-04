@@ -4,10 +4,18 @@
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    "./alignments": "./alignments/index.ts"
+    ".": "./index.ts",
+    "./alignments": "./alignments/index.ts",
+    "./genome-browser": "./genome-browser/index.ts"
+  },
+  "peerDependencies": {
+    "@ensembl/ensembl-genome-browser": "0.6.11",
+    "lit": ">=3.3.1",
+    "d3": ">=7.0.0"
   },
   "scripts": {
-    "dev-alignments": "vite serve alignments-playground",
+    "dev": "vite serve playgrounds/sv-browser-playground",
+    "dev-alignments": "vite serve playgrounds/alignments-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test:watch": "node --import=tsx --experimental-test-module-mocks --enable-source-maps --test-only --test --watch **/*.test.*",

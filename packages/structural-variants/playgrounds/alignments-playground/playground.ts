@@ -1,29 +1,14 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import '../alignments/variant-alignments';
-import './control-buttons';
+import '../../alignments/variant-alignments';
+import '../shared/control-buttons';
 
-import type { VariantClickPayload } from '../alignments/types/variant';
-import type { ViewportChangePayload } from './control-buttons';
+import type { VariantClickPayload } from '../../alignments/types/variant';
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
-
-// a location on chromosome 1 that has some features
-// const INITIAL_START = 1;
-// const INITIAL_END = 1_000_000;
-
-// const INITIAL_START = 1;
-// const INITIAL_END = 80_000;
-
-const INITIAL_REGION_NAME = '1';
-// const INITIAL_START = 142_500_000;
-const INITIAL_START = 143_920_000;
-// const INITIAL_END = 145_500_000;
-const INITIAL_END = 144_000_000;
-
-const chm13T2TGenomeId = '4c07817b-c7c5-463f-8624-982286bc4355';
-const grch38GenomeId = 'a7335667-93e7-11ec-a39d-005056b38ce3';
+import { REFERENCE_GENOME_ID, ALT_GENOME_ID, INITIAL_VIEWPORT, ENDPOINTS } from '../shared/constants';
 
 @customElement('alignments-playground')
 export class StructuralVariantsPlayground extends LitElement {
@@ -43,13 +28,13 @@ export class StructuralVariantsPlayground extends LitElement {
   `;
 
   @state()
-  regionName = INITIAL_REGION_NAME;
+  regionName = INITIAL_VIEWPORT.regionName;
 
   @state()
-  start = INITIAL_START;
+  start = INITIAL_VIEWPORT.start;
 
   @state()
-  end = INITIAL_END;
+  end = INITIAL_VIEWPORT.end;
 
   @state()
   altStart = 0;
@@ -58,26 +43,18 @@ export class StructuralVariantsPlayground extends LitElement {
   altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
-    const payload = event.detail;
-
-    this.start = payload.reference.start;
-    this.end = payload.reference.end;
-    this.altStart = payload.alt.start;
-    this.altEnd = payload.alt.end;
+    const payload = event.detail || {};
+    if(payload.reference) {
+      this.start = payload.reference.start;
+      this.end = payload.reference.end;
+    }
+    if(payload.alt) {
+      this.altStart = payload.alt.start;
+      this.altEnd = payload.alt.end;
+    }
   }
 
-  onLocationUpdated = (event: CustomEvent) => {
-    const {
-      reference: { start: refStart, end: refEnd },
-      alt: { start: altStart, end: altEnd }
-    } = event.detail;
-    this.start = refStart;
-    this.end = refEnd;
-    this.altStart = altStart;
-    this.altEnd = altEnd;
-  }
-
-  onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
+  onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
     const { detail: {
       variantName,
       variantType,
@@ -102,24 +79,22 @@ export class StructuralVariantsPlayground extends LitElement {
           .end=${this.end}
           .altStart=${this.altStart}
           .altEnd=${this.altEnd}
+          .regionLength=${INITIAL_VIEWPORT.regionLength}
         >
         </control-buttons>
       </div>
       <ens-sv-alignments
-        @location-updated=${this.onLocationUpdated}
-        @variant-clicked=${this.onVariantClicked}
-        .referenceGenomeId=${chm13T2TGenomeId}
-        .altGenomeId=${grch38GenomeId}
-        .regionName=${"1"}
+        @viewport-change=${this.onViewportChange}
+        @variant-click=${this.onVariantClick}
+        .referenceGenomeId=${REFERENCE_GENOME_ID}
+        .altGenomeId=${ALT_GENOME_ID}
+        .regionName=${this.regionName}
         .start=${this.start}
         .end=${this.end}
         .altStart=${this.altStart}
         .altEnd=${this.altEnd}
-        .regionLength=${Infinity}
-        .endpoints=${{
-          alignments: 'https://dev-2020.ensembl.org/api/structural-variants/alignments',
-          variants: 'https://dev-2020.ensembl.org/api/structural-variants/variants'
-        }}
+        .regionLength=${INITIAL_VIEWPORT.regionLength}
+        .endpoints=${ENDPOINTS}
       ></ens-sv-alignments>
       <div class="variant-message"></div>
     `;
