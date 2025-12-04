@@ -49,3 +49,28 @@ alignmentsElement.endpoints = endpoints;
 alignmentsElement.addEventListener('viewport-change', (event) => console.log("Heard viewport change event", (event as CustomEvent).detail));
 alignmentsElement.addEventListener('ens-reg-feature-click', (event) => console.log("Heard feature click event", (event as CustomEvent).detail));
 ```
+
+## Genome browser
+
+The `ens-sv-genome-browser` element is a version of Ensembl genome browser, packaged as a web component for integration to Ensembl structural variants app.
+In addition of rendering genomic tracks it exposes track metadata and tooltips.
+
+Example setup:
+```ts
+import '@ensembl/ensembl-structural-variants/genome-browser';
+const genomeBrowser = document.createElement('ens-sv-genome-browser');
+genomeBrowser.genomeId = '4c07817b-c7c5-463f-8624-982286bc4355';
+genomeBrowser.regionName = '1';
+genomeBrowser.regionLength = 248_956_422;
+genomeBrowser.start = 142_500_000;
+genomeBrowser.end = 145_500_000;
+genomeBrowser.tracks = ['sv-gene', 'my-track-uuid'];
+genomeBrowser.endpoint = 'https://dev-2020.ensembl.org/api/browser/data';
+
+genomeBrowser.addEventListener('track-message', (event) => {
+  const { tracks } = (event as CustomEvent).detail;
+  console.log('Loaded genome browser tracks:', tracks);
+});
+```
+
+The endpoint property defaults to `/api/browser/data` when not set. The `ens-sv-genome-browser` element embeds `@ensembl/ensembl-genome-browser` component while tooltips use popup elements from `@ensembl/ensembl-elements-common`.

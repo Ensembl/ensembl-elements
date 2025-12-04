@@ -4,7 +4,14 @@
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    "./alignments": "./alignments/index.ts"
+    "./alignments": "./alignments/index.ts",
+    "./genome-browser": "./genome-browser/index.ts"
+  },
+  "dependencies": {
+    "@ensembl/ensembl-elements-common": "0.0.3"
+  },
+  "peerDependencies": {
+    "@ensembl/ensembl-genome-browser": "0.6.11"
   },
   "scripts": {
     "dev-alignments": "vite serve alignments-playground",
