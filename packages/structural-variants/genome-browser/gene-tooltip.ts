@@ -12,7 +12,7 @@ export class GeneTooltip extends LitElement {
       display: block;
     }
 
-    .variant-popup {
+    .hotspot-tooltip {
       font-family: var(--font-family-body);
       font-size: var(--body-font-size);
       line-height: var(--body-line-height);
@@ -31,12 +31,12 @@ export class GeneTooltip extends LitElement {
       gap: 1ch;
     }
 
-    .variant-popup .row span + span {
+    .hotspot-tooltip .row span + span {
       margin-left: 1ch;
       font-weight: 500;
     }
 
-    .variant-popup .light {
+    .hotspot-tooltip .light {
       font-weight: 300;
     }
   `;
@@ -58,9 +58,8 @@ export class GeneTooltip extends LitElement {
     const transcript = contentItems.find((item) => item.metadata.type === 'transcript')?.metadata as TranscriptMetadata | undefined;
 
     return html`
-      <div class="variant-popup">
+      <div class="hotspot-tooltip">
         ${gene ? this.#renderGeneSection(gene) : null}
-        ${transcript ? this.#renderTranscriptSection(transcript) : null}
       </div>
     `;
   }
@@ -86,10 +85,6 @@ export class GeneTooltip extends LitElement {
         </div>
       </div>
     `;
-  }
-
-  #renderTranscriptSection(_transcript: TranscriptMetadata) {
-    return '';
   }
 
   #renderGeneLink(gene: GeneMetadata) {
