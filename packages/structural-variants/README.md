@@ -74,3 +74,14 @@ genomeBrowser.addEventListener('track-message', (event) => {
 ```
 
 The endpoint property defaults to `/api/browser/data` when not set. The `ens-sv-genome-browser` element embeds `@ensembl/ensembl-genome-browser` component while tooltips use popup elements from `@ensembl/ensembl-elements-common`.
+
+## Structural variants browser
+
+`ens-sv-browser` is a wrapper element that stacks two `ens-sv-genome-browser` instances around `ens-sv-alignments`, synchronising location changes and exposing the same events the underlying components emit (`location-updated`, `variant-clicked`, `reference-position-change`, `alt-position-change`). 
+
+```
+import '@ensembl/ensembl-structural-variants/sv-browser';
+```
+
+The component accepts the same props than its standalone pieces (genome IDs, tracks list, endpoint URLs).
+For local testing and development, run `npm run dev-sv` inside `packages/structural-variants` to launch the structural variants playground.
