@@ -11,11 +11,14 @@ const alignments = new Hono();
 const dbPath = path.resolve(import.meta.dirname, '../data/db.sqlite');
 
 alignments.get('/', (c) => {
-  const viewportString = c.req.query('viewport');
-  const queryMode = c.req.query('mode');
+  const refViewportParam = c.req.query('reference_viewport');
+  const altViewportParam = c.req.query('alt_viewport');
+  const queryMode = refViewportParam ? 'reference' : 'alternate';
+
+  const viewportString = refViewportParam || altViewportParam;
 
   if (!viewportString) {
-    throw 'Missing query';
+    throw 'Missing viewport search param';
   }
 
   const { regionName, start, end } = parseViewportString(viewportString);
@@ -101,13 +104,11 @@ const readAlignmentsFromAltSequence = ({
   const statement = db.prepare(`
     SELECT * from alignments
     WHERE target_region_name = :regionName
-    AND
-      ( target_start + target_length > :start
-        AND target_start < :end
-      )`
-  );
+    AND target_start + target_length > :start
+    AND target_start < :end
+  `);
   const storedData = statement.all({
-    regionName: `chr${regionName}`,
+    regionName,
     start,
     end
   });

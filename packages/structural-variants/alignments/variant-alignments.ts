@@ -142,15 +142,17 @@ export class VariantAlignments extends LitElement {
         referenceGenomeId: this.referenceGenomeId,
         altGenomeId: this.altGenomeId,
         regionName: this.regionName,
-        endpoint: this.endpoints!.alignments as string
+        endpoint: this.endpoints!.alignments as string,
+        isReference: true
       });
     }
     if (!this.#altToRefAlignmentsDataService) {
       this.#altToRefAlignmentsDataService = createAlignmentsDataService({
-        referenceGenomeId: this.altGenomeId,
-        altGenomeId: this.referenceGenomeId,
+        referenceGenomeId: this.referenceGenomeId,
+        altGenomeId: this.altGenomeId,
         regionName: this.regionName,
-        endpoint: this.endpoints!.alignments as string
+        endpoint: this.endpoints!.alignments as string,
+        isReference: false
       });
     }
 
@@ -169,8 +171,8 @@ export class VariantAlignments extends LitElement {
 
     if (this.altStart && this.altEnd) {
       const { start: altStart, end: altEnd } = this.#getStandardInterval({
-        start: this.start,
-        end: this.end
+        start: this.altStart,
+        end: this.altEnd
       });
 
       altToRefAlignments = await this.#altToRefAlignmentsDataService.get({
@@ -179,8 +181,7 @@ export class VariantAlignments extends LitElement {
       });
     }
 
-    // return [...refToAltAlignments, ...altToRefAlignments];
-    return refToAltAlignments;
+    return [...refToAltAlignments, ...altToRefAlignments];
   }
 
   #getStandardInterval(params: {
@@ -289,9 +290,10 @@ const createAlignmentsDataService = (params: {
   referenceGenomeId: string;
   altGenomeId: string;
   regionName: string;
-  endpoint: string
+  endpoint: string;
+  isReference: boolean;
 }) => {
-  const { referenceGenomeId, altGenomeId, regionName, endpoint } = params;
+  const { referenceGenomeId, altGenomeId, regionName, endpoint, isReference } = params;
   const getAlignmentStart = (alignment: Alignment) => alignment.reference.start;
   const getAlignmentEnd = (alignment: Alignment) =>
     alignment.reference.start + alignment.reference.length - 1;
@@ -303,9 +305,10 @@ const createAlignmentsDataService = (params: {
     loader: async (params) => {
       const { start, end } = params;
       const searchParams = new URLSearchParams();
+      const viewportParamName = isReference ? 'reference_viewport' : 'alt_viewport';
       searchParams.append('reference_genome_id', referenceGenomeId);
       searchParams.append('alt_genome_id', altGenomeId);
-      searchParams.append('viewport', `${regionName}:${start}-${end}`);
+      searchParams.append(viewportParamName, `${regionName}:${start}-${end}`);
       const queryString = decodeURIComponent(searchParams.toString());
       const url = `${endpoint}?${queryString}`;
       const data: Alignment[] = await fetch(url).then(response => response.json());

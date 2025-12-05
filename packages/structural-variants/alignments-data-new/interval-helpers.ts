@@ -1,4 +1,4 @@
-type Interval = {
+export type Interval = {
   start: number;
   end: number;
 };
@@ -36,7 +36,9 @@ export const checkIntervalOverlap = ({
     };
   }
 
-  for (const interval of intervalsForTesting) {
+  while (intervalsForTesting.length) {
+    const interval = intervalsForTesting.shift() as Interval;
+
     for (const [intervalFromSetIndex, intervalFromSet] of intervals.entries()) {
       const {
         intersecting: intersectingInterval,
@@ -45,23 +47,17 @@ export const checkIntervalOverlap = ({
         referenceInterval: intervalFromSet,
         queryInterval: interval
       });
-      if (intersectingInterval === null) {
-        // test interval does not intersect with the cached interval
-        if (intervalFromSetIndex === intervals.length - 1) {
-          // there aren't any more intervals to compare with the test interval
-          // therefore, add this test interval to the list of final results
-          nonOverlappingIntervals.push(interval);
+
+      if (!intersectingInterval && intervalFromSetIndex === intervals.length - 1) {
+        // This is last loop of the cycle.
+        // There aren't any more intervals to compare with the test interval
+        // therefore, add this test interval to the list of final results
+        nonOverlappingIntervals.push(interval);
+      } else if (intersectingInterval) {
+        overlappingIntervals.push(intersectingInterval);
+        if (nonIntersectingIntervals.length) {
+          intervalsForTesting.push(...nonIntersectingIntervals);
         }
-      } else if (intersectingInterval === interval) {
-        // the test interval in fully contained within one of the intervals from the set
-        overlappingIntervals.push(interval)
-        break;
-      } else {
-        // interval comparison has detected that the interval being tested
-        // partly overlaps with the current interval from the set
-        // => add the remainder to the list of intervals for testing,
-        // and break out of this loop
-        intervalsForTesting.push(...nonIntersectingIntervals);
         break;
       }
     }

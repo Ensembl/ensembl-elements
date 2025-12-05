@@ -1,5 +1,3 @@
-import { getUncachedIntervals } from './cache-helpers';
-
 type Interval = {
   start: number;
   end: number;
@@ -14,7 +12,6 @@ type DefaultFeatureWithId = {
 export type FeatureCache<Feature> = {
   add: (params: { interval: Interval; features: Feature[]; }) => void;
   get: (params: { start: number; end: number; }) => Feature[];
-  getUncachedIntervals: (queryInterval: Interval) => Interval[];
   getCachedIntervals: () => Interval[];
 };
 
@@ -128,22 +125,6 @@ export class SimpleArrayCache<Feature extends object> implements FeatureCache<Fe
 
   getCachedIntervals() {
     return this.#cachedIntervals;
-  }
-
-  /**
-   * Given an interval, return slices of that interval that have not yet been cached
-   */
-  getUncachedIntervals({
-    start,
-    end
-  }: {
-    start: number;
-    end: number;
-  }): Interval[] {
-    return getUncachedIntervals({
-      cachedIntervals: this.#cachedIntervals,
-      queryInterval: { start, end }
-    });
   }
 
   #insertFeature({
