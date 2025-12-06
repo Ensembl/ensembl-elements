@@ -1,8 +1,8 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { DataService } from '../alignments-data-new/data-service';
-import { getStepBasedInterval } from '../alignments-data-new/request-interval-helpers';
+import { DataService } from '../alignments-data/data-service';
+import { getStepBasedInterval } from '../alignments-data/request-interval-helpers';
 
 import './variant-alignments-image';
 

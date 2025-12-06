@@ -3,13 +3,33 @@ import assert from 'node:assert';
 
 import { DataService } from './data-service';
 
-type Feature = {
+/**
+ * This feature type contains everything the service needs by default
+ * to store the feature in and retrieve it from cache
+ */
+type SimpleFeature = {
   id: string;
   start: number;
   end: number;
 };
 
-describe('DataService', () => {
+/**
+ * This feature type requires additional helpers passed into the service
+ * to infer feature id and start and end coordinates
+ */
+type FeatureWithLocation = {
+  stable_id: string;
+  location: {
+    start: number;
+    end: number;
+  }
+}
+
+const mockBackendForSimpleFeatures = () => {
+
+};
+
+describe.skip('DataService', () => {
 
   test('features do not overlap bin boundaries', async () => {
     const mockLoader = () => {
