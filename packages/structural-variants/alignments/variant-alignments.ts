@@ -70,12 +70,14 @@ export class VariantAlignments extends LitElement {
   #refToAltAlignmentsDataService: ReturnType<typeof createAlignmentsDataService> | null = null;
   #altToRefAlignmentsDataService: ReturnType<typeof createAlignmentsDataService> | null = null;
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.#fetchData();
-  }
-
   willUpdate(changedProperties: PropertyValues) {
+    if (
+      changedProperties.has('referenceGenomeId') ||
+      changedProperties.has('altGenomeId') || 
+      changedProperties.has('regionName')
+    ) {
+      this.#setDataServices();
+    }
     if (
       changedProperties.has('start') ||
       changedProperties.has('end') || 
@@ -88,6 +90,39 @@ export class VariantAlignments extends LitElement {
 
   #onLocationUpdated = () => {
     this.#fetchData();
+  }
+
+  #setDataServices() {
+    if (
+      !this.referenceGenomeId ||
+      !this.altGenomeId ||
+      !this.regionName
+    ) {
+      return;
+    }
+
+    // Setting up alignments data services
+    this.#refToAltAlignmentsDataService = createAlignmentsDataService({
+      referenceGenomeId: this.referenceGenomeId,
+      altGenomeId: this.altGenomeId,
+      regionName: this.regionName,
+      endpoint: this.endpoints!.alignments as string,
+      isReference: true
+    });
+    this.#altToRefAlignmentsDataService = createAlignmentsDataService({
+      referenceGenomeId: this.referenceGenomeId,
+      altGenomeId: this.altGenomeId,
+      regionName: this.regionName,
+      endpoint: this.endpoints!.alignments as string,
+      isReference: false
+    });
+
+    // Setting up variants data service
+    this.#variantDataService = createVariantDataService({
+      genomeId: this.referenceGenomeId,
+      endpoint: this.endpoints!.variants as string,
+      regionName: this.regionName
+    });
   }
 
   #fetchData = async () => {
@@ -108,16 +143,8 @@ export class VariantAlignments extends LitElement {
   }
 
   #fetchVariantsData = async () => {
-    if (!this.referenceGenomeId || !this.altGenomeId) {
-      return [];
-    }
-    // TODO: create new variants data services when a region changes
     if (!this.#variantDataService) {
-      this.#variantDataService = createVariantDataService({
-        genomeId: this.referenceGenomeId,
-        endpoint: this.endpoints!.variants as string,
-        regionName: this.regionName
-      });
+      return [];
     }
 
     const { start, end } = this.#getStandardInterval({
@@ -132,28 +159,8 @@ export class VariantAlignments extends LitElement {
   }
 
   #fetchAlignmentsData = async () => {
-    if (!this.referenceGenomeId || !this.altGenomeId) {
+    if (!this.#refToAltAlignmentsDataService || !this.#altToRefAlignmentsDataService) {
       return [];
-    }
-
-    // TODO: create new alignments data services when a region changes
-    if (!this.#refToAltAlignmentsDataService) {
-      this.#refToAltAlignmentsDataService = createAlignmentsDataService({
-        referenceGenomeId: this.referenceGenomeId,
-        altGenomeId: this.altGenomeId,
-        regionName: this.regionName,
-        endpoint: this.endpoints!.alignments as string,
-        isReference: true
-      });
-    }
-    if (!this.#altToRefAlignmentsDataService) {
-      this.#altToRefAlignmentsDataService = createAlignmentsDataService({
-        referenceGenomeId: this.referenceGenomeId,
-        altGenomeId: this.altGenomeId,
-        regionName: this.regionName,
-        endpoint: this.endpoints!.alignments as string,
-        isReference: false
-      });
     }
 
     const { start: refStart, end: refEnd } = this.#getStandardInterval({
