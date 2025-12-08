@@ -3,10 +3,6 @@ import assert from 'node:assert';
 
 import { DataService } from './data-service';
 
-/**
- * This feature type contains everything the service needs by default
- * to store the feature in and retrieve it from cache
- */
 type SimpleFeature = {
   id: string;
   start: number;

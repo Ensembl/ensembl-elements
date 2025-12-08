@@ -80,7 +80,7 @@ export class SimpleArrayCache<Feature extends object> implements FeatureCache<Fe
     interval: Interval,
     features: Feature[];
   }) {
-    // Just a convinience to keep track of insertion index
+    // Just a convenience to keep track of insertion index
     // (so that each feature does not have to look for its insertion position
     // from the start of the cached features array)
     const insertionState = { index: 0 };
