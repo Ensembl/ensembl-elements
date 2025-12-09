@@ -301,9 +301,8 @@ const createAlignmentsDataService = (params: {
   isReference: boolean;
 }) => {
   const { referenceGenomeId, altGenomeId, regionName, endpoint, isReference } = params;
-  const getAlignmentStart = (alignment: Alignment) => alignment.reference.start;
-  const getAlignmentEnd = (alignment: Alignment) =>
-    alignment.reference.start + alignment.reference.length - 1;
+  const getAlignmentStart = isReference ? getRefToAltAlignmentStart : getAltToRefAlignmentStart;
+  const getAlignmentEnd = isReference ? getRefToAltAlignmentEnd : getAltToRefAlignmentEnd;
 
   const dataService = new DataService<Alignment, {
     start: number;
@@ -327,6 +326,14 @@ const createAlignmentsDataService = (params: {
 
   return dataService;
 };
+
+const getRefToAltAlignmentStart = (alignment: Alignment) => alignment.reference.start;
+const getRefToAltAlignmentEnd = (alignment: Alignment) =>
+  alignment.reference.start + alignment.reference.length - 1;
+
+const getAltToRefAlignmentStart = (alignment: Alignment) => alignment.alt.start;
+const getAltToRefAlignmentEnd = (alignment: Alignment) =>
+  alignment.alt.start + alignment.alt.length - 1;
 
 declare global {
   interface HTMLElementTagNameMap {
