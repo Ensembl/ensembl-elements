@@ -20,6 +20,7 @@ export const COLORS = {
   rulerTick: '#d4d9df', // medium-light-grey
   rulerLabel: '#1b2c39', // Ensembl black colour
   transcriptionStartSite: '#1b2c39', // Ensembl black colour
+  regulatoryFeatureUnfocused: '#e5eaf0', // Light grey; same colour that is used during location selection
 } as const;
 
 export type Colors = typeof COLORS;

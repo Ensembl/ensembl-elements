@@ -236,7 +236,8 @@ export class RegionOverview extends LitElement {
             colors
           })}
           ${this.renderRegulatoryFeatureTracks({
-            offsetTop: regulatoryFeatureTracksTopOffset
+            offsetTop: regulatoryFeatureTracksTopOffset,
+            colors
           })}
           ${renderRuler({
             scale: this.scale,
@@ -280,16 +281,17 @@ export class RegionOverview extends LitElement {
   }
 
   renderRegulatoryFeatureTracks({
-    offsetTop
+    offsetTop,
+    colors
   }: {
     offsetTop: number;
+    colors: Colors;
   }) {
     if (!this.featureTracks || !this.data || !this.scale) {
       return;
     }
 
     const { regulatoryFeatureTracks } = this.featureTracks;
-    const colors = this.#getColors();
 
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,
@@ -297,7 +299,8 @@ export class RegionOverview extends LitElement {
       scale: this.scale,
       regionName: this.regionName,
       focusRegulatoryFeatureId: this.focusRegulatoryFeatureId,
-      offsetTop
+      offsetTop,
+      colors
     });
   }
 

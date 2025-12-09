@@ -11,7 +11,7 @@ import {
 import type { RegulatoryFeature } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
 import type { RegulatoryFeatureClickPayload } from '../types/featureClickEvent';
-
+import type { Colors } from './constants';
 
 export const renderRegulatoryFeatureTracks = ({
   tracks,
@@ -19,7 +19,8 @@ export const renderRegulatoryFeatureTracks = ({
   scale,
   regionName,
   focusRegulatoryFeatureId,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   tracks: RegulatoryFeature[][];
   featureTypes: InputData['regulatory_feature_types'];
@@ -27,6 +28,7 @@ export const renderRegulatoryFeatureTracks = ({
   regionName: string;
   focusRegulatoryFeatureId: string | null;
   offsetTop: number;
+  colors: Colors;
 }) => {
   return svg`
     <g>
@@ -36,7 +38,8 @@ export const renderRegulatoryFeatureTracks = ({
         scale,
         regionName,
         focusRegulatoryFeatureId,
-        offsetTop: offsetTop + index * REGULATORY_FEATURE_TRACK_HEIGHT
+        offsetTop: offsetTop + index * REGULATORY_FEATURE_TRACK_HEIGHT,
+        colors
       }))}
     </g>
   `;
@@ -48,7 +51,8 @@ const renderTrack = ({
   scale,
   regionName,
   focusRegulatoryFeatureId,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   track: RegulatoryFeature[];
   featureTypes: InputData['regulatory_feature_types'];
@@ -56,6 +60,7 @@ const renderTrack = ({
   regionName: string;
   focusRegulatoryFeatureId: string | null;
   offsetTop: number;
+  colors: Colors;
 }) => {
   const [viewportGenomicStart, viewportGenomicEnd] = scale.domain();
   const viewportGenomicDistance = viewportGenomicEnd - viewportGenomicStart + 1;
@@ -94,7 +99,8 @@ const renderTrack = ({
       regionName,
       focusRegulatoryFeatureId,
       scale,
-      isLowRes: shouldRenderLowRes
+      isLowRes: shouldRenderLowRes,
+      colors
     });
   });
 
@@ -113,6 +119,7 @@ const renderRegulatoryFeature = (params: {
   focusRegulatoryFeatureId: string | null;
   scale: ScaleLinear<number, number>;
   isLowRes: boolean;
+  colors: Colors;
 }) => {
   if (params.isLowRes) {
     return renderFeatureLowRes(params);
@@ -127,6 +134,7 @@ const renderFeatureLowRes = (params: {
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   scale: ScaleLinear<number, number>;
+  colors: Colors;
 }) => {
   const { feature, featureTypes, offsetTop, scale } = params;
   const genomicStart = feature.extended_start ?? feature.start;
@@ -137,7 +145,7 @@ const renderFeatureLowRes = (params: {
   let color = featureTypes[feature.feature_type].color;
 
   if (params.focusRegulatoryFeatureId && feature.id !== params.focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    color = params.colors.regulatoryFeatureUnfocused;
   }
 
   return svg`
@@ -158,6 +166,7 @@ const renderFeatureHiRes = (params: {
   offsetTop: number;
   regionName: string;
   scale: ScaleLinear<number, number>;
+  colors: Colors;
 }) => {
   return svg`
     <g>
@@ -174,13 +183,15 @@ const renderCoreRegion = ({
   focusRegulatoryFeatureId,
   featureTypes,
   scale,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   feature: RegulatoryFeature;
   focusRegulatoryFeatureId: string | null;
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   scale: ScaleLinear<number, number>;
+  colors: Colors;
 }) => {
   const x1 = scale(feature.start);
   const x2 = scale(feature.end);
@@ -188,7 +199,7 @@ const renderCoreRegion = ({
   let color = featureTypes[feature.feature_type].color;
 
   if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    color = colors.regulatoryFeatureUnfocused;
   }
 
   return svg`
@@ -208,7 +219,8 @@ const renderBoundsRegion = ({
   featureTypes,
   scale,
   offsetTop,
-  side
+  side,
+  colors
 }: {
   feature: RegulatoryFeature;
   focusRegulatoryFeatureId: string | null;
@@ -216,6 +228,7 @@ const renderBoundsRegion = ({
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   side: 'left' | 'right';
+  colors: Colors;
 }) => {
   const extentCoordinate =
     side === 'left' ? feature.extended_start : feature.extended_end;
@@ -242,7 +255,7 @@ const renderBoundsRegion = ({
   let color = featureTypes[feature.feature_type].color;
 
   if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = '#e5eaf0';
+    color = colors.regulatoryFeatureUnfocused;
   }
 
   return svg`

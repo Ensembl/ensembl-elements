@@ -76,7 +76,6 @@ export class RegulationPlayground extends LitElement {
             .end=${this.end}
             .regionName=${"1"}
             .regionLength=${CHROMOSOME_LENGTH}
-            .focusRegulatoryFeatureId=${"ENSR1_9TFW4"}
             .data=${data}>
           </ens-reg-region-overview>
         </ens-reg-region-overview-popup-injector>
