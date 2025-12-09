@@ -224,9 +224,6 @@ export class RegionOverview extends LitElement {
         @click=${this.handleClick}
       >
         ${unselectedBackgroundFilter()}
-        <filter id="unselecterRegulatoryFeature">
-          <feColorMatrix type="saturate" in="SourceGraphic" values="0"/>
-        </filter>
         <g filter="url(#unselected-background)">
           ${renderRuler({
             scale: this.scale,
