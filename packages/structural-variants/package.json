@@ -10,7 +10,8 @@
     "dev-alignments": "vite serve alignments-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:watch": "node --import=tsx --experimental-test-module-mocks --enable-source-maps --test-only --test --watch **/*.test.*",
+    "test": "node --import=tsx --experimental-test-module-mocks --enable-source-maps --test-only --test **/*.test.*"
   },
   "publishConfig": {
     "@ensembl:registry": "https://gitlab.ebi.ac.uk/api/v4/projects/3500/packages/npm/"

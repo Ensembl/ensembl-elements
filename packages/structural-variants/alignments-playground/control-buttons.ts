@@ -80,10 +80,8 @@ export class ControlButtons extends LitElement {
     const newEnd = newStart + quarterViewportDistance * 2;
 
     // For the alternative sequence
-    // const targetViewportDistance = this.alignmentTargetEnd - this.alignmentTargetStart;
-    // const quarterNewTargetViewportDistance = Math.round(targetViewportDistance / 4);
-
-    const quarterNewAltViewportDistance = quarterViewportDistance;
+    const altViewportDistance = this.altEnd - this.altStart;
+    const quarterNewAltViewportDistance = Math.round(altViewportDistance / 4);
 
     const newAltStart = this.altStart + quarterNewAltViewportDistance;
     const newAltEnd = newAltStart + quarterNewAltViewportDistance * 2;

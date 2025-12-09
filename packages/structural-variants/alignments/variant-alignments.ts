@@ -1,11 +1,13 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { DataService, AlignmentsLoader } from '../alignments-data';
+import { DataService } from '../alignments-data/data-service';
+import { getStepBasedInterval } from '../alignments-data/request-interval-helpers';
 
 import './variant-alignments-image';
 
 import type { Variant } from './types/variant';
+import type { Alignment } from './types/alignment';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
 type Endpoints = {
@@ -64,15 +66,18 @@ export class VariantAlignments extends LitElement {
   @state()
   data!: VariantAlignmentsData;
 
-  variantDataService: ReturnType<typeof createVariantDataService> | null = null;
-  alignmentsDataService: AlignmentsLoader | null = null;
-
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.#fetchData();
-  }
+  #variantDataService: ReturnType<typeof createVariantDataService> | null = null;
+  #refToAltAlignmentsDataService: ReturnType<typeof createAlignmentsDataService> | null = null;
+  #altToRefAlignmentsDataService: ReturnType<typeof createAlignmentsDataService> | null = null;
 
   willUpdate(changedProperties: PropertyValues) {
+    if (
+      changedProperties.has('referenceGenomeId') ||
+      changedProperties.has('altGenomeId') || 
+      changedProperties.has('regionName')
+    ) {
+      this.#setDataServices();
+    }
     if (
       changedProperties.has('start') ||
       changedProperties.has('end') || 
@@ -85,6 +90,39 @@ export class VariantAlignments extends LitElement {
 
   #onLocationUpdated = () => {
     this.#fetchData();
+  }
+
+  #setDataServices() {
+    if (
+      !this.referenceGenomeId ||
+      !this.altGenomeId ||
+      !this.regionName
+    ) {
+      return;
+    }
+
+    // Setting up alignments data services
+    this.#refToAltAlignmentsDataService = createAlignmentsDataService({
+      referenceGenomeId: this.referenceGenomeId,
+      altGenomeId: this.altGenomeId,
+      regionName: this.regionName,
+      endpoint: this.endpoints!.alignments as string,
+      isReference: true
+    });
+    this.#altToRefAlignmentsDataService = createAlignmentsDataService({
+      referenceGenomeId: this.referenceGenomeId,
+      altGenomeId: this.altGenomeId,
+      regionName: this.regionName,
+      endpoint: this.endpoints!.alignments as string,
+      isReference: false
+    });
+
+    // Setting up variants data service
+    this.#variantDataService = createVariantDataService({
+      genomeId: this.referenceGenomeId,
+      endpoint: this.endpoints!.variants as string,
+      regionName: this.regionName
+    });
   }
 
   #fetchData = async () => {
@@ -105,41 +143,59 @@ export class VariantAlignments extends LitElement {
   }
 
   #fetchVariantsData = async () => {
-    if (!this.referenceGenomeId || !this.altGenomeId) {
+    if (!this.#variantDataService) {
       return [];
     }
-    if (!this.variantDataService) {
-      this.variantDataService = createVariantDataService({
-        genomeId: this.referenceGenomeId,
-        endpoint: this.endpoints?.variants
-      });
-    }
 
-    return await this.variantDataService.get({
-      regionName: this.regionName,
+    const { start, end } = this.#getStandardInterval({
       start: this.start,
-      end: this.end,
+      end: this.end
+    });
+
+    return await this.#variantDataService.get({
+      start,
+      end,
     });
   }
 
   #fetchAlignmentsData = async () => {
-    if (!this.alignmentsDataService) {
-      this.alignmentsDataService = new AlignmentsLoader({
-        endpoint: this.endpoints?.alignments
-      });
-    } if (!this.referenceGenomeId || !this.altGenomeId) {
+    if (!this.#refToAltAlignmentsDataService || !this.#altToRefAlignmentsDataService) {
       return [];
     }
 
-    return this.alignmentsDataService.get({
-      referenceGenomeId: this.referenceGenomeId,
-      altGenomeId: this.altGenomeId,
-      regionName: this.regionName,
+    const { start: refStart, end: refEnd } = this.#getStandardInterval({
       start: this.start,
-      end: this.end,
-      altStart: this.altStart,
-      altEnd: this.altEnd
+      end: this.end
     });
+
+    const refToAltAlignments = await this.#refToAltAlignmentsDataService.get({
+      start: refStart,
+      end: refEnd
+    });
+
+    // TODO: add altToRef alignments; remember to use altStart and altEnd for start and end
+    let altToRefAlignments: Alignment[] = [];
+
+    if (this.altStart && this.altEnd) {
+      const { start: altStart, end: altEnd } = this.#getStandardInterval({
+        start: this.altStart,
+        end: this.altEnd
+      });
+
+      altToRefAlignments = await this.#altToRefAlignmentsDataService.get({
+        start: altStart,
+        end: altEnd
+      });
+    }
+
+    return [...refToAltAlignments, ...altToRefAlignments];
+  }
+
+  #getStandardInterval(params: {
+    start: number;
+    end: number;
+  }) {
+    return getStepBasedInterval({...params, step: 1_000_000});
   }
 
   #getInitialAltSequenceCoords() {
@@ -168,6 +224,24 @@ export class VariantAlignments extends LitElement {
 
     this.altStart = genomicStart;
     this.altEnd = genomicEnd;
+
+    const eventData = {
+      reference: {
+        start: this.start,
+        end: this.end
+      },
+      alt: {
+        start: this.altStart,
+        end: this.altEnd
+      }
+    }
+
+    const positionUpdatedEvent = new CustomEvent('location-updated', {
+      bubbles: true,
+      composed: true,
+      detail: eventData
+    });
+    this.dispatchEvent(positionUpdatedEvent);
   };
 
   render() {
@@ -189,17 +263,20 @@ export class VariantAlignments extends LitElement {
 
 const createVariantDataService = (params: {
   genomeId: string;
-  endpoint?: string
+  regionName: string;
+  endpoint: string
 }) => {
-  const { genomeId, endpoint = '/api/variants' } = params;
+  const { genomeId, regionName, endpoint } = params;
+  const getVariantId = (variant: Variant) => variant.name;
+  const getVariantStart = (variant: Variant) => variant.location.start;
+  const getVariantEnd = (variant: Variant) => variant.location.end;
 
   const dataService = new DataService<Variant, {
-    regionName: string;
     start: number;
     end: number;
   }>({
     loader: async (params) => {
-      const { regionName, start, end } = params;
+      const { start, end } = params;
       const searchParams = new URLSearchParams();
       searchParams.append('genome_id', genomeId);
       searchParams.append('viewport', `${regionName}:${start}-${end}`);
@@ -208,15 +285,55 @@ const createVariantDataService = (params: {
       const data = await fetch(url).then(response => response.json());
       return data;
     },
-    featureStartFieldPath: 'location.start',
-    featureEndFieldPath: 'location.end',
-    getFeatureId: (variant: Variant) => {
-      return variant.name;
-    }
+    getFeatureId: getVariantId,
+    getFeatureStart: getVariantStart,
+    getFeatureEnd: getVariantEnd
   });
 
   return dataService;
 };
+
+const createAlignmentsDataService = (params: {
+  referenceGenomeId: string;
+  altGenomeId: string;
+  regionName: string;
+  endpoint: string;
+  isReference: boolean;
+}) => {
+  const { referenceGenomeId, altGenomeId, regionName, endpoint, isReference } = params;
+  const getAlignmentStart = isReference ? getRefToAltAlignmentStart : getAltToRefAlignmentStart;
+  const getAlignmentEnd = isReference ? getRefToAltAlignmentEnd : getAltToRefAlignmentEnd;
+
+  const dataService = new DataService<Alignment, {
+    start: number;
+    end: number;
+  }>({
+    loader: async (params) => {
+      const { start, end } = params;
+      const searchParams = new URLSearchParams();
+      const viewportParamName = isReference ? 'reference_viewport' : 'alt_viewport';
+      searchParams.append('reference_genome_id', referenceGenomeId);
+      searchParams.append('alt_genome_id', altGenomeId);
+      searchParams.append(viewportParamName, `${regionName}:${start}-${end}`);
+      const queryString = decodeURIComponent(searchParams.toString());
+      const url = `${endpoint}?${queryString}`;
+      const data: Alignment[] = await fetch(url).then(response => response.json());
+      return data;
+    },
+    getFeatureStart: getAlignmentStart,
+    getFeatureEnd: getAlignmentEnd
+  });
+
+  return dataService;
+};
+
+const getRefToAltAlignmentStart = (alignment: Alignment) => alignment.reference.start;
+const getRefToAltAlignmentEnd = (alignment: Alignment) =>
+  alignment.reference.start + alignment.reference.length - 1;
+
+const getAltToRefAlignmentStart = (alignment: Alignment) => alignment.alt.start;
+const getAltToRefAlignmentEnd = (alignment: Alignment) =>
+  alignment.alt.start + alignment.alt.length - 1;
 
 declare global {
   interface HTMLElementTagNameMap {

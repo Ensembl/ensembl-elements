@@ -3,139 +3,147 @@ import assert from 'node:assert';
 
 import { DataService } from './data-service';
 
-type Feature = {
+type SimpleFeature = {
   id: string;
   start: number;
   end: number;
 };
 
+const buildSimpleFeatures = (params: {
+  from: number;
+  to: number;
+  size: number;
+}) => {
+  const { from, to, size } = params;
+  const distance = to - from;
+  const numFeatures = Math.floor(distance / size);
+  
+  const features = [...Array(numFeatures)].map((_, index) => {
+    const start = from + size * index;
+    const end = start + size;
+    return {
+      id: `${start}-${end}`,
+      start,
+      end
+    };
+  });
+
+  return features;
+}
+
 describe('DataService', () => {
+  const simpleFeatures = [[1, 10], [11, 20], [21, 30]].map(([start, end]) => ({
+    id: `${start}-${end}`,
+    start,
+    end
+  }));
 
-  test('features do not overlap bin boundaries', async () => {
-    const mockLoader = () => {
-      const locations = [[1, 10], [11, 20], [21, 30]].map(([start, end]) => ({
-        id: `${start}-${end}`,
-        start,
-        end
-      }));
-      return Promise.resolve(locations);
-    }
-
-    const dataService = new DataService<Feature>({
-      loader: mockLoader,
-      binSize: 10
+  test('single data request', async () => {
+    const intervalStart = 1;
+    const intervalEnd = 100;
+    const featureSize = 10;
+    const features = buildSimpleFeatures({
+      from: intervalStart,
+      to: intervalEnd,
+      size: featureSize
     });
 
-    const result = await dataService.get({ start: 1, end: 30 });
+    const mockLoader = () => {
+      return Promise.resolve(features);
+    }
 
-    const expectedResult = await mockLoader();
+    const dataService = new DataService<SimpleFeature>({
+      loader: mockLoader,
+    });
+
+    const result = await dataService.get({ start: intervalStart, end: intervalEnd });
+
+    const expectedResult = features;
+
+    assert.deepStrictEqual(result, expectedResult);
+  });
+
+  test('request of same interval while previous request is in flight', async () => {
+    const intervalStart = 1;
+    const intervalEnd = 100;
+    const featureSize = 10;
+    const features = buildSimpleFeatures({
+      from: intervalStart,
+      to: intervalEnd,
+      size: featureSize
+    });
+
+    let { promise: loaderBlockRemoved, resolve: removeLoaderBlocker } = Promise.withResolvers();
+    let loaderCalledTimes = 0;
+    const mockLoader = async () => {
+      loaderCalledTimes++;
+      await loaderBlockRemoved;
+      return features;
+    }
+
+    const dataService = new DataService<SimpleFeature>({
+      loader: mockLoader,
+    });
+
+    // call once
+    dataService.get({ start: intervalStart, end: intervalEnd });
+
+    // call second time, synchronously; the request from the previous call shouldn't have resolved
+    const featuresPromise = dataService.get({ start: intervalStart, end: intervalEnd });
+
+    // the loader should have been called only once
+    assert.strictEqual(loaderCalledTimes, 1);
+    
+    removeLoaderBlocker('whatever');
+
+    const result = await featuresPromise;
+    const expectedResult = features;
 
     assert.deepStrictEqual(result, expectedResult);
   });
 
 
-  test('features overlap bin boundaries', async () => {
-    const mockLoader = () => {
-      const locations = [[1, 55], [31, 67], [39, 72]].map(([start, end]) => ({
-        id: `${start}-${end}`,
-        start,
-        end
-      }));
-      return Promise.resolve(locations);
-    }
 
-    const dataService = new DataService<Feature>({
-      loader: mockLoader,
-      binSize: 10
+  test('request an interval that overlaps a previously requested one', async () => {
+    const intervalStart = 1;
+    const intervalEnd = 100;
+    const featureSize = 10;
+    const features = buildSimpleFeatures({
+      from: intervalStart,
+      to: intervalEnd,
+      size: featureSize
     });
 
-    const result = await dataService.get({ start: 1, end: 100 });
-
-    const expectedResult = await mockLoader();
-
-    assert.deepStrictEqual(result, expectedResult);
-  });
-
-
-  test('requesting features while they are being loaded', async () => {
-    let timesCalledLoader = 0;
-
-    const mockLoader = () => {
-      timesCalledLoader++;
-
-      const locations = [[1, 55], [31, 67], [39, 72]].map(([start, end]) => ({
-        id: `${start}-${end}`,
-        start,
-        end
-      }));
-      return Promise.resolve(locations);
+    let loaderCalledTimes = 0;
+    const recordedRequests: { start: number, end: number }[] = [];
+    const mockLoader = async (params: { start: number, end: number }) => {
+      loaderCalledTimes++;
+      recordedRequests.push(params);
+      return features;
     }
 
-    const dataService = new DataService<Feature>({
-      loader: mockLoader,
-      binSize: 10
+    const dataService = new DataService<SimpleFeature>({
+      loader: mockLoader
     });
 
-    dataService.get({ start: 1, end: 100 }); // <-- note that we aren't waiting for the result here
-    const result = await dataService.get({ start: 1, end: 35 }); // <-- this should now start while the previous data is loading
+    await dataService.get({ start: 40, end: 60 });
+    await dataService.get({ start: 1, end: 100 });
 
+    // Expect the service to have made 3 requests:
+    // one for the first interval (which is then cached),
+    // and then one for each of the sides of the larger interval
+    assert.strictEqual(loaderCalledTimes, 3);
 
-    // Although the loader returns three features, the last dataService.get call
-    // only asks for features within the 1-35 slice; so we are expecting it to return two features
-    const expectedResult = [
-      { id: '1-55', start: 1, end: 55 },
-      { id: '31-67', start: 31, end: 67 }
+    const expectedParamsOfRequests = [
+      { start: 1, end: 39},
+      { start: 40, end: 60},
+      { start: 61, end: 100}
     ];
 
-    assert.deepStrictEqual(result, expectedResult);
-    assert.strictEqual(timesCalledLoader, 1);
-  });
-
-  test('using cached data to modify requests', { only: true }, async () => {
-    const recordedRequestParams: Array<{start: number; end: number;}> = [];
-
-    const mockLoader = (params: {start: number; end: number;}) => {
-      recordedRequestParams.push(params);
-      const { start, end } = params;
-
-      const feature = {
-        id: `${start}-${end}`,
-        start,
-        end
-      };
-
-      return Promise.resolve([feature]);
-    }
-
-    const dataService = new DataService<Feature>({
-      loader: mockLoader,
-      binSize: 100
-    });
-
-    await dataService.get({ start: 220, end: 280 });
-    const result = await dataService.get({ start: 180, end: 320 });
-
-    assert.strictEqual(recordedRequestParams.length, 3); // three requests were made via the loader
-
-    // The first captured request params should reflect what data was requested first (via the .get method)
-    assert.deepStrictEqual(recordedRequestParams[0], { start: 201, end: 300 });
-
-    // The second and the third captured request params should demonstrate
-    // that the previously requested slice (between 201 and 300) was not requested again;
-    // but that the service requested data to either side of the previously requested slice
-    const remainingRequestParams = recordedRequestParams.slice(1).toSorted((a, b) => a.start - b.start);
-    assert.deepStrictEqual(remainingRequestParams, [
-      { start: 101, end: 200 },
-      { start: 301, end: 400 }
-    ]);
-
-    // Finally, confirm that the data service can retrieve both the earlier retrieved data,
-    // and the more recently fetched one
-    assert.deepStrictEqual(result, [
-      { id: '101-200', start: 101, end: 200 },
-      { id: '201-300', start: 201, end: 300 },
-      { id: '301-400', start: 301, end: 400 }
-    ]);
+    assert.deepStrictEqual(
+      recordedRequests.toSorted((a, b) => a.start - b.start),
+      expectedParamsOfRequests
+    );
   });
 
 });
