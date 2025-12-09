@@ -63,17 +63,16 @@ export class DataService<
     // are already in flight
     let intervalsToCompare = [...uncachedIntervals];
     let intervalsToRequest: Interval[] = [];
-    const ongoingRequests: Set<Promise<void>> = new Set();
+    const filteredOngoingRequests: Set<Promise<void>> = new Set();
 
     if (!this.#ongoingRequests.size) {
       intervalsToRequest = intervalsToCompare;
     }
 
-    // TODO: don't know what to name this; names are hard
-    const ongoingReqs = [...this.#ongoingRequests.values()];
+    const allOngoingRequests = [...this.#ongoingRequests.values()];
 
-    for (let i = 0; i < ongoingReqs.length; i++) {
-      const req = ongoingReqs[i];
+    for (let i = 0; i < allOngoingRequests.length; i++) {
+      const req = allOngoingRequests[i];
       const intervalInRequest = req.interval;
 
       for (const testInterval of intervalsToCompare) {
@@ -88,13 +87,13 @@ export class DataService<
         if (intersectingInterval === null) {
           intervalsToRequest.push(testInterval);
         } else {
-          ongoingRequests.add(req.promise);
+          filteredOngoingRequests.add(req.promise);
           intervalsToRequest.push(...nonIntersectingIntervals);
         }
       }
 
       intervalsToCompare = [...intervalsToRequest];
-      if (i < ongoingReqs.length - 1) {
+      if (i < allOngoingRequests.length - 1) {
         intervalsToRequest = [];
       }
     }
@@ -124,8 +123,7 @@ export class DataService<
       newRequests.push(promise);
     }
 
-    // TODO: think about what to do if some of the requests fail
-    await Promise.all([...ongoingRequests, ...newRequests]);
+    await Promise.allSettled([...filteredOngoingRequests, ...newRequests]);
 
     // By the time the above promise resolves, the features should have been added to the cache
     return this.#featuresCache.get(params);
