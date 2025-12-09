@@ -16,9 +16,16 @@ import '@ensembl/ensembl-elements-common/styles/fonts.css';
 
 
 // a location on chromosome 1 that has some features
-const INITIAL_START = 58873313;
-const INITIAL_END = 59273313;
+// const INITIAL_START = 58873313;
+// const INITIAL_END = 59273313;
 const CHROMOSOME_LENGTH = 248956422; // length of chromosome 1
+
+// A location on chromosome 1 that has two features (promoter and enhancer) next to one another
+// Useful to make sure:
+// - There is no empty space between the features when they are rendered
+// - The extended start / extended end is taken into account when feature is rendered into view
+const INITIAL_START = 59814609;
+const INITIAL_END = 59815441;
 
 
 @customElement('regulation-playground')

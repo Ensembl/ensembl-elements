@@ -73,7 +73,7 @@ const renderTrack = ({
     const featureGenomicStart = feature.extended_start ?? feature.start;
     const featureGenomicEnd = feature.extended_end ?? feature.end;
     const featureStart = scale(featureGenomicStart);
-    const featureEnd = scale(featureGenomicEnd);
+    const featureEnd = scale(featureGenomicEnd + 1);
 
     const prevFeatureGenomicStart =
       prevFeature?.extended_start ?? prevFeature?.start;
@@ -82,7 +82,7 @@ const renderTrack = ({
       ? scale(prevFeatureGenomicStart)
       : -1;
     const prevFeatureEnd = prevFeatureGenomicEnd
-      ? scale(prevFeatureGenomicEnd)
+      ? scale(prevFeatureGenomicEnd + 1)
       : -1;
 
     if (featureStart === prevFeatureStart && featureEnd === prevFeatureEnd) {
@@ -140,7 +140,7 @@ const renderFeatureLowRes = (params: {
   const genomicStart = feature.extended_start ?? feature.start;
   const genomicEnd = feature.extended_end ?? feature.end;
   const x1 = scale(genomicStart);
-  const x2 = scale(genomicEnd);
+  const x2 = scale(genomicEnd + 1);
   const width = Math.max(x2 - x1, 2);
   let color = featureTypes[feature.feature_type].color;
 
@@ -194,7 +194,7 @@ const renderCoreRegion = ({
   colors: Colors;
 }) => {
   const x1 = scale(feature.start);
-  const x2 = scale(feature.end);
+  const x2 = scale(feature.end + 1);
   const width = Math.max(x2 - x1, 2);
   let color = featureTypes[feature.feature_type].color;
 
@@ -241,7 +241,7 @@ const renderBoundsRegion = ({
     return null;
   }
 
-  const extentX = scale(extentCoordinate);
+  const extentX = side === 'left' ? scale(extentCoordinate) : scale(extentCoordinate + 1);
   const width =
     side === 'left'
       ? scale(feature.start) - extentX
@@ -279,7 +279,7 @@ const renderInteractiveArea = (params: {
   const genomicStart = feature.extended_start ?? feature.start;
   const genomicEnd = feature.extended_end ?? feature.end;
   const x1 = scale(genomicStart);
-  const x2 = scale(genomicEnd);
+  const x2 = scale(genomicEnd + 1);
   const width = Math.max(x2 - x1, 2);
 
   return svg`
