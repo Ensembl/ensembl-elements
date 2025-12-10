@@ -3,8 +3,18 @@ import { customElement, property } from 'lit/decorators.js';
 
 import '../alignments/variant-alignments';
 import '../genome-browser/genome-browser';
+import { LocationChangePayload } from '../genome-browser';
 
-import type { Endpoints } from '../alignments/variant-alignments';
+export type ViewportChangePayload = {
+  reference?: LocationChangePayload,
+  alt?: LocationChangePayload
+};
+
+export type Endpoints = {
+  variants: string;
+  alignments: string;
+  genomeBrowser: string;
+};
 
 @customElement('ens-sv-browser')
 export class EnsSvBrowser extends LitElement {
@@ -15,12 +25,6 @@ export class EnsSvBrowser extends LitElement {
       border-radius: 4px;
       padding: 1rem;
       margin: 1rem 0;
-    }
-
-    ens-sv-genome-browser {
-      border-top: 1px solid #eef0f3;
-      border-bottom: 1px solid #eef0f3;
-      padding: 1rem 0;
     }
   `;
 
@@ -55,10 +59,31 @@ export class EnsSvBrowser extends LitElement {
   altEnd = 0;
 
   @property({ type: Object })
-  endpoints: Endpoints | null = null;
+  endpoints!: Endpoints;
 
-  @property({ type: String })
-  genomeBrowserEndpoint = '/api/browser/data';
+  private syncViewport(reference?: LocationChangePayload, alt?: LocationChangePayload) {
+    if (reference) {
+      this.start = reference.start;
+      this.end = reference.end;
+    }
+    if (alt) {
+      this.altStart = alt.start;
+      this.altEnd = alt.end;
+    }
+  };
+
+  private onLocationChange = (event: CustomEvent<ViewportChangePayload>) => {
+    const { reference, alt } = event.detail ?? {};
+    this.syncViewport(reference, alt);
+  };
+
+  private onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+    this.syncViewport(event.detail, undefined);
+  };
+
+  private onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+    this.syncViewport(undefined, event.detail);
+  };
 
   render() {
     const altStart = this.altStart || this.start;
@@ -72,7 +97,8 @@ export class EnsSvBrowser extends LitElement {
       .regionLength=${this.regionLength}
       .start=${this.start}
       .end=${this.end}
-      .endpoint=${this.genomeBrowserEndpoint}
+      .endpoint=${this.endpoints.genomeBrowser}
+      @location-change=${this.onReferenceLocationChange}
     ></ens-sv-genome-browser>
     <ens-sv-alignments
       .referenceGenomeId=${this.referenceGenomeId}
@@ -84,6 +110,7 @@ export class EnsSvBrowser extends LitElement {
       .altStart=${altStart}
       .altEnd=${altEnd}
       .endpoints=${this.endpoints}
+      @location-change=${this.onLocationChange}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
@@ -92,7 +119,8 @@ export class EnsSvBrowser extends LitElement {
       .regionLength=${this.regionLength}
       .start=${altStart}
       .end=${altEnd}
-      .endpoint=${this.genomeBrowserEndpoint}
+      .endpoint=${this.endpoints.genomeBrowser}
+      @location-change=${this.onAltLocationChange}
     ></ens-sv-genome-browser>
     `;
   }

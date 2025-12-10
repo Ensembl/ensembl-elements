@@ -4,13 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import '../../sv-browser/sv-browser';
 import '../shared/control-buttons';
 
-import type { ViewportChangePayload } from '../shared/control-buttons';
-import type { LocationChangePayload } from '../../genome-browser/types/viewport';
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 import type { VariantClickPayload } from '../../alignments/types/variant';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 
 import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
+import { GBMessagePayload } from '../../genome-browser/types/genome-browser';
 
 @customElement('sv-browser-playground')
 export class SvBrowserPlayground extends LitElement {
@@ -52,29 +52,22 @@ export class SvBrowserPlayground extends LitElement {
   altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
-    const payload = event.detail;
+    const payload = event.detail || {};
 
-    this.start = payload.reference.start;
-    this.end = payload.reference.end;
-    this.altStart = payload.alt.start;
-    this.altEnd = payload.alt.end;
-  }
-
-  onLocationChange = (event: CustomEvent) => {
-    const {
-      reference: { start: refStart, end: refEnd },
-      alt: { start: altStart, end: altEnd }
-    } = event.detail;
-    this.start = refStart;
-    this.end = refEnd;
-    this.altStart = altStart;
-    this.altEnd = altEnd;
+    if(payload.reference) {
+      this.start = payload.reference.start;
+      this.end = payload.reference.end;
+    }
+    if(payload.alt) {
+      this.altStart = payload.alt.start;
+      this.altEnd = payload.alt.end;
+    }
   }
 
   onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
     const { detail: { variantName, variantType, variantStart, variantEnd } } = event;
     const numberFormatter = new Intl.NumberFormat('en-GB');
-    const messageContainer = this.shadowRoot!.querySelector('.variant-message');
+    const messageContainer = this.shadowRoot!.querySelector('.click-message');
     const start = numberFormatter.format(parseInt(variantStart));
     const end = numberFormatter.format(parseInt(variantEnd));
     const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
@@ -83,22 +76,13 @@ export class SvBrowserPlayground extends LitElement {
     }
   }
 
-  onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
-    const detail = event.detail;
-    if (!detail) {
-      return;
+  onHotspotClick = (event: CustomEvent<GBMessagePayload>) => {
+    const { detail: { genome, payload } } = event;
+    const messageContainer = this.shadowRoot!.querySelector('.click-message');
+    const message = `Tooltip for ${genome}: ${JSON.stringify(payload)}`;
+    if (messageContainer) {
+      messageContainer.textContent = message;
     }
-    this.start = detail.start;
-    this.end = detail.end;
-  }
-
-  onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
-    const detail = event.detail;
-    if (!detail) {
-      return;
-    }
-    this.altStart = detail.start;
-    this.altEnd = detail.end;
   }
 
   render() {
@@ -127,16 +111,11 @@ export class SvBrowserPlayground extends LitElement {
         .end=${this.end}
         .altStart=${altStart}
         .altEnd=${altEnd}
-        .endpoints=${{
-          alignments: ENDPOINTS.alignments,
-          variants: ENDPOINTS.variants
-        }}
-        .genomeBrowserEndpoint=${ENDPOINTS.genomeBrowser}
-        @location-change=${this.onLocationChange}
+        .endpoints=${ENDPOINTS}
         @variant-click=${this.onVariantClick}
-        @location-change=${this.onReferenceLocationChange}
+        @hotspot-message=${this.onHotspotClick}
       ></ens-sv-browser>
-      <div class="variant-message"></div>
+      <div class="click-message"></div>
     `;
   }
 }

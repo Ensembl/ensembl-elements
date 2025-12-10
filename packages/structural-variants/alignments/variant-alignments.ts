@@ -11,8 +11,8 @@ import type { Alignment } from './types/alignment';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
 export type Endpoints = {
-  variants?: string;
-  alignments?: string;
+  variants: string;
+  alignments: string;
 };
 
 /**
@@ -236,12 +236,12 @@ export class VariantAlignments extends LitElement {
       }
     }
 
-    const positionUpdatedEvent = new CustomEvent('location-updated', {
+    const viewportUpdateEvent = new CustomEvent('viewport-update', {
       bubbles: true,
       composed: true,
       detail: eventData
     });
-    this.dispatchEvent(positionUpdatedEvent);
+    this.dispatchEvent(viewportUpdateEvent);
   };
 
   render() {

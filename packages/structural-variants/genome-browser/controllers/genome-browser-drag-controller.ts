@@ -1,6 +1,6 @@
 import type { ReactiveController } from 'lit';
 import type { GenomeBrowser } from '../genome-browser';
-import type { LocationChangePayload } from '../types/viewport';
+import type { LocationChangePayload } from '../types/genome-browser';
 
 class GenomeBrowserDragController implements ReactiveController {
   private host: GenomeBrowser;

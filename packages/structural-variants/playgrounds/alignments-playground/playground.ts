@@ -5,7 +5,7 @@ import '../../alignments/variant-alignments';
 import '../shared/control-buttons';
 
 import type { VariantClickPayload } from '../../alignments/types/variant';
-import type { ViewportChangePayload } from '../shared/control-buttons';
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 import { REFERENCE_GENOME_ID, ALT_GENOME_ID, INITIAL_VIEWPORT, ENDPOINTS } from '../shared/constants';
@@ -43,12 +43,15 @@ export class StructuralVariantsPlayground extends LitElement {
   altEnd = 0;
 
   onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
-    const payload = event.detail;
-
-    this.start = payload.reference.start;
-    this.end = payload.reference.end;
-    this.altStart = payload.alt.start;
-    this.altEnd = payload.alt.end;
+    const payload = event.detail || {};
+    if(payload.reference) {
+      this.start = payload.reference.start;
+      this.end = payload.reference.end;
+    }
+    if(payload.alt) {
+      this.altStart = payload.alt.start;
+      this.altEnd = payload.alt.end;
+    }
   }
 
   onLocationChange = (event: CustomEvent) => {
