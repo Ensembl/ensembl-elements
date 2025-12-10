@@ -1,14 +1,16 @@
 import { svg } from 'lit';
 import type { ScaleLinear } from 'd3';
 
-import { RULER_HEIGHT } from './constants';
+import { RULER_HEIGHT, type Colors } from './constants';
 
 export const renderRuler = ({
   scale,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   scale: ScaleLinear<number, number>;
   offsetTop: number;
+  colors: Colors;
 }) => {
   const ticksCount = 5; // this could potentially be dynamically changed based on viewport width 
   const prettyTicks = scale.ticks(ticksCount);
@@ -18,7 +20,8 @@ export const renderRuler = ({
     coord: tick,
     scale,
     offsetTop,
-    numberFormatter
+    numberFormatter,
+    colors
   }));
 
   const width = scale.range()[1];
@@ -44,12 +47,14 @@ const renderLabelledTick = ({
   coord,
   scale,
   offsetTop,
-  numberFormatter
+  numberFormatter,
+  colors
 }: {
   coord: number
   scale: ScaleLinear<number, number>;
   offsetTop: number;
   numberFormatter: Intl.NumberFormat;
+  colors: Colors;
 }) => {
   const x = scale(coord);
   const y1 = offsetTop;
@@ -59,8 +64,8 @@ const renderLabelledTick = ({
   const labelX = x + tickThickness + 1;
   const labelY = y2 - 3;
 
-  const tickColor = '#d4d9de';
-  const textColor = 'black';
+  const tickColor = colors.rulerTick;
+  const textColor = colors.rulerLabel;
   const label = numberFormatter.format(coord);
 
   return svg`

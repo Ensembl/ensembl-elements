@@ -13,7 +13,11 @@ export const pickData = ({
 }) => {
   const genes = data.genes.filter(gene => gene.start <= end && gene.end >= start);
   const regulatory_features = data.regulatory_features.data
-    .filter(feature => feature.start <= end && feature.end >= start);
+    .filter(feature => {
+      const featureStart = feature.extended_start ?? feature.start;
+      const featureEnd = feature.extended_end ?? feature.end;
+      return featureStart <= end && featureEnd >= start;
+    });
 
   return {
     genes,
