@@ -3,11 +3,6 @@ export type GenomeBrowserConfig = {
   target_element: HTMLElement;
 };
 
-export type PointerPosition = {
-  x: number;
-  y: number;
-};
-
 type TrackSummaryEntry = {
   type: string;
   ['switch-id']: string;
@@ -17,4 +12,10 @@ type TrackSummaryEntry = {
 
 export type TrackSummaryPayload = {
   summary: TrackSummaryEntry[];
+};
+export type HotspotPayload = {
+  x: number;
+  y: number;
+  content: object[];
+  variety: object[];
 };

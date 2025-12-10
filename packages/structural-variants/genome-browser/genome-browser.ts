@@ -1,14 +1,9 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
+import { customElement, property, query } from 'lit/decorators.js';
 
 import initializeGenomeBrowser, { GenomeBrowser as EnsemblGenomeBrowser, type InitOutput } from '@ensembl/ensembl-genome-browser';
 import GenomeBrowserDragController from './controllers/genome-browser-drag-controller';
-import '@ensembl/ensembl-elements-common/components/popup/popup.js';
-import './gene-tooltip';
-
-import type { GenomeBrowserConfig, PointerPosition, TrackSummaryPayload } from './types/genome-browser';
-import type { HotspotPayload, TooltipState } from './types/tooltip';
+import type { GenomeBrowserConfig, TrackSummaryPayload, HotspotPayload } from './types/genome-browser';
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -45,13 +40,6 @@ export class GenomeBrowser extends LitElement {
   genomeBrowser!: EnsemblGenomeBrowser;
   dragController: GenomeBrowserDragController;
 
-  @state()
-  private tooltip: TooltipState | null = null;
-
-  private virtualTooltipAnchor: { getBoundingClientRect: () => DOMRect } | null = null;
-
-  private lastPointerPosition: PointerPosition | null = null;
-
   @query('#viewport', true)
   viewport!: HTMLElement;
 
@@ -79,15 +67,6 @@ export class GenomeBrowser extends LitElement {
   @property({ type: String })
   endpoint = '/api/browser/data';
 
-  #clearTooltip = () => {
-    if (this.tooltip !== null) {
-      this.tooltip = null;
-    }
-    if (this.virtualTooltipAnchor) {
-      this.virtualTooltipAnchor = null;
-    }
-  };
-
   #stopWheelPropagation = (event: WheelEvent) => {
     event.stopImmediatePropagation();
   };
@@ -100,98 +79,32 @@ export class GenomeBrowser extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('wheel', this.#stopWheelPropagation, { capture: true });
-    this.addEventListener('pointermove', this.#handlePointerMove, { capture: true });
-    this.addEventListener('pointerdown', this.#handlePointerMove, { capture: true });
-    this.addEventListener('pointerleave', this.#handlePointerLeave, { capture: true });
   }
 
   disconnectedCallback(): void {
     this.removeEventListener('wheel', this.#stopWheelPropagation, { capture: true });
-    this.removeEventListener('pointermove', this.#handlePointerMove, { capture: true });
-    this.removeEventListener('pointerdown', this.#handlePointerMove, { capture: true });
-    this.removeEventListener('pointerleave', this.#handlePointerLeave, { capture: true });
     super.disconnectedCallback();
   }
-
-  #handlePointerMove = (event: PointerEvent) => {
-    const viewport = this.viewport;
-    if (!viewport) {
-      return;
-    }
-
-    const rect = viewport.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
-      this.lastPointerPosition = null;
-      return;
-    }
-
-    this.lastPointerPosition = { x, y };
-  };
-
-  #handlePointerLeave = () => {
-    this.lastPointerPosition = null;
-  };
   
   #handleGenomeBrowserMessage = (kind: string, ...more: unknown[]) => {
     if (kind === 'track_summary') {
       const [payload] = more as [TrackSummaryPayload?];
-      const summary = Array.isArray(payload?.summary) ? payload.summary : [];
-      const tracks = summary
-        .filter((entry) => entry?.type === 'track' && entry['switch-id'])
-        .map((entry) => ({
-          switchId: entry['switch-id'] as string,
-          offset: entry.offset ?? 0,
-          height: entry.height ?? 0
-        }));
-
       this.dispatchEvent(new CustomEvent('track-message', {
-        detail: { tracks },
+        detail: payload,
         bubbles: true,
         composed: true
       }));
     } else if (kind === 'hotspot') {
       const [payload] = more as [HotspotPayload?];
-      this.#handleHotspotMessage(payload);
+      this.dispatchEvent(new CustomEvent('hotspot-message', {
+        detail: payload,
+        bubbles: true,
+        composed: true
+      }));
     } else if (kind === 'error') {
       console.error('[GenomeBrowser error]', ...more);
     }
   };
-
-  #handleHotspotMessage(payload?: HotspotPayload | null) {
-    const pointer = this.#getPointerPosition();
-    if (!payload || !Array.isArray(payload.content) || payload.content.length === 0 || !pointer) {
-      this.#clearTooltip();
-      return;
-    }
-
-    this.tooltip = {
-      contentItems: payload.content,
-      pointer
-    };
-  }
-
-  #getPointerPosition(): PointerPosition | null {
-    const viewport = this.viewport;
-    const pointer = this.lastPointerPosition;
-
-    if (!viewport || !pointer) {
-      return null;
-    }
-
-    const containerWidth = Math.max(viewport.clientWidth, 1);
-    const containerHeight = Math.max(viewport.clientHeight, 1);
-
-    const maxLeft = Math.max(containerWidth - 1, 0);
-    const maxTop = Math.max(containerHeight - 1, 0);
-
-    const left = clamp(pointer.x, 0, maxLeft);
-    const top = clamp(pointer.y, 0, maxTop);
-
-    return { x: left, y: top };
-  }
 
   protected firstUpdated(): void {
     const endpoint = typeof this.endpoint === 'string' ? this.endpoint.trim() : '';
@@ -238,51 +151,11 @@ export class GenomeBrowser extends LitElement {
 
   protected updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-
-    if (
-      this.tooltip &&
-      (changedProperties.has('start') || changedProperties.has('end') || changedProperties.has('regionName'))
-    ) {
-      this.#clearTooltip();
-    }
   }
 
   render() {
-    const tooltip = this.tooltip;
-    const pointer = tooltip?.pointer ?? null;
-
-    if (pointer) {
-      const hostRect = this.getBoundingClientRect();
-      const x = hostRect.left + pointer.x;
-      const y = hostRect.top + pointer.y;
-
-      this.virtualTooltipAnchor = {
-        getBoundingClientRect: () => new DOMRect(x, y, 1, 1)
-      };
-    } else if (this.virtualTooltipAnchor) {
-      this.virtualTooltipAnchor = null;
-    }
-
     return html`
       <div id="viewport">
-        ${tooltip && pointer
-          ? html`
-              ${this.virtualTooltipAnchor
-                ? html`
-                    <ens-popup
-                      .anchor=${this.virtualTooltipAnchor as unknown as HTMLElement}
-                      placement="bottom"
-                      @ens-popup-click-outside=${this.#clearTooltip}
-                    >
-                      <ens-sv-gene-tooltip
-                        .contentItems=${tooltip.contentItems}
-                        .genomeId=${this.genomeId}
-                      ></ens-sv-gene-tooltip>
-                    </ens-popup>
-                  `
-                : null}
-            `
-          : null}
       </div>
     `;
   }

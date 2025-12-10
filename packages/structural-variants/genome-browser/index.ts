@@ -1,4 +1,3 @@
 export * from './genome-browser';
-export type { GenomeBrowserConfig, PointerPosition, TrackSummaryPayload } from './types/genome-browser';
-export type { HotspotContent, HotspotPayload, GeneMetadata, TranscriptMetadata } from './types/tooltip';
+export type { GenomeBrowserConfig, TrackSummaryPayload, HotspotPayload } from './types/genome-browser';
 export type { PositionChangePayload, ViewportChangePayload } from './types/viewport';
