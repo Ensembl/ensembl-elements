@@ -37,7 +37,7 @@ export class RegulationPlayground extends LitElement {
       margin-top: 2em;
     }
 
-    ens-reg-region-overview {
+    ens-reg-region-annotation {
       grid-column: middle;
     }
 
@@ -76,7 +76,7 @@ export class RegulationPlayground extends LitElement {
           ${this.start}-${this.end}
         </div>
         <ens-reg-region-overview-popup-injector>
-          <ens-reg-region-overview
+          <ens-reg-region-annotation
             @viewport-change=${this.onViewportChange}
             @ens-reg-track-positions=${this.onTrackPositionsChange}
             .start=${this.start}
@@ -84,7 +84,7 @@ export class RegulationPlayground extends LitElement {
             .regionName=${"1"}
             .regionLength=${CHROMOSOME_LENGTH}
             .data=${data}>
-          </ens-reg-region-overview>
+          </ens-reg-region-annotation>
         </ens-reg-region-overview-popup-injector>
         <ens-reg-zoom-buttons
           .start=${this.start}

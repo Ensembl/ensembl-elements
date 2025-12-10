@@ -31,7 +31,7 @@ type CalculatedTrackPositions = {
   regulatoryFeatures: number[];
 };
 
-@customElement('ens-reg-region-overview')
+@customElement('ens-reg-region-annotation')
 export class RegionOverview extends LitElement {
   static styles = css`
     :host {
@@ -309,6 +309,6 @@ export class RegionOverview extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'ens-reg-region-overview': RegionOverview;
+    'ens-reg-region-annotation': RegionOverview;
   }
 }

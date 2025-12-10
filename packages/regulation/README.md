@@ -27,7 +27,7 @@ Note that the package depends on `lit` and `d3` to work.
 ### Using the component
 The component is created with the following markup:
 
-`<ens-reg-region-overview></ens-reg-region-overview>`
+`<ens-reg-region-annotation></ens-reg-region-annotation>`
 
 The component expects the following properties in order to work:
 
