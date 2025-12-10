@@ -64,7 +64,7 @@ export class GenomeBrowser extends LitElement {
   tracks: string[] = [];
 
   @property({ type: String })
-  endpoint = '/api/browser/data';
+  endpoint!: string;
 
   #stopWheelPropagation = (event: WheelEvent) => {
     event.stopImmediatePropagation();
@@ -89,14 +89,20 @@ export class GenomeBrowser extends LitElement {
     if (kind === 'track_summary') {
       const [payload] = more as [TrackSummaryPayload?];
       this.dispatchEvent(new CustomEvent('track-message', {
-        detail: payload,
+        detail: {
+          genome: this.genomeId,
+          payload: payload,
+        },
         bubbles: true,
         composed: true
       }));
     } else if (kind === 'hotspot') {
       const [payload] = more as [HotspotPayload?];
       this.dispatchEvent(new CustomEvent('hotspot-message', {
-        detail: payload,
+        detail: {
+          genome: this.genomeId,
+          payload: payload,
+        },
         bubbles: true,
         composed: true
       }));
@@ -107,9 +113,13 @@ export class GenomeBrowser extends LitElement {
 
   protected firstUpdated(): void {
     const endpoint = typeof this.endpoint === 'string' ? this.endpoint.trim() : '';
-    const backendUrl = endpoint || '/api/browser/data';
+    if (!endpoint) {
+      console.error('[GenomeBrowser] No endpoint provided!');
+      return;
+    }
+
     const gbConfig: GenomeBrowserConfig = {
-      backend_url: backendUrl,
+      backend_url: endpoint,
       target_element: this.viewport
     };
 
@@ -123,7 +133,6 @@ export class GenomeBrowser extends LitElement {
       gb.switch(['settings', 'no-padding'], true);
       gb.switch(['ruler'], false);
       gb.switch(['ruler', 'one_based'], false);
-      gb.switch(['track', 'sv-gene'], true);
       this.tracks.forEach((trackId) => {
         const base = isUuid(trackId) ? ['track', 'expand'] : ['track'];
         gb.switch([...base, trackId], true);

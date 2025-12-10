@@ -52,8 +52,7 @@ alignmentsElement.addEventListener('ens-reg-feature-click', (event) => console.l
 
 ## Genome browser
 
-The `ens-sv-genome-browser` element is a version of Ensembl genome browser, packaged as a web component for integration to Ensembl structural variants app.
-In addition of rendering genomic tracks it exposes track metadata and tooltips.
+The `ens-sv-genome-browser` element is a version of Ensembl genome browser component (imported from `@ensembl/ensembl-genome-browser`), packaged as a web component for integration with Ensembl structural variants browser. In addition to rendering genomic tracks it exposes events for genome browser messages (tracks and hostpot).
 
 Example setup:
 ```ts
@@ -68,12 +67,12 @@ genomeBrowser.tracks = ['sv-gene', 'my-track-uuid'];
 genomeBrowser.endpoint = 'https://dev-2020.ensembl.org/api/browser/data';
 
 genomeBrowser.addEventListener('track-message', (event) => {
-  const { tracks } = (event as CustomEvent).detail;
-  console.log('Loaded genome browser tracks:', tracks);
+  console.log('Loaded genome browser tracks:', (event as CustomEvent).detail);
+});
+genomeBrowser.addEventListener('hotspot-message', (event) => {
+  console.log('Clicked genome browser hotspot:', (event as CustomEvent).detail);
 });
 ```
-
-The endpoint property defaults to `/api/browser/data` when not set. The `ens-sv-genome-browser` element embeds `@ensembl/ensembl-genome-browser` component while tooltips use popup elements from `@ensembl/ensembl-elements-common`.
 
 ## Structural variants browser
 
@@ -83,5 +82,5 @@ The endpoint property defaults to `/api/browser/data` when not set. The `ens-sv-
 import '@ensembl/ensembl-structural-variants/sv-browser';
 ```
 
-The component accepts the same props than its standalone pieces (genome IDs, tracks list, endpoint URLs).
+The component accepts the same properties as its standalone pieces (genome IDs, tracks list, endpoint URLs).
 For local testing and development, run `npm run dev-integration` inside `packages/structural-variants` to launch the structural variants playground.
