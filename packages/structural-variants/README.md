@@ -77,11 +77,11 @@ The endpoint property defaults to `/api/browser/data` when not set. The `ens-sv-
 
 ## Structural variants browser
 
-`ens-sv-browser` is a wrapper element that stacks two `ens-sv-genome-browser` instances around `ens-sv-alignments`, synchronising location changes and exposing the same events the underlying components emit (`location-updated`, `variant-clicked`, `reference-position-change`, `alt-position-change`). 
+`ens-sv-browser` is a wrapper element that stacks two `ens-sv-genome-browser` instances around `ens-sv-alignments` and synchronises viewport location changes between the subcomponents.
 
 ```
 import '@ensembl/ensembl-structural-variants/sv-browser';
 ```
 
 The component accepts the same props than its standalone pieces (genome IDs, tracks list, endpoint URLs).
-For local testing and development, run `npm run dev-sv` inside `packages/structural-variants` to launch the structural variants playground.
+For local testing and development, run `npm run dev-integration` inside `packages/structural-variants` to launch the structural variants playground.

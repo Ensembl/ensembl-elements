@@ -5,7 +5,7 @@ import '../../sv-browser/sv-browser';
 import '../shared/control-buttons';
 
 import type { ViewportChangePayload } from '../shared/control-buttons';
-import type { PositionChangePayload } from '../../genome-browser/types/viewport';
+import type { LocationChangePayload } from '../../genome-browser/types/viewport';
 import type { VariantClickPayload } from '../../alignments/types/variant';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
@@ -83,7 +83,7 @@ export class SvBrowserPlayground extends LitElement {
     }
   }
 
-  onReferencePositionChange = (event: CustomEvent<PositionChangePayload>) => {
+  onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     const detail = event.detail;
     if (!detail) {
       return;
@@ -92,7 +92,7 @@ export class SvBrowserPlayground extends LitElement {
     this.end = detail.end;
   }
 
-  onAltPositionChange = (event: CustomEvent<PositionChangePayload>) => {
+  onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     const detail = event.detail;
     if (!detail) {
       return;
@@ -134,7 +134,7 @@ export class SvBrowserPlayground extends LitElement {
         .genomeBrowserEndpoint=${ENDPOINTS.genomeBrowser}
         @location-updated=${this.onLocationUpdated}
         @variant-clicked=${this.onVariantClicked}
-        @position-change=${this.onReferencePositionChange}
+        @location-change=${this.onReferenceLocationChange}
       ></ens-sv-browser>
       <div class="variant-message"></div>
     `;

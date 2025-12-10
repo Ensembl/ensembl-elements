@@ -1,6 +1,6 @@
 import type { ReactiveController } from 'lit';
 import type { GenomeBrowser } from '../genome-browser';
-import type { PositionChangePayload } from '../types/viewport';
+import type { LocationChangePayload } from '../types/viewport';
 
 class GenomeBrowserDragController implements ReactiveController {
   private host: GenomeBrowser;
@@ -50,10 +50,10 @@ class GenomeBrowserDragController implements ReactiveController {
 
     this.isDragging = true;
     const deltaX = event.clientX - this.mouseDownX;
-    const newPosition = this.#calculateNewPosition(deltaX);
+    const newLocation = this.#calculateNewLocation(deltaX);
 
-    this.host.dispatchEvent(new CustomEvent<PositionChangePayload>('position-change', {
-      detail: newPosition,
+    this.host.dispatchEvent(new CustomEvent<LocationChangePayload>('location-change', {
+      detail: newLocation,
       bubbles: true,
       composed: true
     }));
@@ -78,7 +78,7 @@ class GenomeBrowserDragController implements ReactiveController {
     this.#activePointerId = null;
   }
 
-  #calculateNewPosition(deltaX: number): PositionChangePayload {
+  #calculateNewLocation(deltaX: number): LocationChangePayload {
     if (this.#initialStart === null || this.#initialEnd === null) {
       return { start: this.host.start, end: this.host.end };
     }

@@ -1,9 +1,9 @@
-export type PositionChangePayload = {
+export type LocationChangePayload = {
   start: number;
   end: number;
 };
 
 export type ViewportChangePayload = {
-  reference?: PositionChangePayload;
-  alt?: PositionChangePayload;
+  reference?: LocationChangePayload;
+  alt?: LocationChangePayload;
 };
