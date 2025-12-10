@@ -60,7 +60,7 @@ export class SvBrowserPlayground extends LitElement {
     this.altEnd = payload.alt.end;
   }
 
-  onLocationUpdated = (event: CustomEvent) => {
+  onLocationChange = (event: CustomEvent) => {
     const {
       reference: { start: refStart, end: refEnd },
       alt: { start: altStart, end: altEnd }
@@ -71,7 +71,7 @@ export class SvBrowserPlayground extends LitElement {
     this.altEnd = altEnd;
   }
 
-  onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
+  onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
     const { detail: { variantName, variantType, variantStart, variantEnd } } = event;
     const numberFormatter = new Intl.NumberFormat('en-GB');
     const messageContainer = this.shadowRoot!.querySelector('.variant-message');
@@ -132,8 +132,8 @@ export class SvBrowserPlayground extends LitElement {
           variants: ENDPOINTS.variants
         }}
         .genomeBrowserEndpoint=${ENDPOINTS.genomeBrowser}
-        @location-updated=${this.onLocationUpdated}
-        @variant-clicked=${this.onVariantClicked}
+        @location-change=${this.onLocationChange}
+        @variant-click=${this.onVariantClick}
         @location-change=${this.onReferenceLocationChange}
       ></ens-sv-browser>
       <div class="variant-message"></div>

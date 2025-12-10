@@ -67,7 +67,7 @@ class DragController implements ReactiveController {
       alt: this.#calculateCoordsForAlt({ deltaX, directionCoefficient })
     }
 
-    const locationUpdatedEvent = new CustomEvent('location-updated', {
+    const locationUpdatedEvent = new CustomEvent('location-change', {
       bubbles: true,
       composed: true,
       detail: eventData

@@ -8,7 +8,7 @@ import type { VariantClickPayload } from '../../alignments/types/variant';
 import type { ViewportChangePayload } from '../shared/control-buttons';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
-import { REFERENCE_GENOME_ID, ALT_GENOME_ID, INITIAL_VIEWPORT, ALIGNMENT_ENDPOINTS } from '../shared/constants';
+import { REFERENCE_GENOME_ID, ALT_GENOME_ID, INITIAL_VIEWPORT, ENDPOINTS } from '../shared/constants';
 
 @customElement('alignments-playground')
 export class StructuralVariantsPlayground extends LitElement {
@@ -51,7 +51,7 @@ export class StructuralVariantsPlayground extends LitElement {
     this.altEnd = payload.alt.end;
   }
 
-  onLocationUpdated = (event: CustomEvent) => {
+  onLocationChange = (event: CustomEvent) => {
     const {
       reference: { start: refStart, end: refEnd },
       alt: { start: altStart, end: altEnd }
@@ -62,7 +62,7 @@ export class StructuralVariantsPlayground extends LitElement {
     this.altEnd = altEnd;
   }
 
-  onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
+  onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
     const { detail: {
       variantName,
       variantType,
@@ -92,8 +92,8 @@ export class StructuralVariantsPlayground extends LitElement {
         </control-buttons>
       </div>
       <ens-sv-alignments
-        @location-updated=${this.onLocationUpdated}
-        @variant-clicked=${this.onVariantClicked}
+        @location-change=${this.onLocationChange}
+        @variant-click=${this.onVariantClick}
         .referenceGenomeId=${REFERENCE_GENOME_ID}
         .altGenomeId=${ALT_GENOME_ID}
         .regionName=${this.regionName}
@@ -102,7 +102,7 @@ export class StructuralVariantsPlayground extends LitElement {
         .altStart=${this.altStart}
         .altEnd=${this.altEnd}
         .regionLength=${INITIAL_VIEWPORT.regionLength}
-        .endpoints=${ALIGNMENT_ENDPOINTS}
+        .endpoints=${ENDPOINTS}
       ></ens-sv-alignments>
       <div class="variant-message"></div>
     `;
