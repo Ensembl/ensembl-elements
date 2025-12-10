@@ -1,6 +1,5 @@
 import { html, css, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import initializeGenomeBrowser, { GenomeBrowser as EnsemblGenomeBrowser, type InitOutput } from '@ensembl/ensembl-genome-browser';
@@ -39,14 +38,6 @@ export class GenomeBrowser extends LitElement {
       width: 100%;
       height: auto;
     }
-
-    .tooltip-anchor {
-      position: absolute;
-      pointer-events: none;
-      width: 1px;
-      height: 1px;
-    }
-
   `;
 
   static initPromise: Promise<InitOutput> | null = null;
@@ -57,7 +48,7 @@ export class GenomeBrowser extends LitElement {
   @state()
   private tooltip: TooltipState | null = null;
 
-  private tooltipAnchor: HTMLElement | null = null;
+  private virtualTooltipAnchor: { getBoundingClientRect: () => DOMRect } | null = null;
 
   private lastPointerPosition: PointerPosition | null = null;
 
@@ -88,20 +79,12 @@ export class GenomeBrowser extends LitElement {
   @property({ type: String })
   endpoint = '/api/browser/data';
 
-  #setTooltipAnchor = (element?: Element | null) => {
-    const anchor = (element ?? null) as HTMLElement | null;
-    if (this.tooltipAnchor !== anchor) {
-      this.tooltipAnchor = anchor;
-      this.requestUpdate();
-    }
-  };
-
   #clearTooltip = () => {
     if (this.tooltip !== null) {
       this.tooltip = null;
     }
-    if (this.tooltipAnchor) {
-      this.tooltipAnchor = null;
+    if (this.virtualTooltipAnchor) {
+      this.virtualTooltipAnchor = null;
     }
   };
 
@@ -169,21 +152,12 @@ export class GenomeBrowser extends LitElement {
         bubbles: true,
         composed: true
       }));
-      
-      return;
-    }
-
-    if (kind === 'hotspot') {
+    } else if (kind === 'hotspot') {
       const [payload] = more as [HotspotPayload?];
       this.#handleHotspotMessage(payload);
-      return;
-    }
-
-    if (kind === 'error') {
+    } else if (kind === 'error') {
       console.error('[GenomeBrowser error]', ...more);
-      return;
     }
-
   };
 
   #handleHotspotMessage(payload?: HotspotPayload | null) {
@@ -277,24 +251,26 @@ export class GenomeBrowser extends LitElement {
     const tooltip = this.tooltip;
     const pointer = tooltip?.pointer ?? null;
 
+    if (pointer) {
+      const hostRect = this.getBoundingClientRect();
+      const x = hostRect.left + pointer.x;
+      const y = hostRect.top + pointer.y;
+
+      this.virtualTooltipAnchor = {
+        getBoundingClientRect: () => new DOMRect(x, y, 1, 1)
+      };
+    } else if (this.virtualTooltipAnchor) {
+      this.virtualTooltipAnchor = null;
+    }
+
     return html`
       <div id="viewport">
         ${tooltip && pointer
           ? html`
-              <div
-                class="tooltip-anchor"
-                style=${styleMap({
-                  left: `${pointer.x}px`,
-                  top: `${pointer.y}px`,
-                  width: '1px',
-                  height: '1px'
-                })}
-                ${ref(this.#setTooltipAnchor)}
-              ></div>
-              ${this.tooltipAnchor
+              ${this.virtualTooltipAnchor
                 ? html`
                     <ens-popup
-                      .anchor=${this.tooltipAnchor}
+                      .anchor=${this.virtualTooltipAnchor as unknown as HTMLElement}
                       placement="bottom"
                       @ens-popup-click-outside=${this.#clearTooltip}
                     >

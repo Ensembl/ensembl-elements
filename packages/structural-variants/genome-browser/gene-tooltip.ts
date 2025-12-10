@@ -55,8 +55,6 @@ export class GeneTooltip extends LitElement {
     }
 
     const gene = contentItems.find((item) => item.metadata.type === 'gene')?.metadata as GeneMetadata | undefined;
-    const transcript = contentItems.find((item) => item.metadata.type === 'transcript')?.metadata as TranscriptMetadata | undefined;
-
     return html`
       <div class="hotspot-tooltip">
         ${gene ? this.#renderGeneSection(gene) : null}
@@ -90,7 +88,7 @@ export class GeneTooltip extends LitElement {
   #renderGeneLink(gene: GeneMetadata) {
     const stableId = gene.unversioned_id;
     const href = `https://beta.ensembl.org/genome-browser/${this.genomeId}?focus=gene:${stableId}`;
-    return stableId ? html`<ens-external-link href=${href}>${stableId}</ens-external-link>` : '—';
+    return stableId ? html`<a href=${href}>${stableId}</a>` : '—';
   }
 }
 

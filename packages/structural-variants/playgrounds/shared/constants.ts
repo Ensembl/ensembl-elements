@@ -10,8 +10,8 @@ export const INITIAL_VIEWPORT = {
   regionLength: 248_956_422
 };
 
-export const GENOME_BROWSER_ENDPOINT = 'https://dev-2020.ensembl.org/api/browser/data';
-export const ALIGNMENT_ENDPOINTS = {
+export const ENDPOINTS = {
+  genomeBrowser: 'https://dev-2020.ensembl.org/api/browser/data',
   alignments: 'https://dev-2020.ensembl.org/api/structural-variants/alignments',
   variants: 'https://dev-2020.ensembl.org/api/structural-variants/variants'
 };

@@ -10,7 +10,7 @@ import type { VariantClickPayload } from '../../alignments/types/variant';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 
-import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, GENOME_BROWSER_ENDPOINT, ALIGNMENT_ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
+import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
 
 @customElement('sv-browser-playground')
 export class SvBrowserPlayground extends LitElement {
@@ -127,12 +127,14 @@ export class SvBrowserPlayground extends LitElement {
         .end=${this.end}
         .altStart=${altStart}
         .altEnd=${altEnd}
-        .endpoints=${ALIGNMENT_ENDPOINTS}
-        .genomeBrowserEndpoint=${GENOME_BROWSER_ENDPOINT}
+        .endpoints=${{
+          alignments: ENDPOINTS.alignments,
+          variants: ENDPOINTS.variants
+        }}
+        .genomeBrowserEndpoint=${ENDPOINTS.genomeBrowser}
         @location-updated=${this.onLocationUpdated}
         @variant-clicked=${this.onVariantClicked}
-        @reference-position-change=${this.onReferencePositionChange}
-        @alt-position-change=${this.onAltPositionChange}
+        @position-change=${this.onReferencePositionChange}
       ></ens-sv-browser>
       <div class="variant-message"></div>
     `;

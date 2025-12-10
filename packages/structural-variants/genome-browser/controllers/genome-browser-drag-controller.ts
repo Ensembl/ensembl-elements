@@ -10,7 +10,6 @@ class GenomeBrowserDragController implements ReactiveController {
   mouseDownX: number | null = null;
   #initialStart: number | null = null;
   #initialEnd: number | null = null;
-  #viewportWidth: number | null = null;
   #activePointerId: number | null = null;
 
   constructor(host: GenomeBrowser) {
@@ -19,7 +18,6 @@ class GenomeBrowserDragController implements ReactiveController {
   }
 
   addCanvasListener() {
-    this.#viewportWidth = this.host.viewport.clientWidth;
     this.host.canvas.addEventListener('pointerdown', this.#onMouseDown);
     this.host.canvas.addEventListener('pointermove', this.#onMouseMove);
     this.host.canvas.addEventListener('pointerup', this.#onMouseUp);
@@ -85,21 +83,13 @@ class GenomeBrowserDragController implements ReactiveController {
       return { start: this.host.start, end: this.host.end };
     }
 
-    if (this.#viewportWidth === null || this.#viewportWidth === 0) {
-      this.#viewportWidth = this.host.viewport.clientWidth;
-    }
-
-    if (!this.#viewportWidth) {
-      return { start: this.host.start, end: this.host.end };
-    }
-
-    const genomicRange = this.#initialEnd - this.#initialStart;
+    const genomicRange = this.#initialEnd - this.#initialStart + 1;
 
     if (genomicRange <= 0) {
       return { start: this.host.start, end: this.host.end };
     }
 
-    const pixelsPerBase = this.#viewportWidth / genomicRange;
+    const pixelsPerBase = this.host.viewport.clientWidth / genomicRange;
     const genomicDelta = Math.round(deltaX / pixelsPerBase);
     const newStart = Math.max(1, this.#initialStart - genomicDelta);
     const newEnd = Math.min(this.host.regionLength, this.#initialEnd - genomicDelta);

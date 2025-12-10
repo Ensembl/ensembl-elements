@@ -4,8 +4,6 @@ import { customElement, property } from 'lit/decorators.js';
 import '../alignments/variant-alignments';
 import '../genome-browser/genome-browser';
 
-import type { VariantClickPayload } from '../alignments/types/variant';
-import type { PositionChangePayload } from '../genome-browser/types/viewport';
 import type { Endpoints } from '../alignments/variant-alignments';
 
 @customElement('ens-sv-browser')
@@ -17,17 +15,12 @@ export class EnsSvBrowser extends LitElement {
       border-radius: 4px;
       padding: 1rem;
       margin: 1rem 0;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
     }
 
     ens-sv-genome-browser {
       border-top: 1px solid #eef0f3;
       border-bottom: 1px solid #eef0f3;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
+      padding: 1rem 0;
     }
   `;
 
@@ -67,30 +60,6 @@ export class EnsSvBrowser extends LitElement {
   @property({ type: String })
   genomeBrowserEndpoint = '/api/browser/data';
 
-  #bubbleEvent = (name: string, detail: unknown) => {
-    this.dispatchEvent(new CustomEvent(name, {
-      detail,
-      bubbles: true,
-      composed: true
-    }));
-  };
-
-  #onLocationUpdated = (event: CustomEvent) => {
-    this.#bubbleEvent('location-updated', event.detail);
-  };
-
-  #onVariantClicked = (event: CustomEvent<VariantClickPayload>) => {
-    this.#bubbleEvent('variant-clicked', event.detail);
-  };
-
-  #onReferenceBrowserPositionChange = (event: CustomEvent<PositionChangePayload>) => {
-    this.#bubbleEvent('reference-position-change', event.detail);
-  };
-
-  #onAltBrowserPositionChange = (event: CustomEvent<PositionChangePayload>) => {
-    this.#bubbleEvent('alt-position-change', event.detail);
-  };
-
   render() {
     const altStart = this.altStart || this.start;
     const altEnd = this.altEnd || this.end;
@@ -104,7 +73,6 @@ export class EnsSvBrowser extends LitElement {
       .start=${this.start}
       .end=${this.end}
       .endpoint=${this.genomeBrowserEndpoint}
-      @position-change=${this.#onReferenceBrowserPositionChange}
     ></ens-sv-genome-browser>
     <ens-sv-alignments
       .referenceGenomeId=${this.referenceGenomeId}
@@ -116,8 +84,6 @@ export class EnsSvBrowser extends LitElement {
       .altStart=${altStart}
       .altEnd=${altEnd}
       .endpoints=${this.endpoints}
-      @location-updated=${this.#onLocationUpdated}
-      @variant-clicked=${this.#onVariantClicked}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
@@ -127,7 +93,6 @@ export class EnsSvBrowser extends LitElement {
       .start=${altStart}
       .end=${altEnd}
       .endpoint=${this.genomeBrowserEndpoint}
-      @position-change=${this.#onAltBrowserPositionChange}
     ></ens-sv-genome-browser>
     `;
   }
