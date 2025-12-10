@@ -9,3 +9,6 @@ export type {
 export type {
   InputData
 } from '../types/inputData';
+export type {
+  Colors
+} from './constants';

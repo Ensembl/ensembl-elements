@@ -18,7 +18,6 @@ const HORIZONTAL_ARM_LENGTH = 6;
 const ARROWHEAD_BASE_LENGTH = 6; // the base of the triangle that represents the arrowhead
 const ARROWHEAD_HEIGHT = 6.75; // the height of the triangle that represents the arrowhead
 const VERTICAL_OFFSET_FROM_GENE = 2;
-const COLOR = 'black';
 
 type Params = {
   tss: GeneInRegionOverview['tss']; // an array of genomic coordinates related to this transcription start site
@@ -27,6 +26,7 @@ type Params = {
   geneTracks: GeneTrack[];
   trackIndex: number;
   trackOffsetsTop: number[];
+  color: string;
 };
 
 export const renderTranscriptionStartSites = (params: Params) => {
@@ -41,7 +41,7 @@ export const renderTranscriptionStartSites = (params: Params) => {
 const renderTranscriptionStartSite = (params: Params & {
   site: ReturnType<typeof prepareTssData>[number];
 }) => {
-  const { strand, site } = params;
+  const { strand, site, color } = params;
   const { yStart, yEnd, x, isOverlapping } = site;
 
   const stemX = x;
@@ -65,7 +65,7 @@ const renderTranscriptionStartSite = (params: Params & {
         x2=${stemX}
         y1=${yStart}
         y2=${yEnd}
-        stroke=${COLOR}
+        stroke=${color}
         strokeWidth="1"
       />
       <line
@@ -73,7 +73,7 @@ const renderTranscriptionStartSite = (params: Params & {
         x2=${armEndX}
         y1=${yEnd}
         y2=${yEnd}
-        stroke=${COLOR}
+        stroke=${color}
         strokeWidth="1"
       />
       ${isOverlapping ? svg`
@@ -82,12 +82,13 @@ const renderTranscriptionStartSite = (params: Params & {
           x2=${arrowheadPointX}
           y1=${yEnd}
           y2=${yEnd}
-          stroke=${COLOR}
+          stroke=${color}
           strokeWidth="1"
         />  
       ` : svg`
         <polygon
           points=${`${arrowheadBaseBottomCoords} ${arrowheadPointCoords} ${arrowheadBaseTopCoords}`}
+          fill=${color}
         />
       `
       }

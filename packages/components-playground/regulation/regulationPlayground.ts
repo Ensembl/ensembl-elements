@@ -16,9 +16,16 @@ import '@ensembl/ensembl-elements-common/styles/fonts.css';
 
 
 // a location on chromosome 1 that has some features
-const INITIAL_START = 58873313;
-const INITIAL_END = 59273313;
+// const INITIAL_START = 58873313;
+// const INITIAL_END = 59273313;
 const CHROMOSOME_LENGTH = 248956422; // length of chromosome 1
+
+// A location on chromosome 1 that has two features (promoter and enhancer) next to one another
+// Useful to make sure:
+// - There is no empty space between the features when they are rendered
+// - The extended start / extended end is taken into account when feature is rendered into view
+const INITIAL_START = 59814609;
+const INITIAL_END = 59815441;
 
 
 @customElement('regulation-playground')
@@ -30,7 +37,7 @@ export class RegulationPlayground extends LitElement {
       margin-top: 2em;
     }
 
-    ens-reg-region-overview {
+    ens-reg-region-annotation {
       grid-column: middle;
     }
 
@@ -69,7 +76,7 @@ export class RegulationPlayground extends LitElement {
           ${this.start}-${this.end}
         </div>
         <ens-reg-region-overview-popup-injector>
-          <ens-reg-region-overview
+          <ens-reg-region-annotation
             @viewport-change=${this.onViewportChange}
             @ens-reg-track-positions=${this.onTrackPositionsChange}
             .start=${this.start}
@@ -77,7 +84,7 @@ export class RegulationPlayground extends LitElement {
             .regionName=${"1"}
             .regionLength=${CHROMOSOME_LENGTH}
             .data=${data}>
-          </ens-reg-region-overview>
+          </ens-reg-region-annotation>
         </ens-reg-region-overview-popup-injector>
         <ens-reg-zoom-buttons
           .start=${this.start}

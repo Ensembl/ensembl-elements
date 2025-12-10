@@ -10,6 +10,7 @@ import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
 import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
+import { COLORS, type Colors } from './constants';
 
 import ViewportController from './viewportController';
 import AreaSelectionController from './selection/area-selection-controller';
@@ -30,7 +31,7 @@ type CalculatedTrackPositions = {
   regulatoryFeatures: number[];
 };
 
-@customElement('ens-reg-region-overview')
+@customElement('ens-reg-region-annotation')
 export class RegionOverview extends LitElement {
   static styles = css`
     :host {
@@ -64,6 +65,15 @@ export class RegionOverview extends LitElement {
 
   @property({ type: Object })
   data: InputData | null = null;
+
+  @property({ type: Object })
+  colors: Partial<Colors> | null = null;
+
+  @property({ type: String })
+  focusGeneId: string | null = null;
+
+  @property({ type: String })
+  focusRegulatoryFeatureId: string | null = null;
 
   @state()
   featureTracks: FeatureTracks | null = null;
@@ -184,6 +194,13 @@ export class RegionOverview extends LitElement {
     this.dispatchEvent(event);
   }
 
+  #getColors() {
+    return {
+      ...COLORS,
+      ...this.colors
+    };
+  }
+
   render() {
     if (!this.imageWidth || !this.scale || !this.featureTracks) {
       return;
@@ -198,6 +215,7 @@ export class RegionOverview extends LitElement {
       strandDividerTopOffset
     } = calculatedHeightsAndOffsets;
     this.#onTrackPositionsCalculated(calculatedHeightsAndOffsets); // as a side effect, report calculated track positions
+    const colors = this.#getColors();
 
     return html`
       <svg
@@ -209,18 +227,22 @@ export class RegionOverview extends LitElement {
         <g filter="url(#unselected-background)">
           ${renderRuler({
             scale: this.scale,
-            offsetTop: 0
+            offsetTop: 0,
+            colors
           })}
           ${this.renderGeneTracks({
             offsetTop: geneTracksTopOffset,
-            strandDividerTopOffset
+            strandDividerTopOffset,
+            colors
           })}
           ${this.renderRegulatoryFeatureTracks({
-            offsetTop: regulatoryFeatureTracksTopOffset
+            offsetTop: regulatoryFeatureTracksTopOffset,
+            colors
           })}
           ${renderRuler({
             scale: this.scale,
-            offsetTop: bottomRulerTopOffset
+            offsetTop: bottomRulerTopOffset,
+            colors
           })}
           ${areaSelection()}
         </g>
@@ -231,16 +253,19 @@ export class RegionOverview extends LitElement {
 
   renderGeneTracks({
     offsetTop,
-    strandDividerTopOffset
+    strandDividerTopOffset,
+    colors
   }: {
     offsetTop: number;
     strandDividerTopOffset: number;
+    colors: Colors;
   }) {
     if (!this.featureTracks || !this.scale) {
       return;
     }
 
     const { geneTracks } = this.featureTracks;
+
     return renderGeneTracks({
       offsetTop,
       scale: this.scale,
@@ -248,27 +273,34 @@ export class RegionOverview extends LitElement {
       start: this.start,
       regionName: this.regionName,
       end: this.end,
+      focusGeneId: this.focusGeneId,
       strandDividerTopOffset,
-      width: this.imageWidth
+      width: this.imageWidth,
+      colors
     })
   }
 
   renderRegulatoryFeatureTracks({
-    offsetTop
+    offsetTop,
+    colors
   }: {
     offsetTop: number;
+    colors: Colors;
   }) {
     if (!this.featureTracks || !this.data || !this.scale) {
       return;
     }
 
     const { regulatoryFeatureTracks } = this.featureTracks;
+
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,
       featureTypes: this.data.regulatory_feature_types,
       scale: this.scale,
       regionName: this.regionName,
-      offsetTop
+      focusRegulatoryFeatureId: this.focusRegulatoryFeatureId,
+      offsetTop,
+      colors
     });
   }
 
@@ -277,6 +309,6 @@ export class RegionOverview extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'ens-reg-region-overview': RegionOverview;
+    'ens-reg-region-annotation': RegionOverview;
   }
 }
