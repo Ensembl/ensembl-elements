@@ -37,6 +37,11 @@ The component expects the following properties in order to work:
 - `regionLength` - total length of the region, in base pairs
 - `data` - an object containing the data for visualisation (see the exported `RegionOverviewData` type for details)
 
+It also accepts the following optional properties:
+- `colors` - a configuration object that is a map of configurable colours. To see which colours of the regulatory annotation panel are configurable, inspect the `Colors` type exported from the package.
+- `focusGeneId` - id of the gene that is "in focus" (it is coloured differently from the others)
+- `focusRegulatoryFeatureId` - id of the regulatory feature that is "in focus" (it is coloured differently from the others)
+
 The component also emits the following events:
 
 - `viewport-change` - a custom event containing the new desired start and end genomic coordinates on the region (emitted when user drags the content of the component, or makes a selection within it)
