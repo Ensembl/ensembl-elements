@@ -14,8 +14,8 @@
     "d3": ">=7.0.0"
   },
   "scripts": {
-    "dev-alignments": "vite serve alignments-playground",
-    "dev-integration": "vite serve sv-browser-playground",
+    "dev": "vite serve playgrounds/sv-browser-playground",
+    "dev-alignments": "vite serve playgrounds/alignments-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test:watch": "node --import=tsx --experimental-test-module-mocks --enable-source-maps --test-only --test --watch **/*.test.*",

@@ -83,4 +83,4 @@ import '@ensembl/ensembl-structural-variants/sv-browser';
 ```
 
 The component accepts the same properties as its standalone pieces (genome IDs, tracks list, endpoint URLs).
-For local testing and development, run `npm run dev-integration` inside `packages/structural-variants` to launch the structural variants playground.
+For local testing and development, run `npm run dev` inside `packages/structural-variants` to launch the structural variants playground.

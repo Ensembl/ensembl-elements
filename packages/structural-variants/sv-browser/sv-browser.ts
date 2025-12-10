@@ -23,7 +23,6 @@ export class EnsSvBrowser extends LitElement {
       display: block;
       border: 1px dashed #d0d4da;
       border-radius: 4px;
-      padding: 1rem;
       margin: 1rem 0;
     }
   `;
