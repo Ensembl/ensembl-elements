@@ -23,4 +23,4 @@ export const COLORS = {
   regulatoryFeatureUnfocused: '#e5eaf0', // Light grey; same colour that is used during location selection
 } as const;
 
-export type Colors = typeof COLORS;
+export type Colors = Record<keyof typeof COLORS, string>;
