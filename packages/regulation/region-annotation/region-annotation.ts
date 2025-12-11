@@ -209,7 +209,8 @@ export class RegionOverview extends LitElement {
     const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
     const {
       imageHeight,
-      geneTracksTopOffset,
+      forwardStrandGeneTrackOffsets,
+      reverseStrandGeneTrackOffsets,
       bottomRulerTopOffset,
       regulatoryFeatureTracksTopOffset,
       strandDividerTopOffset
@@ -231,7 +232,8 @@ export class RegionOverview extends LitElement {
             colors
           })}
           ${this.renderGeneTracks({
-            offsetTop: geneTracksTopOffset,
+            forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
+            reverseStrandTopOffsets: reverseStrandGeneTrackOffsets,
             strandDividerTopOffset,
             colors
           })}
@@ -252,11 +254,13 @@ export class RegionOverview extends LitElement {
   }
 
   renderGeneTracks({
-    offsetTop,
+    forwardStrandTopOffsets,
+    reverseStrandTopOffsets,
     strandDividerTopOffset,
     colors
   }: {
-    offsetTop: number;
+    forwardStrandTopOffsets: number[];
+    reverseStrandTopOffsets: number[];
     strandDividerTopOffset: number;
     colors: Colors;
   }) {
@@ -267,7 +271,8 @@ export class RegionOverview extends LitElement {
     const { geneTracks } = this.featureTracks;
 
     return renderGeneTracks({
-      offsetTop,
+      forwardStrandTopOffsets,
+      reverseStrandTopOffsets,
       scale: this.scale,
       tracks: geneTracks,
       start: this.start,

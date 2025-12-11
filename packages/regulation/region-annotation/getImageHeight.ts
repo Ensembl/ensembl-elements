@@ -14,32 +14,43 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
 
   const geneTracksTopOffset = RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET;
 
-  const forwardStrandGeneTrackOffsets = forwardStrandTracks.map((_, index) => {
-    return geneTracksTopOffset + index * GENE_TRACK_HEIGHT;
-  });
+  // make sure there is space for at least 3 gene tracks for the forward strand
+  const forwardStrandGeneTracksCount = Math.max(forwardStrandTracks.length, 3);
+  const forwardStrandGeneTrackOffsets = [...Array(forwardStrandGeneTracksCount)]
+    .map((_, index) => {
+      return geneTracksTopOffset + index * GENE_TRACK_HEIGHT;
+    });
 
   const strandDividerTopOffset =
     geneTracksTopOffset +
-    forwardStrandTracks.length * GENE_TRACK_HEIGHT +
+    forwardStrandGeneTracksCount * GENE_TRACK_HEIGHT +
     0.5 * GENE_TRACK_HEIGHT;
 
-  const reverseStrandGeneTrackOffsets = reverseStrandTracks.map((_, index) => {
-    return strandDividerTopOffset + GENE_TRACK_HEIGHT + geneTracksTopOffset + index * GENE_TRACK_HEIGHT;
-  });
+  // make sure there is space for at least 3 gene tracks for the reverse strand
+  const reverseStrandGeneTracksCount = Math.max(reverseStrandTracks.length, 3);
+  const reverseStrandGeneTrackOffsets = [...Array(reverseStrandGeneTracksCount)]
+    .map((_, index) => {
+      return strandDividerTopOffset
+        + GENE_TRACK_HEIGHT
+        + index * GENE_TRACK_HEIGHT;
+    });
 
   const regulatoryFeatureTracksTopOffset =
     strandDividerTopOffset +
     GENE_TRACK_HEIGHT +
-    reverseStrandTracks.length * GENE_TRACK_HEIGHT +
+    reverseStrandGeneTracksCount * GENE_TRACK_HEIGHT +
     REGULATORY_FEATURE_TRACKS_TOP_OFFSET;
 
-  const regulatoryFeatureTrackOffsets = regulatoryFeatureTracks.map((_, index) => {
-    return regulatoryFeatureTracksTopOffset + index * REGULATORY_FEATURE_TRACK_HEIGHT;
-  });
+  // make sure there is space for at least 3 tracks of regulatory features
+  const regulatoryFeatureTracksCount = Math.max(regulatoryFeatureTracks.length, 3);
+  const regulatoryFeatureTrackOffsets = [...Array(regulatoryFeatureTracksCount)]
+    .map((_, index) => {
+      return regulatoryFeatureTracksTopOffset + index * REGULATORY_FEATURE_TRACK_HEIGHT;
+    });
 
   const imageHeight =
     regulatoryFeatureTracksTopOffset +
-    regulatoryFeatureTracks.length * REGULATORY_FEATURE_TRACK_HEIGHT
+    regulatoryFeatureTracksCount * REGULATORY_FEATURE_TRACK_HEIGHT
     + RULER_HEIGHT;
 
   const bottomRulerTopOffset = imageHeight - RULER_HEIGHT;

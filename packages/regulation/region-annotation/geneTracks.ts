@@ -2,7 +2,6 @@ import { svg } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 import {
-  GENE_TRACK_HEIGHT,
   GENE_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
@@ -26,7 +25,8 @@ export const renderGeneTracks = ({
   start,
   end,
   focusGeneId,
-  offsetTop,
+  forwardStrandTopOffsets,
+  reverseStrandTopOffsets,
   strandDividerTopOffset,
   width,
   colors
@@ -38,34 +38,16 @@ export const renderGeneTracks = ({
   start: number;
   end: number;
   focusGeneId: string | null;
-  offsetTop: number;
+  forwardStrandTopOffsets: number[];
+  reverseStrandTopOffsets: number[];
   strandDividerTopOffset: number;
   colors: Colors;
 }) => {
   const { forwardStrandTracks, reverseStrandTracks } = tracks;
-  let tempY = offsetTop;
-
-  // calculate y-coordinates for gene tracks
-  const forwardStrandTrackYs: number[] = [];
-  const reverseStrandTrackYs: number[] = [];
 
   // Designer's instruction: forward strand genes stack upwards
-  for (let i = forwardStrandTracks.length; i > 0; i--) {
-    const y = offsetTop + GENE_TRACK_HEIGHT * (i - 1);
-    forwardStrandTrackYs.push(y);
-    tempY += GENE_TRACK_HEIGHT;
-  }
-
-  const strandDividerY = tempY + 0.5 * GENE_TRACK_HEIGHT;
-  tempY = strandDividerY + GENE_TRACK_HEIGHT;
-
-  for (let i = 0; i < reverseStrandTracks.length; i++) {
-    reverseStrandTrackYs.push(tempY);
-    tempY += GENE_TRACK_HEIGHT;
-  }
-  tempY += GENE_TRACK_HEIGHT;
-
-  // by this point, tempY should be the y-coordinate of the bottom gene track
+  const forwardStrandTrackYs = forwardStrandTopOffsets.toReversed();
+  const reverseStrandTrackYs = reverseStrandTopOffsets;
 
   const [forwardStrandTrackElements, reverseStrandTrackElements] = [
     forwardStrandTracks,
