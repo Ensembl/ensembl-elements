@@ -54,17 +54,6 @@ export class StructuralVariantsPlayground extends LitElement {
     }
   }
 
-  onLocationChange = (event: CustomEvent) => {
-    const {
-      reference: { start: refStart, end: refEnd },
-      alt: { start: altStart, end: altEnd }
-    } = event.detail;
-    this.start = refStart;
-    this.end = refEnd;
-    this.altStart = altStart;
-    this.altEnd = altEnd;
-  }
-
   onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
     const { detail: {
       variantName,
@@ -95,7 +84,7 @@ export class StructuralVariantsPlayground extends LitElement {
         </control-buttons>
       </div>
       <ens-sv-alignments
-        @location-change=${this.onLocationChange}
+        @viewport-change=${this.onViewportChange}
         @variant-click=${this.onVariantClick}
         .referenceGenomeId=${REFERENCE_GENOME_ID}
         .altGenomeId=${ALT_GENOME_ID}
