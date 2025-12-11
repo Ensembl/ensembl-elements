@@ -15,22 +15,12 @@ export class GenomeBrowser extends LitElement {
     :host {
       display: block;
       min-height: 180px;
-      height: auto;
-      contain: layout;
     }
     
     #viewport {
       width: 100%;
-      height: auto;
       min-height: inherit;
-      overflow: hidden;
       position: relative;
-    }
-    
-    #viewport canvas {
-      display: block;
-      width: 100%;
-      height: auto;
     }
   `;
 

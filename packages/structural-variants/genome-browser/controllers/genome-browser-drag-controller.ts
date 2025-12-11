@@ -98,15 +98,10 @@ class GenomeBrowserDragController implements ReactiveController {
   }
 
   #releasePointerCapture() {
-    if (this.#activePointerId === null) {
-      return;
-    }
-
-    const release = this.host.canvas.releasePointerCapture;
-    if (typeof release === 'function') {
+    if (this.#activePointerId !== null) {
       const pointerId = this.#activePointerId;
       if (this.host.canvas.hasPointerCapture?.(pointerId)) {
-        release.call(this.host.canvas, pointerId);
+        this.host.canvas.releasePointerCapture?.(pointerId);
       }
     }
   }
