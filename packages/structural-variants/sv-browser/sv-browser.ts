@@ -90,16 +90,19 @@ export class EnsSvBrowser extends LitElement {
     this.dispatchEvent(event);
   };
 
-  private onLocationChange = (event: CustomEvent<ViewportChangePayload>) => {
+  private onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
+    event.stopPropagation();
     const { reference, alt } = event.detail ?? {};
     this.syncViewport(reference, alt);
   };
 
   private onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+    event.stopPropagation();
     this.syncViewport(event.detail, undefined);
   };
 
   private onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+    event.stopPropagation();
     this.syncViewport(undefined, event.detail);
   };
 
@@ -128,7 +131,7 @@ export class EnsSvBrowser extends LitElement {
       .altStart=${altStart}
       .altEnd=${altEnd}
       .endpoints=${this.endpoints}
-      @location-change=${this.onLocationChange}
+      @viewport-change=${this.onViewportChange}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
