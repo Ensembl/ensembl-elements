@@ -53,6 +53,15 @@ class DragController implements ReactiveController {
   }
 
   #onMouseMove = (event: MouseEvent) => {
+    if (!this.isMouseDown || this.mouseDownX === null) {
+      return;
+    }
+
+    if (event.buttons === 0) {
+      this.#onMouseUp();
+      return;
+    }
+
     this.isDragging = true;
 
     const { clientX: x } = event;
@@ -149,6 +158,7 @@ class DragController implements ReactiveController {
     this.#draggingMode = null;
 
     document.removeEventListener('mousemove', this.#onMouseMove);
+    document.removeEventListener('mouseup', this.#onMouseUp);
   }
 
   #setDraggingMode = (event: MouseEvent) => {

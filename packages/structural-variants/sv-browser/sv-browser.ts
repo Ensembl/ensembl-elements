@@ -69,6 +69,25 @@ export class EnsSvBrowser extends LitElement {
       this.altStart = alt.start;
       this.altEnd = alt.end;
     }
+
+    const detail: ViewportChangePayload = {
+      reference: {
+        start: this.start,
+        end: this.end
+      },
+      alt: {
+        start: this.altStart || this.start,
+        end: this.altEnd || this.end
+      }
+    };
+
+    const event = new CustomEvent<ViewportChangePayload>('viewport-change', {
+      detail,
+      bubbles: true,
+      composed: true
+    });
+
+    this.dispatchEvent(event);
   };
 
   private onLocationChange = (event: CustomEvent<ViewportChangePayload>) => {

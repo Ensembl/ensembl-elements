@@ -112,6 +112,7 @@ export class SvBrowserPlayground extends LitElement {
         .altStart=${altStart}
         .altEnd=${altEnd}
         .endpoints=${ENDPOINTS}
+        @viewport-change=${this.onViewportChange}
         @variant-click=${this.onVariantClick}
         @hotspot-message=${this.onHotspotClick}
       ></ens-sv-browser>
