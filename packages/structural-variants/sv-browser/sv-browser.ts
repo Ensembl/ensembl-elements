@@ -34,10 +34,10 @@ export class StructuralVariantsBrowser extends LitElement {
   altTracks: string[] = [];
 
   @property({ type: String })
-  referenceGenomeId: string | null = null;
+  referenceGenomeId: string = '';
 
   @property({ type: String })
-  altGenomeId: string | null = null;
+  altGenomeId: string = '';
 
   @property({ type: String })
   regionName = '';
@@ -107,6 +107,11 @@ export class StructuralVariantsBrowser extends LitElement {
   };
 
   render() {
+    if (!this.referenceGenomeId || !this.altGenomeId) {
+      console.error('One or both genome uuids missing!');
+      return;
+    }
+
     const altStart = this.altStart || this.start;
     const altEnd = this.altEnd || this.end;
 
