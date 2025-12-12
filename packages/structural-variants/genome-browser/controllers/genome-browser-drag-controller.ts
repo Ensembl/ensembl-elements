@@ -60,6 +60,16 @@ class GenomeBrowserDragController implements ReactiveController {
   };
 
   #onMouseUp = () => {
+    const event = new CustomEvent<LocationChangePayload>('location-change-end', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        start: this.host.start,
+        end: this.host.end
+      }
+    });
+    this.host.dispatchEvent(event);
+
     this.#releasePointerCapture();
     this.#cleanupPointerState();
   };

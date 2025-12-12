@@ -60,16 +60,22 @@ export class StructuralVariantsBrowser extends LitElement {
   @property({ type: Object })
   endpoints!: Endpoints;
 
-  private syncViewport(reference?: LocationChangePayload, alt?: LocationChangePayload) {
-    if (reference) {
-      this.start = reference.start;
-      this.end = reference.end;
+  private syncViewport(payload: {
+    reference?: LocationChangePayload;
+    alt?: LocationChangePayload;
+    eventName: string;
+  }) {
+    const { reference, alt, eventName } = payload;
+    if (!eventName.endsWith('-end')) {
+      if (reference) {
+        this.start = reference.start;
+        this.end = reference.end;
+      }
+      if (alt) {
+        this.altStart = alt.start;
+        this.altEnd = alt.end;
+      }
     }
-    if (alt) {
-      this.altStart = alt.start;
-      this.altEnd = alt.end;
-    }
-
     const detail: ViewportChangePayload = {
       reference: {
         start: this.start,
@@ -81,7 +87,8 @@ export class StructuralVariantsBrowser extends LitElement {
       }
     };
 
-    const event = new CustomEvent<ViewportChangePayload>('viewport-change', {
+    const outgoingEventName = eventName.endsWith('-end') ? 'viewport-change-end' : 'viewport-change';
+    const event = new CustomEvent<ViewportChangePayload>(outgoingEventName, {
       detail,
       bubbles: true,
       composed: true
@@ -93,17 +100,17 @@ export class StructuralVariantsBrowser extends LitElement {
   private onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     event.stopPropagation();
     const { reference, alt } = event.detail ?? {};
-    this.syncViewport(reference, alt);
+    this.syncViewport({ reference, alt, eventName: event.type });
   };
 
   private onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     event.stopPropagation();
-    this.syncViewport(event.detail, undefined);
+    this.syncViewport({ reference: event.detail, eventName: event.type });
   };
 
   private onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     event.stopPropagation();
-    this.syncViewport(undefined, event.detail);
+    this.syncViewport({ alt: event.detail, eventName: event.type });
   };
 
   render() {
@@ -125,6 +132,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .end=${this.end}
       .endpoint=${this.endpoints.genomeBrowser}
       @location-change=${this.onReferenceLocationChange}
+      @location-change-end=${this.onReferenceLocationChange}
     ></ens-sv-genome-browser>
     <ens-sv-alignments
       .referenceGenomeId=${this.referenceGenomeId}
@@ -137,6 +145,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .altEnd=${altEnd}
       .endpoints=${this.endpoints}
       @viewport-change=${this.onViewportChange}
+      @viewport-change-end=${this.onViewportChange}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
@@ -147,6 +156,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .end=${altEnd}
       .endpoint=${this.endpoints.genomeBrowser}
       @location-change=${this.onAltLocationChange}
+      @location-change-end=${this.onAltLocationChange}
     ></ens-sv-genome-browser>
     `;
   }
