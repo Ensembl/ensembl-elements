@@ -6,8 +6,8 @@ import '../genome-browser/genome-browser';
 import { LocationChangePayload } from '../genome-browser';
 
 export type ViewportChangePayload = {
-  reference?: LocationChangePayload,
-  alt?: LocationChangePayload
+  reference: LocationChangePayload,
+  alt: LocationChangePayload
 };
 
 export type Endpoints = {
@@ -17,7 +17,7 @@ export type Endpoints = {
 };
 
 @customElement('ens-sv-browser')
-export class EnsSvBrowser extends LitElement {
+export class StructuralVariantsBrowser extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -149,6 +149,6 @@ export class EnsSvBrowser extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'ens-sv-browser': EnsSvBrowser;
+    'ens-sv-browser': StructuralVariantsBrowser;
   }
 }
