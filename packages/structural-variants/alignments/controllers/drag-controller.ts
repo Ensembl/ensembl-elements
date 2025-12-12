@@ -151,6 +151,22 @@ class DragController implements ReactiveController {
   }
 
   #onMouseUp = () => {
+    const event = new CustomEvent('viewport-change-end', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        reference: {
+          start: this.host.start,
+          end: this.host.end
+        },
+        alt: {
+          start: this.host.altStart,
+          end: this.host.altEnd
+        }
+      }
+    });
+    this.host.dispatchEvent(event);
+
     this.isDragging = false;
     this.isMouseDown = false;
     this.mouseDownX = null;

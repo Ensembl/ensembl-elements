@@ -94,7 +94,7 @@ describe('compareIntervals', () => {
 
 });
 
-describe.only('checkIntervalOverlap', () => {
+describe('checkIntervalOverlap', () => {
 
   test('reference intervals are an empty list', () => {
     const referenceIntervals: Interval[] = [];

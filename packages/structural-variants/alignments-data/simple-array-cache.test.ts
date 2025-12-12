@@ -3,7 +3,7 @@ import assert from 'node:assert';
 
 import { SimpleArrayCache } from './simple-array-cache';
 
-describe.only('SimpleArrayCache', () => {
+describe('SimpleArrayCache', () => {
 
   describe('basic caching functionality', () => {
     const batch = [...Array(10)]
@@ -79,65 +79,68 @@ describe.only('SimpleArrayCache', () => {
 
   });
 
-  describe('getting uncached intervals', () => {
+  describe('getting cached intervals', () => {
 
-    const features = [{id: 1, start: 100, end: 200}];
-    const cachedInterval = { start: 100, end: 200 };
-    const cache = new SimpleArrayCache();
-
-    cache.add({
-      features,
-      interval: cachedInterval
+    test('empty cache', () => {
+      const cache = new SimpleArrayCache();
+      assert.deepStrictEqual(cache.getCachedIntervals(), []);
     });
 
-    test('interval not cached', () => {
-      const queryInterval = { start: 1000, end: 2000 };
-      const uncachedIntervals = cache.getUncachedIntervals(queryInterval);
+    test('a single cached interval', () => {
+      const features = [{id: 1, start: 100, end: 200}];
+      const cachedInterval = { start: 100, end: 200 };
+      const cache = new SimpleArrayCache();
 
-      assert.deepStrictEqual(uncachedIntervals, [queryInterval]);
+      cache.add({
+        features,
+        interval: cachedInterval
+      });
+
+      assert.deepStrictEqual(cache.getCachedIntervals(), [cachedInterval]);
     });
 
-    test('interval fully cached', () => {
-      // end to end
-      let queryInterval = { start: 100, end: 200 };
-      let uncachedIntervals = cache.getUncachedIntervals(queryInterval);
-      assert.deepStrictEqual(uncachedIntervals, []);
+    test('adjacent cached intervals', () => {
+      const featuresBatch1 = [{id: 1, start: 100, end: 200}];
+      const featuresBatch2 = [{id: 2, start: 200, end: 300}];
+      const cachedInterval1 = { start: 100, end: 200 };
+      const cachedInterval2 = { start: 200, end: 300 };
+      const cache = new SimpleArrayCache();
 
-      // inside of cached interval
-      queryInterval = { start: 120, end: 150 };
-      uncachedIntervals = cache.getUncachedIntervals(queryInterval);
-      assert.deepStrictEqual(uncachedIntervals, []);
+      cache.add({
+        features: featuresBatch1,
+        interval: cachedInterval1
+      });
+      cache.add({
+        features: featuresBatch2,
+        interval: cachedInterval2
+      });
+
+      assert.deepStrictEqual(cache.getCachedIntervals(), [{ start: 100, end: 300 }]);
     });
 
-    test('left part of interval not cached', () => {
-      const queryInterval = { start: 80, end: 120 };
-      const uncachedIntervals = cache.getUncachedIntervals(queryInterval);
+    test('several cached intervals', () => {
+      const featuresBatch1 = [{id: 1, start: 100, end: 200}];
+      const featuresBatch2 = [{id: 2, start: 300, end: 400}];
+      const cachedInterval1 = { start: 100, end: 200 };
+      const cachedInterval2 = { start: 300, end: 400 };
+      const cache = new SimpleArrayCache();
 
-      assert.deepStrictEqual(uncachedIntervals, [{ start: 80, end: 99 }]);
-    });
+      cache.add({
+        features: featuresBatch1,
+        interval: cachedInterval1
+      });
+      cache.add({
+        features: featuresBatch2,
+        interval: cachedInterval2
+      });
 
-    test('right part of interval not cached', () => {
-      const queryInterval = { start: 150, end: 220 };
-      const uncachedIntervals = cache.getUncachedIntervals(queryInterval);
-
-      assert.deepStrictEqual(uncachedIntervals, [{ start: 201, end: 220 }]);
-    });
-
-    test('left and right parts of interval not cached', () => {
-      const queryInterval = { start: 80, end: 220 };
-      const uncachedIntervals = cache.getUncachedIntervals(queryInterval);
-
-      const expectedUncachedIntervals = [
-        {
-          start: 80,
-          end: 99
-        },
-        {
-          start: 201,
-          end: 220
-        }
-      ];
-      assert.deepStrictEqual(uncachedIntervals, expectedUncachedIntervals);
+      assert.deepStrictEqual(
+        cache.getCachedIntervals(),
+        [
+          cachedInterval1,
+          cachedInterval2
+        ]
+      );
     });
 
   });
