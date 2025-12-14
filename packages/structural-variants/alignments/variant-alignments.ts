@@ -188,7 +188,8 @@ export class VariantAlignments extends LitElement {
       });
     }
 
-    return [...refToAltAlignments, ...altToRefAlignments];
+    return [...refToAltAlignments, ...altToRefAlignments]
+      .sort((a, b) => a.reference.start - b.reference.start);
   }
 
   #getStandardInterval(params: {
