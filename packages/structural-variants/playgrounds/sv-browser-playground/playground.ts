@@ -17,11 +17,17 @@ export class SvBrowserPlayground extends LitElement {
   static styles = css`
     :host {
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "top top"
+        "main sidebar";
+      grid-template-columns: 1fr 320px;
+      grid-template-rows: 80px 1fr;
+      align-items: start;
       height: 100%;
     }
 
-    .overflow-container {
+    .main-container {
+      grid-area: main;
       height: 100%;
       overflow-y: auto;
     }
@@ -106,7 +112,7 @@ export class SvBrowserPlayground extends LitElement {
           .regionLength=${INITIAL_VIEWPORT.regionLength}
         ></control-buttons>
       </div>
-      <div class="overflow-container">
+      <div class="main-container">
         <ens-sv-browser
           .referenceTracks=${REFERENCE_TRACKS}
           .altTracks=${ALT_TRACKS}
