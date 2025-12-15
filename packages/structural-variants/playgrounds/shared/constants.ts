@@ -4,9 +4,9 @@ export const REFERENCE_TRACKS = ['sv-gene', '950a71e1-5229-459c-822f-d104506d24e
 export const ALT_TRACKS = ['sv-gene', 'a8691c70-7d68-4322-937d-938affb1b4ea'];
 
 export const INITIAL_VIEWPORT = {
-  regionName: '1',
-  start: 142_500_000,
-  end: 145_500_000,
+  regionName: '7',
+  start: 61_124_381,
+  end: 62_716_567,
   regionLength: 248_956_422
 };
 
