@@ -28,11 +28,6 @@ class AreaSelectionController implements ReactiveController {
 
   #subscriptions: Set<Subscriber> = new Set()
 
-  // FIXME: remove unused variables?
-  #start: number | null = null;
-  #end: number | null = null;
-  #regionLength: number| null = null;
-  #hostWidth: number = 0;
   #scale: ScaleLinear<number, number> | null = null;
   #hostBoundingRect: DOMRect | null = null;
 
@@ -68,8 +63,6 @@ class AreaSelectionController implements ReactiveController {
     const host = this.host;
     this.#hostBoundingRect =  host.getBoundingClientRect();
     this.#scale = host.scale;
-    this.#start = host.start;
-    this.#end = host.end;
   }
 
   #onMouseDown = (event: MouseEvent) => {
@@ -90,6 +83,7 @@ class AreaSelectionController implements ReactiveController {
 
     document.addEventListener('mousemove', this.#onMouseMove);
     document.addEventListener('mouseup', this.#onMouseUp);
+    document.addEventListener('keyup', this.#onKeyUp);
   }
 
   #onMouseMove = (event: MouseEvent) => {
@@ -143,6 +137,16 @@ class AreaSelectionController implements ReactiveController {
       this.host.dispatchEvent(viewportChangeEvent);
     }
 
+    this.#cleanupAfterSelection();
+  }
+
+  #onKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      this.#cleanupAfterSelection();
+    }
+  }
+
+  #cleanupAfterSelection = () => {
     this.#notifySubscriptions(null); // signal to subscribers that the selection has finished
 
     this.isDragging = false;
@@ -151,6 +155,7 @@ class AreaSelectionController implements ReactiveController {
 
     document.removeEventListener('mousemove', this.#onMouseMove);
     document.removeEventListener('mouseup', this.#onMouseUp);
+    document.removeEventListener('keyup', this.#onKeyUp);
   }
 
 
