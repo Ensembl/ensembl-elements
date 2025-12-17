@@ -123,22 +123,27 @@ class AreaSelectionController implements ReactiveController {
     const scale = this.#scale;
     const mouseDownX = this.mouseDownX as number;
 
+    const deltaX = Math.abs(x - mouseDownX);
+    const hasMoved = deltaX >= 2;
+
     const xLeft = Math.min(x, mouseDownX);
     const xRight = Math.max(x, mouseDownX);
 
-    const newGenomicStart = Math.round(scale!.invert(xLeft));
-    const newGenomicEnd = Math.round(scale!.invert(xRight));
+    if (hasMoved) {
+      const newGenomicStart = Math.round(scale!.invert(xLeft));
+      const newGenomicEnd = Math.round(scale!.invert(xRight));
 
-    const viewportChangeEvent = new CustomEvent('viewport-change', {
-      detail: {
-        start: newGenomicStart,
-        end: newGenomicEnd
-      }
-    });
+      const viewportChangeEvent = new CustomEvent('viewport-change', {
+        detail: {
+          start: newGenomicStart,
+          end: newGenomicEnd
+        }
+      });
 
-    this.host.dispatchEvent(viewportChangeEvent);
+      this.host.dispatchEvent(viewportChangeEvent);
+    }
+
     this.#notifySubscriptions(null); // signal to subscribers that the selection has finished
-
 
     this.isDragging = false;
     this.isMouseDown = false;
