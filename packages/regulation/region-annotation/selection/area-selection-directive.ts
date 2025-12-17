@@ -48,6 +48,7 @@ class AreaSelectionDirective extends AsyncDirective {
 
     const selection = svg`
       <rect
+        data-type="area-selector"
         x=${x}
         width=${width}
         height=${height}

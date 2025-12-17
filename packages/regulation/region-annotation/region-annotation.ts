@@ -44,8 +44,20 @@ export class RegionOverview extends LitElement {
       width: 100%;
     }
 
-    .interactive-area {
+    /* Change cursor shape to a pointer:
+        - When the cursor is over a clickable element
+        - BUT ONLY if an area selection isn't ongoing
+    */
+    svg:not(:has([data-type="area-selector"])) .interactive-area {
       cursor: pointer;
+    }
+
+    /* Change cursor shape to crosshair:
+        - When the cursor is over the element that can trigger area selection (i.e. the ruler)
+        - When area selection is ongoing, and the cursor is anywhere within the svg
+    */
+    [data-selector-trigger], svg:has([data-type="area-selector"]) {
+      cursor: crosshair;
     }
   `;
 
