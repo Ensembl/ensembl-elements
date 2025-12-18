@@ -74,6 +74,26 @@ genomeBrowser.addEventListener('hotspot-message', (event) => {
 });
 ```
 
+## Navigation buttons
+
+The `ens-navigation-controls` component emits `viewport-change` events so you can wire zoom and pan buttons into either `ens-sv-browser` or `ens-sv-alignments`.
+
+```
+import '@ensembl/ensembl-structural-variants/navigation-controls';
+
+const navControls = document.createElement('ens-navigation-controls');
+navControls.start = 142_500_000;
+navControls.end = 145_500_000;
+navControls.regionLength = 248_956_422;
+navControls.alignmentTargetStart = 142_500_000;
+navControls.alignmentTargetEnd = 145_500_000;
+
+navControls.addEventListener('viewport-change', (event) => {
+  const { reference, target } = (event as CustomEvent).detail;
+  console.log('Reference viewport:', reference, 'Target viewport:', target);
+});
+```
+
 ## Structural variants browser
 
 `ens-sv-browser` is a wrapper element that stacks two `ens-sv-genome-browser` instances around `ens-sv-alignments` and synchronises viewport location changes between the subcomponents.
