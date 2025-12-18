@@ -45,8 +45,8 @@ export class NavigationControls extends LitElement {
 
   static styles = css`
     :host {
-      display: inline-flex;
-      flex: 0 0 auto;
+      display: flex;
+      width: 100%;
       align-items: center;
       column-gap: 1rem;
     }
@@ -55,22 +55,30 @@ export class NavigationControls extends LitElement {
       display: flex;
       justify-content: flex-end;
       column-gap: 1rem;
+      flex-shrink: 0;
     }
 
     .location-indicator {
+      flex: 1;
       display: flex;
       align-items: center;
-      min-width: 220px;
-      column-gap: 1rem;
-      color: var(--color-dark-grey, #3d4551);
     }
 
     .location-indicator__line {
       flex: 1;
       position: relative;
-      border-bottom: 2px dashed #d0d4da;
       min-width: 160px;
-      height: 12px;
+      min-height: 16px;
+    }
+
+    .location-indicator__line::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      border-bottom: 2px dashed #d0d4da;
+      transform: translateY(-50%);
     }
 
     .location-indicator__viewport {
@@ -89,7 +97,6 @@ export class NavigationControls extends LitElement {
       top: 0;
       bottom: 0;
       width: 3px;
-      height: 100%;
       border: 1.5px solid #aaa;
     }
 
