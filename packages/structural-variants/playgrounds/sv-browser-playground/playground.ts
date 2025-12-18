@@ -95,9 +95,10 @@ export class SvBrowserPlayground extends LitElement {
           @viewport-change=${this.onViewportChange}
           .start=${this.start}
           .end=${this.end}
-          .alignmentTargetStart=${altStart}
-          .alignmentTargetEnd=${altEnd}
+          .altStart=${altStart}
+          .altEnd=${altEnd}
           .regionLength=${INITIAL_VIEWPORT.regionLength}
+          .showLocation=${true}
         ></ens-navigation-controls>
       </div>
       <ens-sv-browser

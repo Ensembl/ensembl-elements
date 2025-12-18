@@ -57,6 +57,52 @@ export class NavigationControls extends LitElement {
       column-gap: 1rem;
     }
 
+    .location-indicator {
+      display: flex;
+      align-items: center;
+      min-width: 220px;
+      column-gap: 1rem;
+      color: var(--color-dark-grey, #3d4551);
+    }
+
+    .location-indicator__line {
+      flex: 1;
+      position: relative;
+      border-bottom: 2px dashed #d0d4da;
+      min-width: 160px;
+      height: 12px;
+    }
+
+    .location-indicator__viewport {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 5px;
+      height: 12px;
+      background: var(--color-white, #ffffff);
+    }
+
+    .location-indicator__viewport::before,
+    .location-indicator__viewport::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      height: 100%;
+      border: 1.5px solid #aaa;
+    }
+
+    .location-indicator__viewport::before {
+      left: 0;
+      border-right: none;
+    }
+
+    .location-indicator__viewport::after {
+      right: 0;
+      border-left: none;
+    }
+
     button {
       display: inline-flex;
       align-items: center;
@@ -106,13 +152,36 @@ export class NavigationControls extends LitElement {
   end = 0;
 
   @property({ type: Number })
-  alignmentAltStart = 0;
+  altStart = 0;
 
   @property({ type: Number })
-  alignmentAltEnd = 0;
+  altEnd = 0;
 
   @property({ type: Number })
   regionLength = 0;
+
+  @property({ type: Boolean })
+  showLocation = false;
+
+  #getViewportStyle(): string {
+    const { regionLength, start, end } = this;
+
+    if (!regionLength || regionLength <= 0) {
+      return 'left:0;width:100%;';
+    }
+
+    const viewportSize = Math.max(end - start, 0);
+    const minWidthPercent = 0.5;
+
+    let widthPercent = (viewportSize / regionLength) * 100;
+    widthPercent = Math.min(Math.max(widthPercent, minWidthPercent), 100);
+
+    let startPercent = (start / regionLength) * 100;
+    const maxStart = Math.max(100 - widthPercent, 0);
+    startPercent = Math.min(Math.max(startPercent, 0), maxStart);
+
+    return `left:${startPercent.toFixed(3)}%;width:${widthPercent.toFixed(3)}%;`;
+  }
 
   private isZoomInDisabled() {
     return this.end - this.start < MIN_ZOOM_BP;
@@ -147,8 +216,8 @@ export class NavigationControls extends LitElement {
     // For alternative sequence
     const quarterNewAltDistance = quarterNewDistance;
 
-    const newAltStart = Math.max(this.alignmentAltStart - quarterNewAltDistance, 1);
-    const newAltEnd = Math.min(this.alignmentAltStart + newViewportDistance, this.regionLength);
+    const newAltStart = Math.max(this.altStart - quarterNewAltDistance, 1);
+    const newAltEnd = Math.min(this.altStart + newViewportDistance, this.regionLength);
 
     this.dispatchNewLocation({
       reference: {
@@ -167,7 +236,6 @@ export class NavigationControls extends LitElement {
       return;
     }
 
-    // For reference sequence
     const viewportDistance = this.end - this.start;
 
     const quarterViewportDistance = Math.max(Math.round(viewportDistance / 4), 1);
@@ -181,10 +249,9 @@ export class NavigationControls extends LitElement {
 
     newStart = Math.max(newStart, 1);
 
-    // For alt sequence
     const quarterNewAltViewportDistance = quarterViewportDistance;
 
-    let newAltStart = this.alignmentAltStart + quarterNewAltViewportDistance;
+    let newAltStart = this.altStart + quarterNewAltViewportDistance;
     let newAltEnd = newAltStart + quarterNewAltViewportDistance * 2;
 
     newAltStart = Math.max(newAltStart, 1);
@@ -210,18 +277,16 @@ export class NavigationControls extends LitElement {
       return;
     }
 
-    // For reference sequence
     const viewportDistance = this.end - this.start;
     const quarterViewportDistance = Math.round(viewportDistance / 4);
 
     const newStart = Math.max(this.start - quarterViewportDistance, 1);
     const newEnd = newStart + viewportDistance;
   
-    // For alt sequence
-    const altViewportDistance = this.alignmentAltEnd - this.alignmentAltStart;
+    const altViewportDistance = this.altEnd - this.altStart;
     const quarterNewAltViewportDistance = Math.round(altViewportDistance / 4);
 
-    const newAltStart = Math.max(this.alignmentAltStart - quarterNewAltViewportDistance, 1);
+    const newAltStart = Math.max(this.altStart - quarterNewAltViewportDistance, 1);
     const newAltEnd = newAltStart + altViewportDistance;
 
     this.dispatchNewLocation({
@@ -241,18 +306,16 @@ export class NavigationControls extends LitElement {
       return;
     }
 
-    // For reference sequence
     const viewportDistance = this.end - this.start;
     const quarterViewportDistance = Math.round(viewportDistance / 4);
 
     const newEnd = Math.min(this.end + quarterViewportDistance, this.regionLength);
     const newStart = newEnd - viewportDistance;
   
-    // For alt sequence
-    const altViewportDistance = this.alignmentAltEnd - this.alignmentAltStart;
+    const altViewportDistance = this.altEnd - this.altStart;
     const quarterNewAltViewportDistance = Math.round(altViewportDistance / 4);
 
-    const newAltEnd = Math.min(this.alignmentAltEnd + quarterNewAltViewportDistance, this.regionLength);
+    const newAltEnd = Math.min(this.altEnd + quarterNewAltViewportDistance, this.regionLength);
     const newAltStart = newAltEnd - altViewportDistance;
 
     this.dispatchNewLocation({
@@ -283,7 +346,19 @@ export class NavigationControls extends LitElement {
     const panLeftDisabled = this.isPanLeftDisabled();
     const panRightDisabled = this.isPanRightDisabled();
 
+    const indicator = this.showLocation ? html`
+      <div class="location-indicator">
+        <div class="location-indicator__line">
+          <span
+            class="location-indicator__viewport"
+            style=${this.#getViewportStyle()}
+          ></span>
+        </div>
+      </div>
+    ` : null;
+
     return html`
+      ${indicator}
       <div class="navigation-controls">
         <button
           type="button"
