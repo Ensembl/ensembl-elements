@@ -58,6 +58,7 @@ export class IconButton extends LitElement {
     return html`
       <button
         type="button"
+        part="button"
         ?disabled=${this.disabled}
       >
         ${this.label ? html`

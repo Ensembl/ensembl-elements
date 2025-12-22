@@ -1,0 +1,20 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+
+.custom-styling {
+  &::part(button-left) {
+    --icon-button-color: red;
+  }
+  &::part(button-right) {
+    --icon-button-color: green;
+  }
+  &::part(button-zoom-in) {
+    --icon-button-color: orange;
+  }
+  &::part(button-zoom-out) {
+    --icon-button-color: purple;
+  }
+}
