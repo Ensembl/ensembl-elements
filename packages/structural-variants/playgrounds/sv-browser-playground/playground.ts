@@ -2,7 +2,7 @@ import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import '../../sv-browser/sv-browser';
-import '../../navigation-controls/navigation-controls';
+import '../../nav-buttons/nav-buttons';
 
 import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 import type { VariantClickPayload } from '../../alignments/types/variant';
@@ -91,15 +91,14 @@ export class SvBrowserPlayground extends LitElement {
 
     return html`
       <div class="controls-wrapper">
-        <ens-navigation-controls
+        <ens-sv-nav-buttons
           @viewport-change=${this.onViewportChange}
           .start=${this.start}
           .end=${this.end}
           .altStart=${altStart}
           .altEnd=${altEnd}
           .regionLength=${INITIAL_VIEWPORT.regionLength}
-          .showLocation=${true}
-        ></ens-navigation-controls>
+        ></ens-sv-nav-buttons>
       </div>
       <ens-sv-browser
         .referenceTracks=${REFERENCE_TRACKS}
