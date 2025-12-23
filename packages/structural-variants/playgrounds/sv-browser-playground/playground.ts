@@ -86,8 +86,8 @@ export class SvBrowserPlayground extends LitElement {
   }
 
   render() {
-    const altStart = this.altStart || this.start;
-    const altEnd = this.altEnd || this.end;
+    const altStart = this.altStart;
+    const altEnd = this.altEnd;
 
     return html`
       <div class="controls-wrapper">
@@ -113,6 +113,7 @@ export class SvBrowserPlayground extends LitElement {
         .altEnd=${altEnd}
         .endpoints=${ENDPOINTS}
         @viewport-change=${this.onViewportChange}
+        @viewport-change-end=${this.onViewportChange}
         @variant-click=${this.onVariantClick}
         @hotspot-message=${this.onHotspotClick}
       ></ens-sv-browser>

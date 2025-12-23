@@ -208,24 +208,20 @@ export class VariantAlignments extends LitElement {
     }
 
     let genomicStart: number = 0;
-    let genomicEnd: number = 0;
     const { alignments } = data;
 
     for (const alignment of alignments) {
       const altStart = alignment.alt.start;
-      const altEnd = alignment.alt.start + alignment.alt.length - 1;
 
       if (!genomicStart || altStart < genomicStart) {
         genomicStart = altStart;
       }
-
-      if (!genomicEnd || altEnd > genomicEnd) {
-        genomicEnd = altEnd;
-      }
     }
 
+    const viewportGenomicDistance = this.end - this.start + 1;
+
     this.altStart = genomicStart;
-    this.altEnd = genomicEnd;
+    this.altEnd = genomicStart + viewportGenomicDistance;
 
     const eventData = {
       reference: {
