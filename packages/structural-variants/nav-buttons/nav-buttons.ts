@@ -40,7 +40,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
 
     // For the alternative genome (move the same distance as reference genome)
     const newAltStart = Math.max(this.altStart - quarterViewportDistance, 1);
-    const newAltEnd = newAltStart + quarterViewportDistance;
+    const newAltEnd = newAltStart + viewportDistance;
 
     this.#dispatchNewLocation({
       reference: {
@@ -64,7 +64,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
 
     // For the alternative genome (move the same distance as reference genome)
     const newAltEnd = Math.min(this.altEnd + quarterViewportDistance, this.regionLength);
-    const newAltStart = newAltEnd - quarterViewportDistance;
+    const newAltStart = newAltEnd - viewportDistance;
 
     this.#dispatchNewLocation({
       reference: {

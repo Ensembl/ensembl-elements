@@ -119,8 +119,8 @@ export class StructuralVariantsBrowser extends LitElement {
       return;
     }
 
-    const altStart = this.altStart || this.start;
-    const altEnd = this.altEnd || this.end;
+    const altStart = this.altStart;
+    const altEnd = this.altEnd;
 
     return html`
     <ens-sv-genome-browser
