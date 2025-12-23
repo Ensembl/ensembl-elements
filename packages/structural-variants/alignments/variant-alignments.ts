@@ -119,7 +119,8 @@ export class VariantAlignments extends LitElement {
 
     // Setting up variants data service
     this.#variantDataService = createVariantDataService({
-      genomeId: this.referenceGenomeId,
+      referenceGenomeId: this.referenceGenomeId,
+      altGenomeId: this.altGenomeId,
       endpoint: this.endpoints!.variants as string,
       regionName: this.regionName
     });
@@ -263,11 +264,12 @@ export class VariantAlignments extends LitElement {
 
 
 const createVariantDataService = (params: {
-  genomeId: string;
+  referenceGenomeId: string;
+  altGenomeId: string;
   regionName: string;
   endpoint: string
 }) => {
-  const { genomeId, regionName, endpoint } = params;
+  const { referenceGenomeId, altGenomeId, regionName, endpoint } = params;
   const getVariantId = (variant: Variant) => variant.name;
   const getVariantStart = (variant: Variant) => variant.location.start;
   const getVariantEnd = (variant: Variant) => variant.location.end;
@@ -279,7 +281,8 @@ const createVariantDataService = (params: {
     loader: async (params) => {
       const { start, end } = params;
       const searchParams = new URLSearchParams();
-      searchParams.append('genome_id', genomeId);
+      searchParams.append('reference_genome_id', referenceGenomeId);
+      searchParams.append('alt_genome_id', altGenomeId);
       searchParams.append('viewport', `${regionName}:${start}-${end}`);
       const queryString = decodeURIComponent(searchParams.toString()); // do not escape the colon in the viewport
       const url = `${endpoint}?${queryString}`;
