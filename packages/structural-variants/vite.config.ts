@@ -8,7 +8,7 @@ export default defineConfig({
       exclude: [
         'vite.config.ts',
         'scripts/*',
-        'alignments-playground',
+        'playgrounds',
         'alignments-dev-server',
         'sv-browser-playground'
       ]
@@ -20,6 +20,7 @@ export default defineConfig({
       entry: [
         'alignments/index.ts',
         'genome-browser/index.ts',
+        'nav-buttons/nav-buttons.ts',
         'sv-browser/index.ts'
       ],
       formats: ['es'],

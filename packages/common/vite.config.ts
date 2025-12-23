@@ -23,6 +23,7 @@ export default defineConfig({
         'components/icon-buttons/download-button/download-button.ts',
         'components/icon-buttons/table-view-button/table-view-button.ts',
         'components/icon-buttons/expand-button/expand-button.ts',
+        'components/nav-buttons/nav-buttons.ts',
         'components/button/button.ts',
         'components/text-button/text-button.ts',
         'components/button-link/button-link.ts',
