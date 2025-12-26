@@ -234,7 +234,7 @@ export class VariantAlignments extends LitElement {
       }
     }
 
-    const viewportUpdateEvent = new CustomEvent('viewport-change', {
+    const viewportUpdateEvent = new CustomEvent('viewport-change-end', {
       bubbles: true,
       composed: true,
       detail: eventData

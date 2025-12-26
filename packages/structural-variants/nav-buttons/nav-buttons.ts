@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import '@ensembl/ensembl-elements-common/components/nav-buttons/nav-buttons.js';
@@ -14,6 +14,13 @@ const MIN_ZOOM_BP = 15;
 
 @customElement('ens-sv-nav-buttons')
 export class NavButtonsForStructuralVariantsBrowser extends LitElement {
+  static styles = [
+    css`
+      :host {
+        display: inline-flex;
+      }
+    `
+  ];
 
   @property({ type: Number })
   start = 0;

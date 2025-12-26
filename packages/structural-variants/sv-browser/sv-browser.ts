@@ -21,9 +21,13 @@ export class StructuralVariantsBrowser extends LitElement {
   static styles = css`
     :host {
       display: block;
+      container-type: inline-size; // to make the width of the genome browser defined by the width of the host component
       border: 1px dashed #d0d4da;
       border-radius: 4px;
-      margin: 1rem 0;
+    }
+
+    ens-sv-genome-browser {
+      width: 100cqw;
     }
   `;
 
