@@ -10,6 +10,7 @@ import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
 import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
+import { toZeroBased } from '../helpers/toZeroBased';
 import { COLORS, type Colors } from './constants';
 
 import ViewportController from './viewportController';
@@ -125,23 +126,11 @@ export class RegionOverview extends LitElement {
         end: this.end
       });
 
-      this.scale = scaleLinear().domain([
-        this.start,
-        this.end
-      ]).rangeRound([
-        0,
-        this.imageWidth
-      ]);
+      this.#resetScale();
     }
 
     if (changedProperties.has('imageWidth')) {
-      this.scale = scaleLinear().domain([
-        this.start,
-        this.end
-      ]).rangeRound([
-        0,
-        this.imageWidth
-      ]);
+      this.#resetScale();
     }
   }
 
@@ -211,6 +200,16 @@ export class RegionOverview extends LitElement {
       ...COLORS,
       ...this.colors
     };
+  }
+
+  #resetScale() {
+    this.scale = scaleLinear().domain([
+      toZeroBased(this.start),
+      this.end
+    ]).rangeRound([
+      0,
+      this.imageWidth
+    ]);
   }
 
   render() {
