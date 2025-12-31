@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev-annotation": "vite serve playgrounds/region-annotation-playground",
+    "dev-epigenomes-activity": "vite serve playgrounds/epigenomes-activity-playground",
     "build": "node --experimental-strip-types ./scripts/build.ts",
     "publish-lib": "node --env-file=.env --experimental-strip-types ./scripts/publish.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
