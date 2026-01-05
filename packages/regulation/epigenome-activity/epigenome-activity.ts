@@ -13,7 +13,7 @@ import {
 
 import { TRACK_HEIGHT } from './constants';
 
-import { TrackData, TrackMetadata } from './types';
+import type { TrackData, TrackMetadata, TrackPositionPayload, TrackPositionsPayload } from './types';
 
 @customElement('ens-reg-epigenome-activity')
 export class RegionOverview extends LitElement {
@@ -42,6 +42,8 @@ export class RegionOverview extends LitElement {
   @state()
   bedScale: ScaleLinear<number, number> | null = null;
 
+  trackIds: string[][] = [];
+
   connectedCallback(): void {
     super.connectedCallback();
     this.#observeHostSize();
@@ -55,6 +57,10 @@ export class RegionOverview extends LitElement {
     ) {
       this.#updateScale();
     }
+  }
+
+  updated() {
+    this.#reportTrackPositions();
   }
 
   #observeHostSize = () => {
@@ -77,6 +83,28 @@ export class RegionOverview extends LitElement {
     ]);
   }
 
+  #reportTrackPositions() {
+    // Check if the list of track ids has changed since previous render,
+    // and report to outside if it did
+    const trackIds = this.tracks.map(track => track.epigenome_ids);
+    const stringifiedTrackIds = JSON.stringify(trackIds);
+    const stringifiedSavedTrackIds = JSON.stringify(this.trackIds);
+    if (stringifiedTrackIds !== stringifiedSavedTrackIds) {
+      this.trackIds = trackIds;
+      const trackPositionsPayload: TrackPositionsPayload = trackIds.map((id, index) => {
+        return {
+          id,
+          y: index * TRACK_HEIGHT,
+          height: TRACK_HEIGHT
+        };
+      });
+      const event = new CustomEvent('track-positions-change', {
+        detail: trackPositionsPayload
+      });
+      this.dispatchEvent(event);
+    }
+  }
+
   render() {
     if(!this.bedScale || !this.trackMetadata || !this.tracks.length) {
       return null;
@@ -95,12 +123,12 @@ export class RegionOverview extends LitElement {
         viewBox="0 0 ${this.imageWidth} ${imageHeight}"
         style="width: 100%; height: ${imageHeight}px;"
       >
-        ${this.renderTracks({ tracks: preparedTracksData })}
+        ${this.#renderTracks({ tracks: preparedTracksData })}
       </svg>
     `
   }
 
-  renderTracks({
+  #renderTracks({
     tracks
   }: {
     tracks: ReturnType<typeof prepareActivityDataForDisplay>

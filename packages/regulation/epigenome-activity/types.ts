@@ -56,6 +56,18 @@ export type HistoneGappedPeak = {
   block_sizes: number[];
 };
 
+
+/* EVENTS */
+
+export type TrackPositionPayload = {
+  id: string[]; // list of ids of epigenomes whose data is rendered in the track
+  y: number; // vertical offset from the top edge of the component
+  height: number; // height of the track
+};
+
+export type TrackPositionsPayload = TrackPositionPayload[];
+
+
 // export type EpigenomeActivityResponse = {
 //   track_metadata: EpigenomeActivityMetadata;
 //   track_data: TrackData[];
