@@ -64,6 +64,10 @@ export class VariantAlignmentsImage extends LitElement {
   @property({ type: Number })
   altEnd = 0;
 
+  // length of the alternative genome region
+  @property({ type: Number })
+  altRegionLength = 0;
+
   @property({ type: Object })
   data: InputData | null = null;
 

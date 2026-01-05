@@ -61,6 +61,9 @@ export class StructuralVariantsBrowser extends LitElement {
   @property({ type: Number })
   altEnd = 0;
 
+  @property({ type: Number })
+  altRegionLength = Infinity;
+
   @property({ type: Object })
   endpoints!: Endpoints;
 
@@ -147,6 +150,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .end=${this.end}
       .altStart=${altStart}
       .altEnd=${altEnd}
+      .altRegionLength=${this.altRegionLength}
       .endpoints=${this.endpoints}
       @viewport-change=${this.onViewportChange}
       @viewport-change-end=${this.onViewportChange}
