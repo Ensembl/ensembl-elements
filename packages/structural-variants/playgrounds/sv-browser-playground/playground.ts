@@ -98,6 +98,7 @@ export class SvBrowserPlayground extends LitElement {
           .altStart=${altStart}
           .altEnd=${altEnd}
           .regionLength=${INITIAL_VIEWPORT.regionLength}
+          .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         ></ens-sv-nav-buttons>
       </div>
       <ens-sv-browser
@@ -111,6 +112,7 @@ export class SvBrowserPlayground extends LitElement {
         .end=${this.end}
         .altStart=${altStart}
         .altEnd=${altEnd}
+        .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         .endpoints=${ENDPOINTS}
         @viewport-change=${this.onViewportChange}
         @viewport-change-end=${this.onViewportChange}

@@ -94,6 +94,7 @@ export class StructuralVariantsPlayground extends LitElement {
         .altStart=${this.altStart}
         .altEnd=${this.altEnd}
         .regionLength=${INITIAL_VIEWPORT.regionLength}
+        .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         .endpoints=${ENDPOINTS}
       ></ens-sv-alignments>
       <div class="variant-message"></div>

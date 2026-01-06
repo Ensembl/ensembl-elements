@@ -60,6 +60,10 @@ export class VariantAlignments extends LitElement {
   @property({ type: Number })
   altEnd = 0;
 
+  // length of the alternative genome region
+  @property({ type: Number })
+  altRegionLength = 0;
+
   @property({ type: Object })
   endpoints: Endpoints | null = null;
 
@@ -249,9 +253,10 @@ export class VariantAlignments extends LitElement {
         .end=${this.end}
         .altStart=${this.altStart}
         .altEnd=${this.altEnd}
-        .regionLength=${Infinity}
+        .regionLength=${this.regionLength}
         .regionName=${this.regionName}
         .data=${this.data}
+        .altRegionLength=${this.altRegionLength}
       ></ens-sv-alignments-image>
     `;
   }

@@ -24,6 +24,7 @@ class DragController implements ReactiveController {
   #altSequenceScale: ScaleLinear<number, number> | null = null;
 
   #regionLength: number| null = null;
+  #altRegionLength: number | null = null;
   #draggingMode: DraggingMode | null = null;
 
   constructor(host: VariantAlignmentsImage) {
@@ -135,7 +136,7 @@ class DragController implements ReactiveController {
     const scale = this.#altSequenceScale as ScaleLinear<number, number>;
     const genomicStart = this.#altStart as number;
     const genomicEnd = this.#altEnd as number;
-    const regionLength = this.#regionLength as number;
+    const regionLength = this.#altRegionLength as number;
 
     let genomicDistance = Math.round(scale.invert(Math.abs(deltaX))) - genomicStart;
 
@@ -203,6 +204,7 @@ class DragController implements ReactiveController {
     this.#referenceSequenceScale = this.host.scale;
     this.#altSequenceScale = this.host.altSequenceScale;
     this.#regionLength = this.host.regionLength;
+    this.#altRegionLength = this.host.altRegionLength;
   }
 
 

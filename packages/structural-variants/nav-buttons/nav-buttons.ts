@@ -37,6 +37,9 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
   @property({ type: Number })
   regionLength = 0;
 
+  @property({ type: Number })
+  altRegionLength = Infinity;
+
   #onMoveLeft = () => {
     // For reference genome
     const viewportDistance = this.end - this.start;
@@ -70,7 +73,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
     const newStart = newEnd - viewportDistance;
 
     // For the alternative genome (move the same distance as reference genome)
-    const newAltEnd = Math.min(this.altEnd + quarterViewportDistance, this.regionLength);
+    const newAltEnd = Math.min(this.altEnd + quarterViewportDistance, this.altRegionLength);
     const newAltStart = newAltEnd - viewportDistance;
 
     this.#dispatchNewLocation({
@@ -120,7 +123,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
   
     // For the alternative genome, change location by the same distance as for reference genome
     const newAltStart = Math.max(this.altStart - quarterNewDistance, 1);
-    const newAltEnd = Math.min(this.altStart + newViewportDistance, this.regionLength);
+    const newAltEnd = Math.min(this.altStart + newViewportDistance, this.altRegionLength);
 
     this.#dispatchNewLocation({
       reference: {
