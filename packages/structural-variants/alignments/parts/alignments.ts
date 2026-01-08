@@ -154,6 +154,7 @@ const renderAlignment = ({
     <polygon
       points=${pointsString}
       fill=${color}
+      fill-opacity=${0.12}
       data-reference-start=${alignment.reference.start}
       data-reference-end=${alignment.reference.start + alignment.reference.length - 1}
       data-alt-start=${alignment.alt.start}
@@ -193,7 +194,7 @@ const renderInvertedAlignment = ({
     <polygon
       points=${pointsString}
       fill=${color}
-      fill-opacity="0.6"
+      fill-opacity="0.35"
       data-reference-start=${alignment.reference.start}
       data-reference-end=${alignment.reference.start + alignment.reference.length - 1}
       data-alt-start=${alignment.alt.start}
