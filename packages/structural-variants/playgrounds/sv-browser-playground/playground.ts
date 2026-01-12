@@ -16,8 +16,14 @@ import { GBMessagePayload } from '../../genome-browser/types/genome-browser';
 export class SvBrowserPlayground extends LitElement {
   static styles = css`
     :host {
-      display: block;
-      padding: 1rem;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+    }
+
+    .overflow-container {
+      height: 100%;
+      overflow-y: auto;
     }
 
     .controls-wrapper {
@@ -101,24 +107,26 @@ export class SvBrowserPlayground extends LitElement {
           .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         ></ens-sv-nav-buttons>
       </div>
-      <ens-sv-browser
-        .referenceTracks=${REFERENCE_TRACKS}
-        .altTracks=${ALT_TRACKS}
-        .referenceGenomeId=${REFERENCE_GENOME_ID}
-        .altGenomeId=${ALT_GENOME_ID}
-        .regionName=${this.regionName}
-        .regionLength=${INITIAL_VIEWPORT.regionLength}
-        .start=${this.start}
-        .end=${this.end}
-        .altStart=${altStart}
-        .altEnd=${altEnd}
-        .altRegionLength=${INITIAL_VIEWPORT.regionLength}
-        .endpoints=${ENDPOINTS}
-        @viewport-change=${this.onViewportChange}
-        @viewport-change-end=${this.onViewportChange}
-        @variant-click=${this.onVariantClick}
-        @hotspot-message=${this.onHotspotClick}
-      ></ens-sv-browser>
+      <div class="overflow-container">
+        <ens-sv-browser
+          .referenceTracks=${REFERENCE_TRACKS}
+          .altTracks=${ALT_TRACKS}
+          .referenceGenomeId=${REFERENCE_GENOME_ID}
+          .altGenomeId=${ALT_GENOME_ID}
+          .regionName=${this.regionName}
+          .regionLength=${INITIAL_VIEWPORT.regionLength}
+          .start=${this.start}
+          .end=${this.end}
+          .altStart=${altStart}
+          .altEnd=${altEnd}
+          .altRegionLength=${INITIAL_VIEWPORT.regionLength}
+          .endpoints=${ENDPOINTS}
+          @viewport-change=${this.onViewportChange}
+          @viewport-change-end=${this.onViewportChange}
+          @variant-click=${this.onVariantClick}
+          @hotspot-message=${this.onHotspotClick}
+        ></ens-sv-browser>
+      </div>
       <div class="click-message"></div>
     `;
   }
