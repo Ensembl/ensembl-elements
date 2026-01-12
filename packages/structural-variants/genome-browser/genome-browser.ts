@@ -21,6 +21,7 @@ export class GenomeBrowser extends LitElement {
       width: 100%;
       min-height: inherit;
       position: relative;
+      overflow: hidden !important;
     }
   `;
 
@@ -119,7 +120,6 @@ export class GenomeBrowser extends LitElement {
     initPromise.then(() => {
       const gb = this.genomeBrowser = new EnsemblGenomeBrowser();
       gb.go(gbConfig);
-      this.viewport.style.overflow = 'hidden';
       gb.set_message_reporter(this.#handleGenomeBrowserMessage);
       gb.switch(['settings', 'no-padding'], true);
       gb.switch(['ruler'], false);
