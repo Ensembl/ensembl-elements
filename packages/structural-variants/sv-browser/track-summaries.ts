@@ -4,12 +4,12 @@ export type TrackPositions = {
   genomeBrowserTop: {
     offsetTop: number;
     height: number;
-    tracks: TrackSummary[];
+    tracks: GenomeBrowserTrackSummary[];
   },
   genomeBrowserBottom: {
     offsetTop: number;
     height: number;
-    tracks: TrackSummary[];
+    tracks: GenomeBrowserTrackSummary[];
   },
   variantAlignments: {
     offsetTop: number;
@@ -18,7 +18,7 @@ export type TrackPositions = {
 };
 
 
-type TrackSummary = {
+export type TrackSummary = {
   id: string; // track id
   offset: number; // y-offset (in pixels) from the top of the component
   height: number;
@@ -56,27 +56,35 @@ export const updateGenomeBrowserTrackSummaries = ({
   isAlt: boolean;
 }) => {
   trackPositions = structuredClone(trackPositions);
-  const topOffset = isAlt ? trackPositions.genomeBrowserBottom.offsetTop : 0;
-  const updatedTrackSummaries = createSummariesForGenomeBrowserTracks({
-    trackSummaries,
-    offset: topOffset
-  });
+  trackSummaries = trackSummaries.toSorted((track1, track2) => track1.offset - track2.offset);
+
   if (isAlt) {
-    trackPositions.genomeBrowserBottom.tracks = updatedTrackSummaries;
+    trackPositions.genomeBrowserBottom.tracks = trackSummaries;
   } else {
-    trackPositions.genomeBrowserTop.tracks = updatedTrackSummaries;
+    trackPositions.genomeBrowserTop.tracks = trackSummaries;
   }
   return trackPositions;
 }
 
-export const createSummariesForGenomeBrowserTracks = (payload: {
-  trackSummaries: GenomeBrowserTrackSummary[];
-  offset: number;
+
+/**
+ * Change track summaries from the format they arrive in from the genome browser
+ * into the format to be broadcast of the sv-browser component
+ */
+const getReshapedTrackSummaries = ({
+  trackPositions,
+  isAlt
+}: {
+  trackPositions: TrackPositions;
+  isAlt?: boolean;
 }) => {
-  const { trackSummaries, offset } = payload;
-  return trackSummaries.toSorted((track1, track2) => track1.offset - track2.offset).map(track => ({
+  const topOffset = isAlt ? trackPositions.genomeBrowserBottom.offsetTop : 0;
+  const trackSummaries = isAlt
+    ? trackPositions.genomeBrowserBottom.tracks
+    : trackPositions.genomeBrowserTop.tracks;
+  return trackSummaries.map(track => ({
     id: track['switch-id'],
-    offset: offset + track.offset,
+    offset: topOffset + track.offset,
     height: track.height
   }));
 }
@@ -85,12 +93,16 @@ export const createSummariesForGenomeBrowserTracks = (payload: {
 /**
  * Although the sv-browser component currently consists of two genome browser instances
  * and a component between the two; this should probably remain an implementation detail
- * that does not leak out from the component.
- * 
+ * that does not need to leak out from the component.
  */
 export const createOutgoingTrackSummaries = (trackPositions: TrackPositions): TrackSummary[] => {
-  const referenceGenomeTracks = trackPositions.genomeBrowserTop.tracks;
-  const altGenomeTracks = trackPositions.genomeBrowserBottom.tracks;
+  const referenceGenomeTracks = getReshapedTrackSummaries({
+    trackPositions
+  });
+  const altGenomeTracks = getReshapedTrackSummaries({
+    trackPositions,
+    isAlt: true
+  });
   const alignmentsTrack = {
     id: 'alignments',
     offset: trackPositions.variantAlignments.offsetTop,

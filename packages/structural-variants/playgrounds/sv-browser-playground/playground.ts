@@ -4,13 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import '../../sv-browser/sv-browser';
 import '../../nav-buttons/nav-buttons';
 
-import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
-import type { VariantClickPayload } from '../../alignments/types/variant';
-
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 
 import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
-import { GBMessagePayload } from '../../genome-browser/types/genome-browser';
+
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
+import type { VariantClickPayload } from '../../alignments/types/variant';
+import type { GBMessagePayload } from '../../genome-browser/types/genome-browser';
 
 @customElement('sv-browser-playground')
 export class SvBrowserPlayground extends LitElement {

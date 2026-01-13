@@ -122,7 +122,7 @@ export class StructuralVariantsBrowser extends LitElement {
 
   #reportTrackPositions() {
     const trackSummaries = createOutgoingTrackSummaries(this.#trackPositions);
-    const event = new CustomEvent('track-positions', {
+    const event = new CustomEvent('track-positions-change', {
       detail: trackSummaries,
       composed: true
     });
@@ -197,7 +197,7 @@ export class StructuralVariantsBrowser extends LitElement {
       const updatedTrackPositions = updateGenomeBrowserTrackSummaries({
         trackPositions: this.#trackPositions,
         trackSummaries: message.payload.summary,
-        isAlt: params.isAlt
+        isAlt
       });
 
       if (haveTrackPositionsChanged(updatedTrackPositions, this.#trackPositions)) {
