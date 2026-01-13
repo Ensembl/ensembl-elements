@@ -11,6 +11,8 @@ const isUuid = (value: string) => UUID_REGEX.test(value);
 @customElement('ens-sv-genome-browser')
 export class GenomeBrowser extends LitElement {
 
+  // The #viewport overflow rule overrides overflow-y:auto set by genome browser
+  // to prevent scrollbars that cause jittering
   static styles = css`
     :host {
       display: block;
@@ -21,6 +23,7 @@ export class GenomeBrowser extends LitElement {
       width: 100%;
       min-height: inherit;
       position: relative;
+      overflow: hidden !important;
     }
   `;
 
