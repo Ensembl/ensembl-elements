@@ -46,12 +46,6 @@ export type HotspotEventDetail = {
   payload: HotspotPayload;
 };
 
-
-export type GBMessagePayload = {
-  genome: string;
-  payload: TrackSummaryPayload | HotspotPayload;
-};
-
 export type LocationChangePayload = {
   start: number;
   end: number;

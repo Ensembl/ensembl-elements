@@ -8,7 +8,8 @@ import {
   initialTrackPositions,
   updateGenomeBrowserTrackSummaries,
   haveTrackPositionsChanged,
-  createOutgoingTrackSummaries
+  createOutgoingTrackSummaries,
+  type TrackSummary
 } from './track-summaries';
 
 import type { LocationChangePayload } from '../genome-browser';
@@ -24,6 +25,10 @@ export type Endpoints = {
   alignments: string;
   genomeBrowser: string;
 };
+
+export type TrackPositionsChangeEvent = CustomEvent<{
+  tracks: TrackSummary[];
+}>
 
 type GenomeBrowserMessage =
   | TrackSummaryEventDetail
@@ -122,8 +127,10 @@ export class StructuralVariantsBrowser extends LitElement {
 
   #reportTrackPositions() {
     const trackSummaries = createOutgoingTrackSummaries(this.#trackPositions);
-    const event = new CustomEvent('track-positions-change', {
-      detail: trackSummaries,
+    const event: TrackPositionsChangeEvent = new CustomEvent('track-positions-change', {
+      detail: {
+        tracks: trackSummaries
+      },
       composed: true
     });
     this.dispatchEvent(event);
