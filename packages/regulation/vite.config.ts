@@ -9,6 +9,7 @@ export default defineConfig({
       exclude: [
         'vite.config.ts',
         'scripts/*',
+        'playgrounds',
         'region-annotation/popupInjector.ts'
       ]
     })

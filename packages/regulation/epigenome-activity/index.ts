@@ -1,6 +1,6 @@
 export * from './epigenome-activity';
 
-export {
+export type {
   TrackData,
   TrackMetadata,
   TrackPositionsChangeEvent,
