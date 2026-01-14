@@ -212,11 +212,6 @@ const renderGene = ({
     const currentExon = merged_exons[i];
     const start = prevExon.end;
     const end = currentExon.start;
-
-    if (end < start) {
-      debugger;
-    }
-
     introns.push({ start, end });
   }
 

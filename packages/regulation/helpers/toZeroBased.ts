@@ -1,6 +1,6 @@
 /**
- * The arithmetic that the toBedStart function does is elementary;
- * however, the function's presence, and its name, should serve
+ * The arithmetic that the toZeroBased function does is elementary.
+ * However, the function's presence in the code, and its name, should serve
  * as a reminder of the necessity to transform Ensembl coordinates
  * to bed coordinates for drawing purposes.
  */
