@@ -68,7 +68,4 @@ export type TrackPositionPayload = {
 export type TrackPositionsPayload = TrackPositionPayload[];
 
 
-// export type EpigenomeActivityResponse = {
-//   track_metadata: EpigenomeActivityMetadata;
-//   track_data: TrackData[];
-// };
+export type TrackPositionsChangeEvent = CustomEvent<TrackPositionsPayload>;

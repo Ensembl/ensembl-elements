@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./region-overview": "./region-annotation/index.ts",
+    "./epigenome-activity": "./epigenome-activity/index.ts",
     "./popup-injector": "./region-annotation/popupInjector.ts"
   },
   "scripts": {

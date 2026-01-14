@@ -13,7 +13,7 @@ import {
 
 import { TRACK_HEIGHT } from './constants';
 
-import type { TrackData, TrackMetadata, TrackPositionPayload, TrackPositionsPayload } from './types';
+import type { TrackData, TrackMetadata, TrackPositionsPayload } from './types';
 
 @customElement('ens-reg-epigenome-activity')
 export class RegionOverview extends LitElement {

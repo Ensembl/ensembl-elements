@@ -17,7 +17,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: [
-        'region-annotation/index.ts'
+        'region-annotation/index.ts',
+        'epigenome-activity/index.ts'
       ],
       formats: ['es'],
     },
