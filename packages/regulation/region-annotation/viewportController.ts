@@ -41,7 +41,7 @@ class ViewportController implements ReactiveController {
 
   syncFromHost = () => {
     const host = this.host as RegionOverview;
-    this.#scale = host.scale;
+    this.#scale = host.ensemblScale;
     this.#start = host.start;
     this.#end = host.end;
     this.#regionLength = host.regionLength;

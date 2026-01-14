@@ -7,6 +7,7 @@ import {
   REGULATORY_FEATURE_EXTENT_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
+import { toZeroBased } from '../helpers/toZeroBased';
 
 import type { RegulatoryFeature } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
@@ -72,17 +73,17 @@ const renderTrack = ({
 
     const featureGenomicStart = feature.extended_start ?? feature.start;
     const featureGenomicEnd = feature.extended_end ?? feature.end;
-    const featureStart = scale(featureGenomicStart);
-    const featureEnd = scale(featureGenomicEnd + 1);
+    const featureStart = scale(toZeroBased(featureGenomicStart));
+    const featureEnd = scale(featureGenomicEnd);
 
     const prevFeatureGenomicStart =
       prevFeature?.extended_start ?? prevFeature?.start;
     const prevFeatureGenomicEnd = prevFeature?.extended_end ?? prevFeature?.end;
     const prevFeatureStart = prevFeatureGenomicStart
-      ? scale(prevFeatureGenomicStart)
+      ? scale(toZeroBased(prevFeatureGenomicStart))
       : -1;
     const prevFeatureEnd = prevFeatureGenomicEnd
-      ? scale(prevFeatureGenomicEnd + 1)
+      ? scale(prevFeatureGenomicEnd)
       : -1;
 
     if (featureStart === prevFeatureStart && featureEnd === prevFeatureEnd) {
@@ -139,8 +140,8 @@ const renderFeatureLowRes = (params: {
   const { feature, featureTypes, offsetTop, scale } = params;
   const genomicStart = feature.extended_start ?? feature.start;
   const genomicEnd = feature.extended_end ?? feature.end;
-  const x1 = scale(genomicStart);
-  const x2 = scale(genomicEnd + 1);
+  const x1 = scale(toZeroBased(genomicStart));
+  const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
   let color = featureTypes[feature.feature_type].color;
 
@@ -193,8 +194,8 @@ const renderCoreRegion = ({
   scale: ScaleLinear<number, number>;
   colors: Colors;
 }) => {
-  const x1 = scale(feature.start);
-  const x2 = scale(feature.end + 1);
+  const x1 = scale(toZeroBased(feature.start));
+  const x2 = scale(feature.end);
   const width = Math.max(x2 - x1, 2);
   let color = featureTypes[feature.feature_type].color;
 
@@ -241,7 +242,9 @@ const renderBoundsRegion = ({
     return null;
   }
 
-  const extentX = side === 'left' ? scale(extentCoordinate) : scale(extentCoordinate + 1);
+  const extentX = side === 'left'
+    ? scale(toZeroBased(extentCoordinate))
+    : scale(extentCoordinate);
   const width =
     side === 'left'
       ? scale(feature.start) - extentX
@@ -278,8 +281,8 @@ const renderInteractiveArea = (params: {
   const { feature, regionName, offsetTop, scale } = params;
   const genomicStart = feature.extended_start ?? feature.start;
   const genomicEnd = feature.extended_end ?? feature.end;
-  const x1 = scale(genomicStart);
-  const x2 = scale(genomicEnd + 1);
+  const x1 = scale(toZeroBased(genomicStart));
+  const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
 
   return svg`

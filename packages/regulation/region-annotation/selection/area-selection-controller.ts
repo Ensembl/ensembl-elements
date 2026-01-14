@@ -2,7 +2,7 @@ import { ReactiveController, ReactiveControllerHost } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 type Host = ReactiveControllerHost & HTMLElement & {
-  scale: ScaleLinear<number, number> | null;
+  ensemblScale: ScaleLinear<number, number> | null;
   start: number;
   end: number;  
 };
@@ -62,7 +62,7 @@ class AreaSelectionController implements ReactiveController {
   #syncFromHost = () => {
     const host = this.host;
     this.#hostBoundingRect =  host.getBoundingClientRect();
-    this.#scale = host.scale;
+    this.#scale = host.ensemblScale;
   }
 
   #onMouseDown = (event: MouseEvent) => {

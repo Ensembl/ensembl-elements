@@ -5,6 +5,7 @@ import {
   GENE_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
+import { toZeroBased } from '../helpers/toZeroBased';
 
 import { renderTranscriptionStartSites } from './transcriptionStartSites';
 
@@ -171,11 +172,9 @@ const renderGeneLowRes = ({
   const {
     data: { start: genomicStart, end: genomicEnd }
   } = gene;
-  const start = scale(genomicStart);
+  const start = scale(toZeroBased(genomicStart));
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
-
-  // <text x=${start} y=${offsetTop}>${gene.data.stable_id}</text>
 
   return svg`
     <rect
@@ -213,6 +212,10 @@ const renderGene = ({
     const currentExon = merged_exons[i];
     const start = prevExon.end;
     const end = currentExon.start;
+
+    if (end < start) {
+      debugger;
+    }
 
     introns.push({ start, end });
   }
@@ -281,7 +284,7 @@ const renderExons = ({
   color: string;
 }) => {
   return exons.map((exon) => {
-    const left = scale(exon.start);
+    const left = scale(toZeroBased(exon.start));
     const right = scale(exon.end);
     const width = Math.max(right - left, 0.2);
 
@@ -322,7 +325,7 @@ const renderCDSBlocks = ({
         ? prevFragment.end
         : fragment.start;
 
-    const left = scale(fragmentGenomicStart);
+    const left = scale(toZeroBased(fragmentGenomicStart));
     const right = scale(fragment.end);
     const width = right - left;
 
@@ -359,7 +362,7 @@ const renderIntrons = ({
 return introns.map((intron) => {
     const y = trackY + GENE_HEIGHT / 2;
 
-    const x1 = scale(intron.start);
+    const x1 = scale(toZeroBased(intron.start));
     const x2 = scale(intron.end);
 
     return svg`
@@ -392,13 +395,13 @@ const renderGeneExtent = ({
 }) => {
   const [ scaleGenomicStart ] = scale.domain();
   const genomicDistance = (to - from);
-  const width = scale(scaleGenomicStart + genomicDistance);
+  const width = scale(toZeroBased(scaleGenomicStart) + genomicDistance);
 
   if (width < 2) {
     return null;
   }
 
-  const xStart = scale(from);
+  const xStart = scale(toZeroBased(from));
   const xEnd = xStart + width;
 
   const lineY = offsetTop + GENE_HEIGHT / 2;
@@ -439,7 +442,7 @@ const renderInteractiveArea = ({
   const {
     data: { start: genomicStart, end: genomicEnd }
   } = gene;
-  const start = scale(genomicStart);
+  const start = scale(toZeroBased(genomicStart));
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
 

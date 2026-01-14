@@ -10,6 +10,7 @@ import { renderRegulatoryFeatureTracks } from './regulatoryFeatureTracks';
 import { renderRuler } from './ruler';
 import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
+import { toZeroBased } from '../helpers/toZeroBased';
 import { COLORS, type Colors } from './constants';
 
 import ViewportController from './viewportController';
@@ -93,7 +94,10 @@ export class RegionOverview extends LitElement {
   @state()
   imageWidth = 0;
 
-  scale: ScaleLinear<number, number> | null = null;
+  bedScale: ScaleLinear<number, number> | null = null;
+
+  ensemblScale: ScaleLinear<number, number> | null = null;
+
   areaSelection: AreaSelectionController;
 
   #calculatedTrackPositions: CalculatedTrackPositions | null = null;
@@ -125,23 +129,11 @@ export class RegionOverview extends LitElement {
         end: this.end
       });
 
-      this.scale = scaleLinear().domain([
-        this.start,
-        this.end
-      ]).rangeRound([
-        0,
-        this.imageWidth
-      ]);
+      this.#resetScale();
     }
 
     if (changedProperties.has('imageWidth')) {
-      this.scale = scaleLinear().domain([
-        this.start,
-        this.end
-      ]).rangeRound([
-        0,
-        this.imageWidth
-      ]);
+      this.#resetScale();
     }
   }
 
@@ -213,8 +205,30 @@ export class RegionOverview extends LitElement {
     };
   }
 
+  #resetScale() {
+    this.bedScale = scaleLinear().domain([
+      toZeroBased(this.start),
+      this.end
+    ]).rangeRound([
+      0,
+      this.imageWidth
+    ]);
+    this.ensemblScale = scaleLinear().domain([
+      this.start,
+      this.end + 1
+    ]).rangeRound([
+      0,
+      this.imageWidth
+    ]);
+  }
+
   render() {
-    if (!this.imageWidth || !this.scale || !this.featureTracks) {
+    if (
+      !this.imageWidth ||
+      !this.bedScale ||
+      !this.ensemblScale ||
+      !this.featureTracks
+    ) {
       return;
     }
 
@@ -239,7 +253,7 @@ export class RegionOverview extends LitElement {
         ${unselectedBackgroundFilter()}
         <g filter="url(#unselected-background)">
           ${renderRuler({
-            scale: this.scale,
+            scale: this.ensemblScale,
             offsetTop: 0,
             colors
           })}
@@ -254,7 +268,7 @@ export class RegionOverview extends LitElement {
             colors
           })}
           ${renderRuler({
-            scale: this.scale,
+            scale: this.ensemblScale,
             offsetTop: bottomRulerTopOffset,
             colors
           })}
@@ -276,7 +290,7 @@ export class RegionOverview extends LitElement {
     strandDividerTopOffset: number;
     colors: Colors;
   }) {
-    if (!this.featureTracks || !this.scale) {
+    if (!this.featureTracks || !this.bedScale) {
       return;
     }
 
@@ -285,7 +299,7 @@ export class RegionOverview extends LitElement {
     return renderGeneTracks({
       forwardStrandTopOffsets,
       reverseStrandTopOffsets,
-      scale: this.scale,
+      scale: this.bedScale,
       tracks: geneTracks,
       start: this.start,
       regionName: this.regionName,
@@ -304,7 +318,7 @@ export class RegionOverview extends LitElement {
     offsetTop: number;
     colors: Colors;
   }) {
-    if (!this.featureTracks || !this.data || !this.scale) {
+    if (!this.featureTracks || !this.data || !this.bedScale) {
       return;
     }
 
@@ -313,7 +327,7 @@ export class RegionOverview extends LitElement {
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,
       featureTypes: this.data.regulatory_feature_types,
-      scale: this.scale,
+      scale: this.bedScale,
       regionName: this.regionName,
       focusRegulatoryFeatureId: this.focusRegulatoryFeatureId,
       offsetTop,
