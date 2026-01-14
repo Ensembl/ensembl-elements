@@ -1,9 +1,19 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 
 import '../alignments/variant-alignments';
 import '../genome-browser/genome-browser';
-import { LocationChangePayload } from '../genome-browser';
+
+import {
+  initialTrackPositions,
+  updateGenomeBrowserTrackSummaries,
+  haveTrackPositionsChanged,
+  createOutgoingTrackSummaries,
+  type TrackSummary
+} from './track-summaries';
+
+import type { LocationChangePayload } from '../genome-browser';
+import type { TrackSummaryEventDetail, HotspotEventDetail } from '../genome-browser/types/genome-browser';
 
 export type ViewportChangePayload = {
   reference: LocationChangePayload,
@@ -15,6 +25,14 @@ export type Endpoints = {
   alignments: string;
   genomeBrowser: string;
 };
+
+export type TrackPositionsChangeEvent = CustomEvent<{
+  tracks: TrackSummary[];
+}>
+
+type GenomeBrowserMessage =
+  | TrackSummaryEventDetail
+  | HotspotEventDetail;
 
 @customElement('ens-sv-browser')
 export class StructuralVariantsBrowser extends LitElement {
@@ -67,7 +85,58 @@ export class StructuralVariantsBrowser extends LitElement {
   @property({ type: Object })
   endpoints!: Endpoints;
 
-  private syncViewport(payload: {
+  @query('ens-sv-genome-browser:first-of-type')
+  genomeBrowserTop!: HTMLElement;
+
+  @query('ens-sv-genome-browser:nth-of-type(2)')
+  genomeBrowserBottom!: HTMLElement;
+
+  @query('ens-sv-alignments')
+  variantAlignmentsElement!: HTMLElement;
+
+  #hostElementHeight = 0;
+
+  #trackPositions = structuredClone(initialTrackPositions);
+
+  protected firstUpdated() {
+    const resizeObserver = new ResizeObserver((entries) => {
+      const [hostElementEntry] = entries;
+      const { height: hostHeight } = hostElementEntry.contentRect;
+      const storedHostHeight = this.#hostElementHeight;
+      if (hostHeight !== storedHostHeight) {
+        this.#recordChildrenPositions();
+        this.#reportTrackPositions();
+        this.#hostElementHeight = hostHeight;
+      }
+    });
+
+    resizeObserver.observe(this);    
+  }
+
+  #recordChildrenPositions() {
+    const genomeBrowserTopBoundingRect = this.genomeBrowserTop!.getBoundingClientRect();
+    const genomeBrowserBottomBoundingRect = this.genomeBrowserBottom!.getBoundingClientRect();
+    const alignmentsBoundingRect = this.variantAlignmentsElement!.getBoundingClientRect();
+    this.#trackPositions.genomeBrowserTop.height = genomeBrowserTopBoundingRect.height;
+    this.#trackPositions.variantAlignments.offsetTop = genomeBrowserTopBoundingRect.height;
+    this.#trackPositions.variantAlignments.height = alignmentsBoundingRect.height;
+    this.#trackPositions.genomeBrowserBottom.offsetTop = this.#trackPositions.variantAlignments.offsetTop
+      + this.#trackPositions.variantAlignments.height;
+    this.#trackPositions.genomeBrowserBottom.height = genomeBrowserBottomBoundingRect.height;
+  }
+
+  #reportTrackPositions() {
+    const trackSummaries = createOutgoingTrackSummaries(this.#trackPositions);
+    const event: TrackPositionsChangeEvent = new CustomEvent('track-positions-change', {
+      detail: {
+        tracks: trackSummaries
+      },
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+
+  #syncViewport(payload: {
     reference?: LocationChangePayload;
     alt?: LocationChangePayload;
     eventName: string;
@@ -104,21 +173,46 @@ export class StructuralVariantsBrowser extends LitElement {
     this.dispatchEvent(event);
   };
 
-  private onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
+  #onViewportChange = (event: CustomEvent<ViewportChangePayload>) => {
     event.stopPropagation();
     const { reference, alt } = event.detail ?? {};
-    this.syncViewport({ reference, alt, eventName: event.type });
+    this.#syncViewport({ reference, alt, eventName: event.type });
   };
 
-  private onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+  #onReferenceLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     event.stopPropagation();
-    this.syncViewport({ reference: event.detail, eventName: event.type });
+    this.#syncViewport({ reference: event.detail, eventName: event.type });
   };
 
-  private onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
+  #onAltLocationChange = (event: CustomEvent<LocationChangePayload>) => {
     event.stopPropagation();
-    this.syncViewport({ alt: event.detail, eventName: event.type });
+    this.#syncViewport({ alt: event.detail, eventName: event.type });
   };
+
+  #onReferenceGenomeBrowserMessage = (event: CustomEvent<GenomeBrowserMessage>) => {
+    this.#onGenomeBrowserMessage({ event, isAlt: false });
+  }
+
+  #onAltGenomeBrowserMessage = (event: CustomEvent<GenomeBrowserMessage>) => {
+    this.#onGenomeBrowserMessage({ event, isAlt: true });
+  }
+
+  #onGenomeBrowserMessage = (params: { event: CustomEvent<GenomeBrowserMessage>, isAlt: boolean }) => {
+    const { event, isAlt } = params;
+    const message = event.detail;
+    if (message.type === 'track-summary') {
+      const updatedTrackPositions = updateGenomeBrowserTrackSummaries({
+        trackPositions: this.#trackPositions,
+        trackSummaries: message.payload.summary,
+        isAlt
+      });
+
+      if (haveTrackPositionsChanged(updatedTrackPositions, this.#trackPositions)) {
+        this.#trackPositions = updatedTrackPositions;
+        this.#reportTrackPositions();
+      }
+    }
+  }
 
   render() {
     if (!this.referenceGenomeId || !this.altGenomeId) {
@@ -138,8 +232,9 @@ export class StructuralVariantsBrowser extends LitElement {
       .start=${this.start}
       .end=${this.end}
       .endpoint=${this.endpoints.genomeBrowser}
-      @location-change=${this.onReferenceLocationChange}
-      @location-change-end=${this.onReferenceLocationChange}
+      @location-change=${this.#onReferenceLocationChange}
+      @location-change-end=${this.#onReferenceLocationChange}
+      @genome-browser-message=${this.#onReferenceGenomeBrowserMessage}
     ></ens-sv-genome-browser>
     <ens-sv-alignments
       .referenceGenomeId=${this.referenceGenomeId}
@@ -152,8 +247,8 @@ export class StructuralVariantsBrowser extends LitElement {
       .altEnd=${altEnd}
       .altRegionLength=${this.altRegionLength}
       .endpoints=${this.endpoints}
-      @viewport-change=${this.onViewportChange}
-      @viewport-change-end=${this.onViewportChange}
+      @viewport-change=${this.#onViewportChange}
+      @viewport-change-end=${this.#onViewportChange}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
@@ -163,8 +258,9 @@ export class StructuralVariantsBrowser extends LitElement {
       .start=${altStart}
       .end=${altEnd}
       .endpoint=${this.endpoints.genomeBrowser}
-      @location-change=${this.onAltLocationChange}
-      @location-change-end=${this.onAltLocationChange}
+      @location-change=${this.#onAltLocationChange}
+      @location-change-end=${this.#onAltLocationChange}
+      @genome-browser-message=${this.#onAltGenomeBrowserMessage}
     ></ens-sv-genome-browser>
     `;
   }

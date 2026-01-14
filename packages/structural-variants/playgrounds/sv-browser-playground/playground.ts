@@ -4,13 +4,12 @@ import { customElement, state } from 'lit/decorators.js';
 import '../../sv-browser/sv-browser';
 import '../../nav-buttons/nav-buttons';
 
-import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
-import type { VariantClickPayload } from '../../alignments/types/variant';
-
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 
 import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
-import { GBMessagePayload } from '../../genome-browser/types/genome-browser';
+
+import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
+import type { VariantClickPayload } from '../../alignments/types/variant';
 
 @customElement('sv-browser-playground')
 export class SvBrowserPlayground extends LitElement {
@@ -76,15 +75,6 @@ export class SvBrowserPlayground extends LitElement {
     }
   }
 
-  onHotspotClick = (event: CustomEvent<GBMessagePayload>) => {
-    const { detail: { genome, payload } } = event;
-    const messageContainer = this.shadowRoot!.querySelector('.click-message');
-    const message = `Tooltip for ${genome}: ${JSON.stringify(payload)}`;
-    if (messageContainer) {
-      messageContainer.textContent = message;
-    }
-  }
-
   render() {
     const altStart = this.altStart;
     const altEnd = this.altEnd;
@@ -117,7 +107,6 @@ export class SvBrowserPlayground extends LitElement {
         @viewport-change=${this.onViewportChange}
         @viewport-change-end=${this.onViewportChange}
         @variant-click=${this.onVariantClick}
-        @hotspot-message=${this.onHotspotClick}
       ></ens-sv-browser>
       <div class="click-message"></div>
     `;

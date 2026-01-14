@@ -3,27 +3,47 @@ export type GenomeBrowserConfig = {
   target_element: HTMLElement;
 };
 
-type TrackSummaryEntry = {
-  type: string;
+export type TrackSummary = {
+  type: 'track';
   ['switch-id']: string;
   offset: number;
   height: number;
 };
 
 export type TrackSummaryPayload = {
-  summary: TrackSummaryEntry[];
+  summary: TrackSummary[];
 };
+
+export type TrackSummaryEventDetail = {
+  type: 'track-summary',
+  genome_id: string,
+  payload: TrackSummaryPayload;
+};
+
+type HotspotVariety = {
+  type: string;
+  [key: string]: unknown | undefined;
+}
 
 export type HotspotPayload = {
   x: number;
   y: number;
-  content: object[];
-  variety: object[];
+  content: unknown[];
+  // Note: genome browser sends floats in the hotspot-area below.
+  // Might be worth updating the genome browser to always send rounded integers
+  'hotspot-area': {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+  };
+  variety: HotspotVariety[];
 };
 
-export type GBMessagePayload = {
-  genome: string;
-  payload: TrackSummaryPayload | HotspotPayload;
+export type HotspotEventDetail = {
+  type: 'hotspot',
+  genome_id: string,
+  payload: HotspotPayload;
 };
 
 export type LocationChangePayload = {

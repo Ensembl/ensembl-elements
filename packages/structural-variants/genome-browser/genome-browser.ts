@@ -3,7 +3,14 @@ import { customElement, property, query } from 'lit/decorators.js';
 
 import initializeGenomeBrowser, { GenomeBrowser as EnsemblGenomeBrowser, type InitOutput } from '@ensembl/ensembl-genome-browser';
 import GenomeBrowserDragController from './controllers/genome-browser-drag-controller';
-import type { GenomeBrowserConfig, TrackSummaryPayload, HotspotPayload } from './types/genome-browser';
+
+import type {
+  GenomeBrowserConfig,
+  TrackSummaryPayload,
+  HotspotPayload,
+  TrackSummaryEventDetail,
+  HotspotEventDetail
+} from './types/genome-browser';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const isUuid = (value: string) => UUID_REGEX.test(value);
@@ -78,29 +85,25 @@ export class GenomeBrowser extends LitElement {
     super.disconnectedCallback();
   }
   
-  #handleGenomeBrowserMessage = (kind: string, ...more: unknown[]) => {
+  #handleGenomeBrowserMessage = (kind: string, payload: unknown) => {
     if (kind === 'track_summary') {
-      const [payload] = more as [TrackSummaryPayload?];
-      this.dispatchEvent(new CustomEvent('track-message', {
+      this.dispatchEvent(new CustomEvent('genome-browser-message', {
         detail: {
-          genome: this.genomeId,
-          payload: payload,
-        },
-        bubbles: true,
-        composed: true
+          type: 'track-summary',
+          genome_id: this.genomeId,
+          payload: payload as TrackSummaryPayload,
+        } as TrackSummaryEventDetail
       }));
     } else if (kind === 'hotspot') {
-      const [payload] = more as [HotspotPayload?];
-      this.dispatchEvent(new CustomEvent('hotspot-message', {
+      this.dispatchEvent(new CustomEvent('genome-browser-message', {
         detail: {
-          genome: this.genomeId,
-          payload: payload,
-        },
-        bubbles: true,
-        composed: true
+          type: 'hotspot',
+          genome_id: this.genomeId,
+          payload: payload as HotspotPayload,
+        } as HotspotEventDetail
       }));
     } else if (kind === 'error') {
-      console.error('[GenomeBrowser error]', ...more);
+      console.error('[GenomeBrowser error]', payload);
     }
   };
 
