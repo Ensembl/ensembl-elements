@@ -1,6 +1,8 @@
 export type Variant = {
   name: string;
   type: string;
+  consequence: string;
+  extent: number;
   location: {
     region_name: string;
     start: number;
@@ -8,10 +10,9 @@ export type Variant = {
   }
 };
 
-export type VariantClickPayload = {
-  variantType: string;
-  variantName: string;
-  variantStart: string;
-  variantEnd: string;
-  anchor: Element;
+export type VariantClickEventDetail = Variant & {
+  x: number;
+  y: number;
 };
+
+export type VariantClickEvent = CustomEvent<VariantClickEventDetail>;

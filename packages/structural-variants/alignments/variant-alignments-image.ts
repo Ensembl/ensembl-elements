@@ -1,4 +1,4 @@
-import { html, css, LitElement, type PropertyValues } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { scaleLinear, type ScaleLinear } from 'd3';
 import { yieldToMain } from '@ensembl/ensembl-elements-helpers';
@@ -11,7 +11,7 @@ import { renderVariants } from './parts/variants';
 import { renderAlignments } from './parts/alignments';
 import { renderRuler } from './parts/ruler';
 
-import type { Variant, VariantClickPayload } from './types/variant';
+import type { Variant, VariantClickEventDetail } from './types/variant';
 import type { Alignment } from './types/alignment';
 
 export type InputData = {
@@ -74,9 +74,6 @@ export class VariantAlignmentsImage extends LitElement {
   @state()
   imageWidth = 0;
 
-  @state()
-  selectedVariant: VariantClickPayload | null = null;
-
   scale: ScaleLinear<number, number> | null = null;
   altSequenceScale: ScaleLinear<number, number> | null = null;
 
@@ -87,49 +84,51 @@ export class VariantAlignmentsImage extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.setListeners();
     this.observeHostSize();
   }
 
-  setListeners() {
-    this.shadowRoot!.addEventListener('click', (event) => {
-      const element = event.target as HTMLElement;
-      const elementData = element.dataset;
-      const { featureType } = elementData;
+  #handleClick = (event: PointerEvent) => {
+    const element = event.target as HTMLElement;
+    const elementData = element.dataset;
+    const { featureType } = elementData;
 
-      if (featureType === 'variant') {
-        const variantType = elementData.variantType as string;
-        const variantName = elementData.name as string;
-        const variantStart = elementData.variantStart as string;
-        const variantEnd = elementData.variantEnd as string;
+    if (featureType === 'variant') {
+      const variantType = elementData.variantType as string;
+      const variantName = elementData.name as string;
+      const variantConsequence = elementData.variantConsequence as string;
+      const variantExtent = elementData.variantExtent as string;
+      const variantRegionName = elementData.variantRegionName as string;
+      const variantStart = elementData.variantStart as string;
+      const variantEnd = elementData.variantEnd as string;
 
-        const payload: VariantClickPayload = {
-          variantType,
-          variantName,
-          variantStart,
-          variantEnd,
-          anchor: element
-        };
+      const x = event.clientX;
+      const y = event.clientY;
 
-        this.selectedVariant = payload;
+      const payload: VariantClickEventDetail = {
+        name: variantName,
+        type: variantType,
+        consequence: variantConsequence,
+        extent: Number(variantExtent),
+        location: {
+          region_name: variantRegionName,
+          start: Number(variantStart),
+          end: Number(variantEnd)
+        },
+        x,
+        y
+      };
 
-        const customEvent = new CustomEvent<VariantClickPayload>('variant-click', {
-          detail: payload,
-          composed: true,
-          bubbles: true
-        });
-        this.dispatchEvent(customEvent);
-      }
-    });
+      const customEvent = new CustomEvent<VariantClickEventDetail>('variant-click', {
+        detail: payload
+      });
+      this.dispatchEvent(customEvent);
+    }
+
   }
 
-  willUpdate(changedProperties: PropertyValues) {
+  willUpdate() {
     this.#updateReferenceScale();
     this.#updateAltSequenceScale();
-
-    if (changedProperties.has('data') && this.selectedVariant) {
-      this.selectedVariant = null;
-    }
   }
 
   async scheduleUpdate(): Promise<void> {
@@ -156,6 +155,7 @@ export class VariantAlignmentsImage extends LitElement {
       <svg
         viewBox="0 0 ${this.imageWidth} ${IMAGE_HEIGHT}"
         style="width: 100%; height: ${IMAGE_HEIGHT}px;"
+        @pointerup=${this.#handleClick}
       >
         <g>
           ${this.renderTopRuler()}
@@ -187,8 +187,6 @@ export class VariantAlignmentsImage extends LitElement {
   }
 
   renderTopRuler() {
-    const [ start, end ] = this.scale!.domain();
-
     return renderRuler({
       offsetTop: 0,
       scale: this.scale as ScaleLinear<number, number>
@@ -196,8 +194,6 @@ export class VariantAlignmentsImage extends LitElement {
   }
 
   renderBottomRuler() {
-    const [ start, end ] = this.altSequenceScale!.domain();
-
     return renderRuler({
       offsetTop: RULER_HEIGHT + ALIGNMENT_AREA_HEIGHT,
       scale: this.altSequenceScale as ScaleLinear<number, number>

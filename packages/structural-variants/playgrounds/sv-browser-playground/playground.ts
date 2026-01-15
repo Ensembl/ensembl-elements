@@ -9,7 +9,7 @@ import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
 import { REFERENCE_GENOME_ID, ALT_GENOME_ID, REFERENCE_TRACKS, ALT_TRACKS, ENDPOINTS, INITIAL_VIEWPORT } from '../shared/constants';
 
 import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
-import type { VariantClickPayload } from '../../alignments/types/variant';
+import type { FeatureClickEventDetails } from '../../sv-browser/feature-message';
 
 @customElement('sv-browser-playground')
 export class SvBrowserPlayground extends LitElement {
@@ -63,16 +63,19 @@ export class SvBrowserPlayground extends LitElement {
     }
   }
 
-  onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
-    const { detail: { variantName, variantType, variantStart, variantEnd } } = event;
-    const numberFormatter = new Intl.NumberFormat('en-GB');
-    const messageContainer = this.shadowRoot!.querySelector('.click-message');
-    const start = numberFormatter.format(parseInt(variantStart));
-    const end = numberFormatter.format(parseInt(variantEnd));
-    const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
-    if (messageContainer) {
-      messageContainer.textContent = message;
-    }
+  onFeatureMessage = (event: CustomEvent<FeatureClickEventDetails>) => {
+    const { detail} = event;
+
+    console.log('message', detail);
+
+    // const numberFormatter = new Intl.NumberFormat('en-GB');
+    // const messageContainer = this.shadowRoot!.querySelector('.click-message');
+    // const start = numberFormatter.format(parseInt(variantStart));
+    // const end = numberFormatter.format(parseInt(variantEnd));
+    // const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
+    // if (messageContainer) {
+    //   messageContainer.textContent = message;
+    // }
   }
 
   render() {
@@ -106,7 +109,7 @@ export class SvBrowserPlayground extends LitElement {
         .endpoints=${ENDPOINTS}
         @viewport-change=${this.onViewportChange}
         @viewport-change-end=${this.onViewportChange}
-        @variant-click=${this.onVariantClick}
+        @feature-message=${this.onFeatureMessage}
       ></ens-sv-browser>
       <div class="click-message"></div>
     `;

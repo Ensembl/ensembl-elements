@@ -6,7 +6,7 @@ import { getStepBasedInterval } from '../alignments-data/request-interval-helper
 
 import './variant-alignments-image';
 
-import type { Variant } from './types/variant';
+import type { Variant, VariantClickEvent } from './types/variant';
 import type { Alignment } from './types/alignment';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
 
@@ -246,6 +246,12 @@ export class VariantAlignments extends LitElement {
     this.dispatchEvent(viewportUpdateEvent);
   };
 
+  #onVariantClick = (event: VariantClickEvent) => {
+    // re-dispatch the event (need to do this, because the original event doesn't bubble)
+    const newEvent = new CustomEvent(event.type, { detail: event.detail });
+    this.dispatchEvent(newEvent);
+  }
+
   render() {
     return html`
       <ens-sv-alignments-image
@@ -257,6 +263,7 @@ export class VariantAlignments extends LitElement {
         .regionName=${this.regionName}
         .data=${this.data}
         .altRegionLength=${this.altRegionLength}
+        @variant-click=${this.#onVariantClick}
       ></ens-sv-alignments-image>
     `;
   }

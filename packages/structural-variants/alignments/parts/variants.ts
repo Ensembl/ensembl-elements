@@ -61,8 +61,11 @@ const renderVariant = ({
       data-feature-type="variant"
       data-name=${variant.name}
       data-variant-type=${variant.type}
+      data-variant-region-name=${variant.location.region_name}
       data-variant-start=${variant.location.start}
       data-variant-end=${variant.location.end}
+      data-variant-extent=${variant.extent}
+      data-variant-consequence=${variant.consequence}
     />
   `;
 };
