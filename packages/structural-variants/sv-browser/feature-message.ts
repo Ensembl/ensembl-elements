@@ -1,35 +1,34 @@
-import type { HotspotPayload } from '../genome-browser/types/genome-browser';
 import type { Variant } from '../alignments/types/variant';
 
-type MessageMarkup = 'light' | 'strong' | 'emphasis' | 'focus';
+export type MessageMarkup = 'light' | 'strong' | 'emphasis' | 'focus';
 
-type MessageTextUnit = {
+export type MessageTextUnit = {
   text: string;
   markup: MessageMarkup[];
 };
 
-type MessageBlock = {
+export type MessageBlock = {
   type: 'block';
   items: MessageTextUnit[];
 };
 
-type MessageParagraph = MessageBlock[];
+export type MessageParagraph = MessageBlock[];
 
 
 // has metadata; normally corresponds to a feature
-type MessageSection = {
+export type MessageSection = {
   data: MessageParagraph[];
   metadata: unknown;
 };
 
-type PayloadVariety = {
+export type PayloadVariety = {
   type: 'zmenu';
   'zmenu-type': string;
 };
 
 
 export type FeatureClickEventDetails = {
-  genome_id: string; // does this belong here?
+  genome_id: string;
   payload: {
     x: number;
     y: number;
@@ -50,6 +49,8 @@ export type FeatureClickEventDetails = {
  * {regionName}:{start}-{end} (if end != start) { strand } strand
  */
 export const prepareHaplotypeVariantMessageContent = (variant: Variant) => {
+  const numberFormatter = new Intl.NumberFormat('en-GB');
+
   const messageBlock1: MessageBlock = {
     type: 'block',
     items: [
@@ -76,7 +77,7 @@ export const prepareHaplotypeVariantMessageContent = (variant: Variant) => {
   };
   const messageParagraph2 = [messageBlock3];
 
-  const alleleText = variant.type === 'inversion' ? 'Alt allele' : 'Reference';
+  const alleleText = variant.type === 'insertion' ? 'Alt allele' : 'Reference';
 
   const messageBlock4: MessageBlock = {
     type: 'block',
@@ -90,9 +91,13 @@ export const prepareHaplotypeVariantMessageContent = (variant: Variant) => {
   };
   const messageParagraph3 = [messageBlock4];
 
-  const locationString = variant.location.end === variant.location.start
-    ? `${variant.location.region_name}:${variant.location.start}`
-    : `${variant.location.region_name}:${variant.location.start}-${variant.location.end}`;
+  const variantStart = variant.location.start;
+  const formattedVariantStart = numberFormatter.format(variantStart);
+  const variantEnd = variant.location.end;
+  const formattedVariantEnd = numberFormatter.format(variantEnd);
+  const locationString = variantEnd === variantStart
+    ? `${variant.location.region_name}:${formattedVariantStart}`
+    : `${variant.location.region_name}:${formattedVariantStart}-${formattedVariantEnd}`;
 
   const messageBlock5: MessageBlock = {
     type: 'block',

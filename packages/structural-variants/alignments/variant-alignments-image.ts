@@ -101,8 +101,8 @@ export class VariantAlignmentsImage extends LitElement {
       const variantStart = elementData.variantStart as string;
       const variantEnd = elementData.variantEnd as string;
 
-      const x = event.clientX;
-      const y = event.clientY;
+      const x = event.offsetX;
+      const y = event.offsetY;
 
       const payload: VariantClickEventDetail = {
         name: variantName,

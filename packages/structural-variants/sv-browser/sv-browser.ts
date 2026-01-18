@@ -214,11 +214,17 @@ export class StructuralVariantsBrowser extends LitElement {
         this.#reportTrackPositions();
       }
     } else if (message.type === 'hotspot') {
-      this.#reportHotspotMessage(message);
+      this.#reportHotspotMessage(message, isAlt);
     }
   }
 
-  #reportHotspotMessage(message: HotspotEventDetail) {
+  #reportHotspotMessage(message: HotspotEventDetail, isAlt: boolean) {
+    // unify events from the genome browser under the same 'feature-message' name
+    // as events from the variant-alignments component
+    if (isAlt) {
+      // adjust the y-coordinate of the event, considering the offset of the genome browser
+      message.payload.y = this.#trackPositions.genomeBrowserBottom.offsetTop + message.payload.y;
+    }
     const outgoingEvent = new CustomEvent('feature-message', {
       detail: message
     });
@@ -234,7 +240,7 @@ export class StructuralVariantsBrowser extends LitElement {
       x,
       y: updatedY,
       content: messageContent,
-      variety: [{ type: 'variant-in-alignment' }]
+      variety: [{ type: 'zmenu', 'zmenu-type': 'variant-in-alignment' }]
     };
     const outgoingEvent = new CustomEvent('feature-message', { detail: {
       genome_id: this.referenceGenomeId,

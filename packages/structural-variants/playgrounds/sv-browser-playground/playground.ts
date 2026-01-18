@@ -65,17 +65,7 @@ export class SvBrowserPlayground extends LitElement {
 
   onFeatureMessage = (event: CustomEvent<FeatureClickEventDetails>) => {
     const { detail} = event;
-
     console.log('message', detail);
-
-    // const numberFormatter = new Intl.NumberFormat('en-GB');
-    // const messageContainer = this.shadowRoot!.querySelector('.click-message');
-    // const start = numberFormatter.format(parseInt(variantStart));
-    // const end = numberFormatter.format(parseInt(variantEnd));
-    // const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
-    // if (messageContainer) {
-    //   messageContainer.textContent = message;
-    // }
   }
 
   render() {
