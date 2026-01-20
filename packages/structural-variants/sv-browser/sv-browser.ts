@@ -11,9 +11,11 @@ import {
   createOutgoingTrackSummaries,
   type TrackSummary
 } from './track-summaries';
+import { prepareHaplotypeVariantMessageContent } from './feature-message';
 
 import type { LocationChangePayload } from '../genome-browser';
 import type { TrackSummaryEventDetail, HotspotEventDetail } from '../genome-browser/types/genome-browser';
+import type { VariantClickEvent } from '../alignments/types/variant';
 
 export type ViewportChangePayload = {
   reference: LocationChangePayload,
@@ -197,7 +199,7 @@ export class StructuralVariantsBrowser extends LitElement {
     this.#onGenomeBrowserMessage({ event, isAlt: true });
   }
 
-  #onGenomeBrowserMessage = (params: { event: CustomEvent<GenomeBrowserMessage>, isAlt: boolean }) => {
+  #onGenomeBrowserMessage(params: { event: CustomEvent<GenomeBrowserMessage>, isAlt: boolean }) {
     const { event, isAlt } = params;
     const message = event.detail;
     if (message.type === 'track-summary') {
@@ -211,7 +213,40 @@ export class StructuralVariantsBrowser extends LitElement {
         this.#trackPositions = updatedTrackPositions;
         this.#reportTrackPositions();
       }
+    } else if (message.type === 'hotspot') {
+      this.#reportHotspotMessage(message, isAlt);
     }
+  }
+
+  #reportHotspotMessage(message: HotspotEventDetail, isAlt: boolean) {
+    // unify events from the genome browser under the same 'feature-message' name
+    // as events from the variant-alignments component
+    if (isAlt) {
+      // adjust the y-coordinate of the event, considering the offset of the genome browser
+      message.payload.y = this.#trackPositions.genomeBrowserBottom.offsetTop + message.payload.y;
+    }
+    const outgoingEvent = new CustomEvent('feature-message', {
+      detail: message
+    });
+    this.dispatchEvent(outgoingEvent);
+  }
+
+  #onVariantClickInAlignment(event: VariantClickEvent) {
+    // transform event payload into a message payload
+    const messageContent = prepareHaplotypeVariantMessageContent(event.detail);
+    const { x, y } = event.detail;
+    const updatedY = this.#trackPositions.variantAlignments.offsetTop + y;
+    const payload = {
+      x,
+      y: updatedY,
+      content: messageContent,
+      variety: [{ type: 'zmenu', 'zmenu-type': 'variant-in-alignment' }]
+    };
+    const outgoingEvent = new CustomEvent('feature-message', { detail: {
+      genome_id: this.referenceGenomeId,
+      payload
+    } });
+    this.dispatchEvent(outgoingEvent);
   }
 
   render() {
@@ -249,6 +284,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .endpoints=${this.endpoints}
       @viewport-change=${this.#onViewportChange}
       @viewport-change-end=${this.#onViewportChange}
+      @variant-click=${this.#onVariantClickInAlignment}
       ></ens-sv-alignments>
     <ens-sv-genome-browser
       .tracks=${this.altTracks}

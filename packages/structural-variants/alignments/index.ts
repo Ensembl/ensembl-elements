@@ -1,8 +1,7 @@
 export * from './variant-alignments';
 
 export type {
-  Variant,
-  VariantClickPayload
+  Variant
 } from './types/variant';
 export type {
   Alignment
