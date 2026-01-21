@@ -4,6 +4,12 @@ import './popup-varieties.css';
 import './popup-positioning.css';
 import './popup-virtual-element.css';
 
+const loremIpsum = `
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Proin id vestibulum lectus. Phasellus pharetra nisl vel nunc tristique,
+et porta orci facilisis. Pellentesque scelerisque eros eget enim faucibus pulvinar.
+`;
+
 export default {
   title: 'Common/Popup'
 };
@@ -80,8 +86,8 @@ export const Positioning = () => {
   const showPopup = () => {
     const popup = document.createElement('ens-popup');
     popup.anchor = anchorButton;
-    popup.placement = positionSelector.value as any;
-    popup.innerText = 'Hello sailor';
+    popup.placement = positionSelector.value as typeof popup.placement;
+    popup.innerHTML = `<div class="content">${loremIpsum}</div>`;
     rootElement.appendChild(popup);
   };
 
@@ -152,14 +158,14 @@ export const Varieties = () => {
   const template = `
     <div class="overflow-container">
       <div class="anchors-container">
-        <button class="anchor-button top-left" data-text="TOP LEFT"></button>
-        <button class="anchor-button top-right" data-text="TOP RIGHT"></button>
-        <button class="anchor-button left-top" data-text="LEFT TOP"></button>
-        <button class="anchor-button left-bottom" data-text="LEFT BOTTOM"></button>
-        <button class="anchor-button bottom-left" data-text="BOTTOM LEFT"></button>
-        <button class="anchor-button bottom-right" data-text="BOTTOM RIGHT"></button>
-        <button class="anchor-button right-top" data-text="RIGHT TOP"></button>
-        <button class="anchor-button right-bottom" data-text="RIGHT BOTTOM"></button>
+        <button class="anchor-button top-left" data-position="top-left" data-text="TOP LEFT"></button>
+        <button class="anchor-button top-right" data-position="top-right" data-text="TOP RIGHT"></button>
+        <button class="anchor-button left-top" data-position="left-top" data-text="LEFT TOP"></button>
+        <button class="anchor-button left-bottom" data-position="left-bottom" data-text="LEFT BOTTOM"></button>
+        <button class="anchor-button bottom-left" data-position="bottom-left" data-text="BOTTOM LEFT"></button>
+        <button class="anchor-button bottom-right" data-position="bottom-right" data-text="BOTTOM RIGHT"></button>
+        <button class="anchor-button right-top" data-position="right-top" data-text="RIGHT TOP"></button>
+        <button class="anchor-button right-bottom" data-position="right-bottom" data-text="RIGHT BOTTOM"></button>
       </div>
     </div>
   `;
@@ -174,9 +180,11 @@ export const Varieties = () => {
     const targetEl = event.target as HTMLElement;
     if (targetEl.classList.contains('anchor-button')) {
       const text = targetEl.dataset.text;
+      const position = targetEl.dataset.position.split('-').shift();
       const popup = document.createElement('ens-popup');
       popup.anchor = targetEl;
       popup.innerText = text;
+      popup.placement = position as typeof popup.placement;
       rootElement.append(popup);
     }
   });

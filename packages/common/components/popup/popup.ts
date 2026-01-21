@@ -6,10 +6,7 @@ import {
   computePosition,
   flip,
   offset,
-  autoPlacement,
-  platform,
   shift,
-  size,
   hide,
   type VirtualElement,
   type MiddlewareState,
@@ -135,7 +132,7 @@ export class Popup extends LitElement {
         hide()
       ]
     }).then((data) => {
-      const { x, y, placement, middlewareData } = data;
+      const { x, y, middlewareData } = data;
 
       // position the popup itself
       Object.assign(this.popup.style, {
@@ -210,10 +207,15 @@ export class Popup extends LitElement {
     const { placement, rects } = state;
     const popupRect = rects.floating;
     const popupWidth = popupRect.width;
+    const popupHeight = popupRect.height;
 
-    const crossAxisOffset = ['top', 'bottom'].includes(placement)
-      ? popupWidth / 2 - 20
-      : undefined;
+    let crossAxisOffset;
+
+    if (['top', 'bottom'].includes(placement)) {
+      crossAxisOffset = popupWidth / 2 - 20;
+    } else {
+      crossAxisOffset = popupHeight / 2 - 20;
+    }
 
     return {
       mainAxis: this.#arrowHeight,
