@@ -20,7 +20,7 @@ export const renderVariants = ({
   const variantElements = variants.map(variant => renderVariant({
     variant,
     scale
-  }));
+  })).filter(node => node !== null);
 
   return svg`
     <g>
