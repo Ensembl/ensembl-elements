@@ -50,7 +50,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
 
     // For the alternative genome (move the same distance as reference genome)
     const newAltStart = Math.max(this.altStart - quarterViewportDistance, 1);
-    const newAltEnd = newAltStart + viewportDistance;
+    const newAltEnd = Math.min(newAltStart + viewportDistance, this.altEnd);
 
     this.#dispatchNewLocation({
       reference: {
@@ -74,7 +74,7 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
 
     // For the alternative genome (move the same distance as reference genome)
     const newAltEnd = Math.min(this.altEnd + quarterViewportDistance, this.altRegionLength);
-    const newAltStart = newAltEnd - viewportDistance;
+    const newAltStart = Math.max(newAltEnd - viewportDistance, 1);
 
     this.#dispatchNewLocation({
       reference: {
@@ -89,16 +89,21 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
 
   }
 
+  /**
+   * Narrow the viewport to half its current size
+   */
   #onZoomIn = () => {
     // For reference genome
+    const refMidpoint = this.start + Math.round((this.end - this.start) / 2);
     const viewportDistance = this.end - this.start;
-    const quarterViewportDistance = Math.max(Math.round(viewportDistance / 4), 1);
-    const newStart = this.start + quarterViewportDistance;
-    const newEnd = newStart + quarterViewportDistance * 2;
+    const newViewportDistance = Math.ceil(viewportDistance / 2);
+    const newStart = refMidpoint - newViewportDistance / 2;
+    const newEnd = refMidpoint + newViewportDistance / 2;
 
     // For the alternative genome, change location by the same distance as for reference genome
-    const newAltStart = this.altStart + quarterViewportDistance;
-    const newAltEnd = newAltStart + quarterViewportDistance * 2;
+    const altMidpoint = this.altStart + Math.round((this.altEnd - this.altStart) / 2);
+    const newAltStart = altMidpoint - newViewportDistance / 2;
+    const newAltEnd = altMidpoint + newViewportDistance / 2;
 
     this.#dispatchNewLocation({
       reference: {
@@ -112,18 +117,22 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
     });
   }
 
+  /**
+   * Grow the viewport by to twice its current size
+   */
   #onZoomOut = () => {
     // For reference genome
+    const refMidpoint = this.start + Math.round((this.end - this.start) / 2);
     const viewportDistance = this.end - this.start;
     const newViewportDistance = Math.min(viewportDistance * 2, this.regionLength);
-    const quarterNewDistance = Math.max(Math.round(newViewportDistance / 4), 1);
 
-    const newStart = Math.max(this.start - quarterNewDistance, 1);
-    const newEnd = Math.min(this.end + quarterNewDistance, this.regionLength);
+    const newStart = Math.max(refMidpoint - newViewportDistance / 2, 1);
+    const newEnd = Math.min(refMidpoint + newViewportDistance / 2, this.regionLength);
   
     // For the alternative genome, change location by the same distance as for reference genome
-    const newAltStart = Math.max(this.altStart - quarterNewDistance, 1);
-    const newAltEnd = Math.min(this.altStart + newViewportDistance, this.altRegionLength);
+    const altMidpoint = this.altStart + Math.round((this.altEnd - this.altStart) / 2);
+    const newAltStart = Math.max(altMidpoint - newViewportDistance / 2, 1);
+    const newAltEnd = Math.min(altMidpoint + newViewportDistance / 2, this.altRegionLength);
 
     this.#dispatchNewLocation({
       reference: {
