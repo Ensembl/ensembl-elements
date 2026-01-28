@@ -9,7 +9,6 @@ import './variant-alignments-image';
 import type { Variant, VariantClickEvent } from './types/variant';
 import type { Alignment } from './types/alignment';
 import type { InputData as VariantAlignmentsData } from './variant-alignments-image';
-import alignments from '../alignments-dev-server/src/alignments';
 
 export type Endpoints = {
   variants: string;
