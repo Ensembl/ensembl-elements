@@ -178,7 +178,6 @@ export class VariantAlignments extends LitElement {
       end: refEnd
     });
 
-    // TODO: add altToRef alignments; remember to use altStart and altEnd for start and end
     let altToRefAlignments: Alignment[] = [];
 
     if (this.altStart && this.altEnd) {
@@ -193,8 +192,19 @@ export class VariantAlignments extends LitElement {
       });
     }
 
-    return [...refToAltAlignments, ...altToRefAlignments]
-      .sort((a, b) => a.reference.start - b.reference.start);
+    const refToAltAlignmentIds = new Set(refToAltAlignments.map(alignment => alignment.id));
+    const combinedAlignments = [...refToAltAlignments];
+
+    for (const alignment of altToRefAlignments) {
+      if (!refToAltAlignmentIds.has(alignment.id)) {
+        combinedAlignments.push(alignment);
+      }
+    }
+
+    combinedAlignments.sort((a, b) => a.reference.start - b.reference.start);
+
+
+    return combinedAlignments;
   }
 
   #getStandardInterval(params: {

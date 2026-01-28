@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import '../../alignments/variant-alignments';
 import '../shared/control-buttons';
 
-import type { VariantClickPayload } from '../../alignments/types/variant';
+import type { VariantClickEvent } from '../../alignments/types/variant';
 import type { ViewportChangePayload } from '../../sv-browser/sv-browser';
 
 import '@ensembl/ensembl-elements-common/styles/custom-properties.css';
@@ -54,19 +54,19 @@ export class StructuralVariantsPlayground extends LitElement {
     }
   }
 
-  onVariantClick = (event: CustomEvent<VariantClickPayload>) => {
+  onVariantClick = (event: VariantClickEvent) => {
     const { detail: {
-      variantName,
-      variantType,
-      variantStart,
-      variantEnd
+      name: variantName,
+      location: { start: variantStart, end: variantEnd, region_name: regionName },
+      type: variantType,
+      extent
     }} = event;
 
     const numberFormatter = new Intl.NumberFormat('en-GB');
     const messageContainer = this.shadowRoot!.querySelector('.variant-message');
-    const start = numberFormatter.format(parseInt(variantStart));
-    const end = numberFormatter.format(parseInt(variantEnd));
-    const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end})`;
+    const start = numberFormatter.format(variantStart);
+    const end = numberFormatter.format(variantEnd);
+    const message = `Last clicked variant: ${variantName}, ${variantType} (${this.regionName}:${start}-${end}), extent: ${extent}`;
     messageContainer!.textContent = message;
   }
 
