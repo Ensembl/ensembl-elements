@@ -14,7 +14,7 @@ export const renderAlignments = ({
   referenceScale: ScaleLinear<number, number>; // <-- scale used for the reference genome
   altScale: ScaleLinear<number, number>;
 }) => {
-  if (alignments.length > 200) {
+  if (alignments.length > 3000) {
     alignments = getReducedAlignments({
       alignments,
       referenceScale,
@@ -78,8 +78,7 @@ const getReducedAlignments = ({
     const lastAlignment = reducedAlignments.at(-1) as Alignment;
     
     if (
-      !isInversion(lastAlignment) && isInversion(alignment) ||
-      isInversion(lastAlignment) && !isInversion(alignment)
+      isInversion(lastAlignment) || isInversion(alignment)
     ) {
       reducedAlignments.push(structuredClone(alignment));
       continue;
