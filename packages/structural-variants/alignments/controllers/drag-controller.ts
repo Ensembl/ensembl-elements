@@ -13,8 +13,7 @@ class DragController implements ReactiveController {
   isMouseDown = false;
   isDragging = false;
 
-  mouseDownX: number | null = null;
-  mouseDownY: number | null = null;
+  #mouseDownX: number | null = null;
 
   #alignmentReferenceStart: number | null = null;
   #alignmentReferenceEnd: number | null = null;
@@ -26,6 +25,7 @@ class DragController implements ReactiveController {
   #regionLength: number| null = null;
   #altRegionLength: number | null = null;
   #draggingMode: DraggingMode | null = null;
+  #hasReportedViewportChange = false;
 
   constructor(host: VariantAlignmentsImage) {
     this.host = host;
@@ -43,8 +43,7 @@ class DragController implements ReactiveController {
   #onMouseDown = (event: MouseEvent) => {
     this.isMouseDown = true;
     const { clientX: x, clientY: y } = event;
-    this.mouseDownX = x;
-    this.mouseDownY = y;
+    this.#mouseDownX = x;
 
     this.#syncDataFromHost();
     this.#setDraggingMode(event);
@@ -54,7 +53,7 @@ class DragController implements ReactiveController {
   }
 
   #onMouseMove = (event: MouseEvent) => {
-    if (!this.isMouseDown || this.mouseDownX === null) {
+    if (!this.isMouseDown || this.#mouseDownX === null) {
       return;
     }
 
@@ -66,7 +65,7 @@ class DragController implements ReactiveController {
     this.isDragging = true;
 
     const { clientX: x } = event;
-    const mouseDownX = this.mouseDownX as number;
+    const mouseDownX = this.#mouseDownX as number;
 
     const deltaX = x - mouseDownX;
 
@@ -83,6 +82,7 @@ class DragController implements ReactiveController {
       detail: eventData
     });
     this.host.dispatchEvent(locationChangeEvent);
+    this.#hasReportedViewportChange = true;
   }
 
   #calculateCoordsForReference = ({
@@ -152,27 +152,29 @@ class DragController implements ReactiveController {
   }
 
   #onMouseUp = () => {
-    const event = new CustomEvent('viewport-change-end', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        reference: {
-          start: this.host.start,
-          end: this.host.end
-        },
-        alt: {
-          start: this.host.altStart,
-          end: this.host.altEnd
+    if (this.#hasReportedViewportChange) {
+      const event = new CustomEvent('viewport-change-end', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          reference: {
+            start: this.host.start,
+            end: this.host.end
+          },
+          alt: {
+            start: this.host.altStart,
+            end: this.host.altEnd
+          }
         }
-      }
-    });
-    this.host.dispatchEvent(event);
+      });
+      this.host.dispatchEvent(event);
+    }
 
     this.isDragging = false;
     this.isMouseDown = false;
-    this.mouseDownX = null;
-    this.mouseDownY = null;
+    this.#mouseDownX = null;
     this.#draggingMode = null;
+    this.#hasReportedViewportChange = false;
 
     document.removeEventListener('mousemove', this.#onMouseMove);
     document.removeEventListener('mouseup', this.#onMouseUp);
