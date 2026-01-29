@@ -97,13 +97,14 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
     const refMidpoint = this.start + Math.round((this.end - this.start) / 2);
     const viewportDistance = this.end - this.start;
     const newViewportDistance = Math.ceil(viewportDistance / 2);
-    const newStart = refMidpoint - newViewportDistance / 2;
-    const newEnd = refMidpoint + newViewportDistance / 2;
+    const halfNewViewportDistance = Math.ceil(newViewportDistance / 2);
+    const newStart = refMidpoint - halfNewViewportDistance;
+    const newEnd = refMidpoint + halfNewViewportDistance;
 
     // For the alternative genome, change location by the same distance as for reference genome
     const altMidpoint = this.altStart + Math.round((this.altEnd - this.altStart) / 2);
-    const newAltStart = altMidpoint - newViewportDistance / 2;
-    const newAltEnd = altMidpoint + newViewportDistance / 2;
+    const newAltStart = altMidpoint - halfNewViewportDistance;
+    const newAltEnd = altMidpoint + halfNewViewportDistance;
 
     this.#dispatchNewLocation({
       reference: {
@@ -125,14 +126,15 @@ export class NavButtonsForStructuralVariantsBrowser extends LitElement {
     const refMidpoint = this.start + Math.round((this.end - this.start) / 2);
     const viewportDistance = this.end - this.start;
     const newViewportDistance = Math.min(viewportDistance * 2, this.regionLength);
+    const halfNewViewportDistance = Math.ceil(newViewportDistance / 2);
 
-    const newStart = Math.max(refMidpoint - newViewportDistance / 2, 1);
-    const newEnd = Math.min(refMidpoint + newViewportDistance / 2, this.regionLength);
+    const newStart = Math.max(refMidpoint - halfNewViewportDistance, 1);
+    const newEnd = Math.min(refMidpoint + halfNewViewportDistance, this.regionLength);
   
     // For the alternative genome, change location by the same distance as for reference genome
     const altMidpoint = this.altStart + Math.round((this.altEnd - this.altStart) / 2);
-    const newAltStart = Math.max(altMidpoint - newViewportDistance / 2, 1);
-    const newAltEnd = Math.min(altMidpoint + newViewportDistance / 2, this.altRegionLength);
+    const newAltStart = Math.max(altMidpoint - halfNewViewportDistance, 1);
+    const newAltEnd = Math.min(altMidpoint + halfNewViewportDistance, this.altRegionLength);
 
     this.#dispatchNewLocation({
       reference: {
