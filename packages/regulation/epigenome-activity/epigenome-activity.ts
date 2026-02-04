@@ -16,7 +16,7 @@ import { TRACK_HEIGHT } from './constants';
 import type { TrackData, TrackMetadata, TrackPositionsPayload } from './types';
 
 @customElement('ens-reg-epigenome-activity')
-export class RegionOverview extends LitElement {
+export class EpigenomeActivity extends LitElement {
 
   static styles = css`
     :host {
@@ -153,5 +153,12 @@ export class RegionOverview extends LitElement {
         })
       ];
     });
+  }
+}
+
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'ens-reg-epigenome-activity': EpigenomeActivity;
   }
 }
