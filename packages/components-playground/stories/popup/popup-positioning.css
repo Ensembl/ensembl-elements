@@ -13,4 +13,8 @@
     border: 1px dashed black;
   }
 
+  .content {
+    max-width: 400px;
+  }
+
 }
