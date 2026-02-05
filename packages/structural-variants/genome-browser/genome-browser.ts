@@ -130,8 +130,7 @@ export class GenomeBrowser extends LitElement {
       gb.switch(['ruler'], false);
       gb.switch(['ruler', 'one_based'], false);
       this.tracks.forEach((trackId) => {
-        const base = isUuid(trackId) ? ['track', 'expand'] : ['track'];
-        gb.switch([...base, trackId], true);
+        this.#toggleTrack({ trackId, isOn: true });
       });
       gb.set_stick(`${this.genomeId}:${this.regionName}`);
       gb.goto(this.start, this.end);
@@ -151,10 +150,32 @@ export class GenomeBrowser extends LitElement {
     if (changedProperties.has('start') || changedProperties.has('end')) {
       this.genomeBrowser.goto(this.start, this.end);
     }
+
+    if (changedProperties.has('tracks')) {
+      this.#onTracksUpdate(changedProperties.get('tracks') as string[]);
+    }
   }
 
   protected updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
+  }
+
+  #onTracksUpdate(previousTracks: string[]) {
+    // NOTE: this method could use Set.prototype.difference() (released in Summer 2024)
+    const tracksToDisable = previousTracks.filter(trackId => !this.tracks.includes(trackId));
+    const tracksToEnable = this.tracks.filter(trackId => !previousTracks.includes(trackId));
+
+    tracksToDisable.forEach((trackId) => {
+      this.#toggleTrack({ trackId, isOn: false });
+    });
+    tracksToEnable.forEach((trackId) => {
+      this.#toggleTrack({ trackId, isOn: true });
+    });
+  }
+
+  #toggleTrack({trackId, isOn}: {trackId: string, isOn: boolean}) {
+    const base = isUuid(trackId) ? ['track', 'expand'] : ['track'];
+    this.genomeBrowser.switch([...base, trackId], isOn); 
   }
 
   render() {
