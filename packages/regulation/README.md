@@ -67,3 +67,21 @@ import type {
 - `GeneInRegionOverview` is the shape of a gene in that data
 - `RegulatoryFeature` is the shape of a regulatory feature in that data
 - `RegulatoryFeatureMetadata` is the shape of metadata about regulatory features
+
+
+
+## Epigenome Activity
+
+This component displays epigenome activity data.
+
+### Component name
+`ens-reg-epigenome-activity`
+
+### Input properties
+- `start` - start coordinate on a region
+- `end` - end coordinate on a region
+- `tracks` - an array of `TrackData` objects (see exported types)
+- `trackMetadata` a `TrackMetadata` object (see exported types)
+
+### Events
+- `track-positions-change` - see exported `TrackPositionsChangeEvent` type

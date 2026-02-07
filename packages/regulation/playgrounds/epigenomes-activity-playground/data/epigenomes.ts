@@ -1,0 +1,23 @@
+export const epigenomeIds = [
+  [
+    "19e12a58-8e53-45f7-a5fe-6c9c0804f6b0"
+  ],
+  [
+    "0d8d65cf-fe97-42a3-8834-7125e716fb78"
+  ],
+  [
+    "1d8bae17-7354-434c-8b20-37894abad74c"
+  ],
+  [
+    "857b68a6-7dee-4d78-ad1d-8d1ac6f990af"
+  ],
+  [
+    "b3e350b0-6bad-40ed-8a37-4b1f29b4d297"
+  ],
+  [
+    "33da29f8-e417-42f5-acc1-9a381be60e08"
+  ],
+  [
+    "b0339af6-7bd3-4879-b53f-3960b27fa8af"
+  ]
+]

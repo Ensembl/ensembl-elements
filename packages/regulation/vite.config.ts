@@ -9,6 +9,7 @@ export default defineConfig({
       exclude: [
         'vite.config.ts',
         'scripts/*',
+        'playgrounds',
         'region-annotation/popupInjector.ts'
       ]
     })
@@ -17,7 +18,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: [
-        'region-annotation/index.ts'
+        'region-annotation/index.ts',
+        'epigenome-activity/index.ts'
       ],
       formats: ['es'],
     },

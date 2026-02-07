@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "npm run dev --workspace=packages/components-playground",
     "storybook": "npm run storybook --workspace=packages/components-playground"
   },
   "dependencies": {
