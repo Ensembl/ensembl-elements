@@ -1,6 +1,7 @@
 export const GENE_TRACKS_TOP_OFFSET = 40;
 export const GENE_HEIGHT = 8;
-export const GENE_TRACK_HEIGHT = GENE_HEIGHT + 3;
+export const GENE_LABEL_HEIGHT = 10;
+export const GENE_TRACK_HEIGHT = GENE_HEIGHT + GENE_LABEL_HEIGHT + 2;
 
 export const REGULATORY_FEATURE_TRACKS_TOP_OFFSET = 38;
 
@@ -21,6 +22,7 @@ export const COLORS = {
   rulerLabel: '#1b2c39', // Ensembl black colour
   transcriptionStartSite: '#1b2c39', // Ensembl black colour
   regulatoryFeatureUnfocused: '#e5eaf0', // Light grey; same colour that is used during location selection
+  geneLabel: '#6f8190' // Ensembl dark grey
 } as const;
 
 export type Colors = Record<keyof typeof COLORS, string>;

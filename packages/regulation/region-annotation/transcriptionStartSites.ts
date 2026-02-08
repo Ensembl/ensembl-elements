@@ -1,7 +1,7 @@
 import { svg } from 'lit';
 import { type ScaleLinear } from 'd3';
 
-import { GENE_TRACK_HEIGHT } from './constants';
+import { GENE_HEIGHT } from './constants';
 
 import type { GeneInRegionOverview } from '../types/regionOverview';
 import type { GeneTrack } from './prepareFeatureTracks';
@@ -228,7 +228,7 @@ const getYStart = ({
     return strand === 'forward'
       ? trackOffsetsTop[trackIndex] - VERTICAL_OFFSET_FROM_GENE
       : trackOffsetsTop[trackIndex] +
-          GENE_TRACK_HEIGHT +
+          GENE_HEIGHT +
           VERTICAL_OFFSET_FROM_GENE;
   }
 
@@ -263,7 +263,7 @@ const getYStart = ({
     strand === 'forward'
       ? trackOffsetsTop[adjustedTrackIndex] - VERTICAL_OFFSET_FROM_GENE
       : trackOffsetsTop[adjustedTrackIndex] +
-        GENE_TRACK_HEIGHT +
+        GENE_HEIGHT +
         VERTICAL_OFFSET_FROM_GENE;
 
   return yStart;

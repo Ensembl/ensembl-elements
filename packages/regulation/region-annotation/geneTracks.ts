@@ -3,6 +3,7 @@ import type { ScaleLinear } from 'd3';
 
 import {
   GENE_HEIGHT,
+  GENE_LABEL_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 import { toZeroBased } from '../helpers/toZeroBased';
@@ -257,6 +258,11 @@ const renderGene = ({
         offsetTop,
         direction: 'right'
       })}
+      ${renderGeneLabel({
+        gene,
+        offsetTop,
+        scale
+      })}
       ${renderInteractiveArea({
         gene,
         regionName,
@@ -420,6 +426,43 @@ const renderGeneExtent = ({
       stroke=${color}
       stroke-width="1"
     />
+  `;
+};
+
+const renderGeneLabel = ({
+  gene,
+  offsetTop,
+  scale
+}: {
+  gene: GeneInTrack;
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+  // colors: Colors;
+}) => {
+  const [ genomicViewportStart ] = scale.domain();
+  const labelText = gene.data.symbol ?? gene.data.stable_id;
+  const geneStrand = gene.data.strand;
+  const labelX = scale(Math.max(gene.data.start, genomicViewportStart));
+  const labelY = geneStrand === 'forward'
+    ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT + 1
+    : offsetTop - 2;
+
+  // const textColor = colors.geneLabel;
+  const textColor = '#6f8190';
+
+  const style = 'font-family: "IBM Plex Mono"; user-select: none';
+
+  // At this font size, the width of a letter in this monospace font is 6
+  return svg`
+    <text
+      x=${labelX}
+      y=${labelY}
+      font-size="10"
+      style=${style}
+      fill=${textColor}
+    >
+      ${labelText}
+    </text>
   `;
 };
 
