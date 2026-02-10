@@ -472,7 +472,7 @@ const renderGeneLabel = ({
   const labelText = gene.data.symbol ?? gene.data.stable_id;
   const labelY = geneStrand === 'forward'
     ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT + 1
-    : offsetTop - 2;
+    : offsetTop - 3;
 
   // const textColor = colors.geneLabel;
   const textColor = '#6f8190';
