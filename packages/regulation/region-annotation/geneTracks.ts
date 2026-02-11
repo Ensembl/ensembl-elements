@@ -3,6 +3,7 @@ import type { ScaleLinear } from 'd3';
 
 import {
   GENE_HEIGHT,
+  GENE_LABEL_HEIGHT,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 import { toZeroBased } from '../helpers/toZeroBased';
@@ -45,6 +46,7 @@ export const renderGeneTracks = ({
   colors: Colors;
 }) => {
   const { forwardStrandTracks, reverseStrandTracks } = tracks;
+  const geneLabelsStore = createGeneLabelsStore({ tracks });
 
   // Designer's instruction: forward strand genes stack upwards
   const forwardStrandTrackYs = forwardStrandTopOffsets.toReversed();
@@ -68,7 +70,8 @@ export const renderGeneTracks = ({
       start,
       end,
       focusGeneId,
-      colors
+      colors,
+      geneLabelsStore
     }))
   });
 
@@ -100,7 +103,8 @@ const renderGeneTrack = ({
   start,
   end,
   focusGeneId,
-  colors
+  colors,
+  geneLabelsStore
 }: {
   // passing a whole bunch of tracks and their offsets in a single track renderer,
   // because they will be needed to render transcription start sites
@@ -113,6 +117,7 @@ const renderGeneTrack = ({
   end: number;
   focusGeneId: string | null;
   colors: Colors;
+  geneLabelsStore: GeneLabelsStore;
 }) => {
   const track = tracks[trackIndex];
   const trackOffsetTop = trackOffsetsTop[trackIndex];
@@ -137,7 +142,10 @@ const renderGeneTrack = ({
         regionName,
         scale,
         offsetTop: trackOffsetTop,
-        color: isFocusGene ? colors.geneFocused : colors.gene
+        color: isFocusGene ? colors.geneFocused : colors.gene,
+        trackIndex,
+        allColors: colors,
+        geneLabelsStore
       })}
       ${renderTranscriptionStartSites({
         tss: gene.data.tss,
@@ -192,13 +200,19 @@ const renderGene = ({
   regionName,
   scale,
   offsetTop,
-  color
+  color,
+  allColors,
+  trackIndex,
+  geneLabelsStore
 }: {
   gene: GeneInTrack;
   regionName: string;
   scale: ScaleLinear<number, number>;
   offsetTop: number;
   color: string;
+  allColors: Colors;
+  trackIndex: number;
+  geneLabelsStore: GeneLabelsStore;
 }) => {
   const trackY = offsetTop;
 
@@ -256,6 +270,14 @@ const renderGene = ({
         color,
         offsetTop,
         direction: 'right'
+      })}
+      ${renderGeneLabel({
+        gene,
+        offsetTop,
+        scale,
+        geneLabelsStore,
+        trackIndex,
+        colors: allColors
       })}
       ${renderInteractiveArea({
         gene,
@@ -423,6 +445,61 @@ const renderGeneExtent = ({
   `;
 };
 
+const renderGeneLabel = ({
+  gene,
+  offsetTop,
+  scale,
+  geneLabelsStore,
+  trackIndex,
+  colors
+}: {
+  gene: GeneInTrack;
+  offsetTop: number;
+  scale: ScaleLinear<number, number>;
+  geneLabelsStore: GeneLabelsStore;
+  trackIndex: number;
+  colors: Colors;
+}) => {
+  const [ genomicViewportStart ] = scale.domain();
+  const geneStrand = gene.data.strand;
+  const labelsForStrand = geneStrand === 'forward'
+    ? geneLabelsStore.labels.forwardStrand
+    : geneLabelsStore.labels.reverseStrand;
+  const labelsForTrack = labelsForStrand[trackIndex];
+  const prevLabel = labelsForTrack.at(-1);
+
+  const labelX = scale(Math.max(gene.data.start, genomicViewportStart));
+
+  if (prevLabel && prevLabel.end >= labelX) {
+    return null;
+  }
+
+  const labelText = gene.data.symbol ?? gene.data.stable_id;
+  const labelY = geneStrand === 'forward'
+    ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT + 1
+    : offsetTop - 3;
+
+  const textColor = colors.geneLabel;
+
+  const style = 'font-family: "IBM Plex Mono"; user-select: none';
+
+  const labelWidth = Math.ceil(geneLabelsStore.textMeasuringCanvas.getContext('2d')!.measureText(labelText).width);
+  labelsForTrack.push({ start: labelX, end: labelX + labelWidth });
+
+  // At this font size, the width of a letter in this monospace font is 6
+  return svg`
+    <text
+      x=${labelX}
+      y=${labelY}
+      font-size="10"
+      style=${style}
+      fill=${textColor}
+    >
+      ${labelText}
+    </text>
+  `;
+};
+
 const renderInteractiveArea = ({
   gene,
   regionName,
@@ -473,5 +550,38 @@ const prepareGeneInfo = ({
     start: geneData.start,
     end: geneData.end,
     strand: geneData.strand
+  }
+};
+
+
+type GeneLabelsStore = {
+  labels: {
+    forwardStrand: Record<string, { start: number, end: number }[]>;
+    reverseStrand: Record<string, { start: number, end: number }[]>;
+  },
+  textMeasuringCanvas: HTMLCanvasElement;
+};
+
+const createGeneLabelsStore = ({ tracks }: { tracks: FeatureTracks['geneTracks'] }): GeneLabelsStore => {
+  const textMeasuringCanvas = document.createElement('canvas');
+  const canvasContext = textMeasuringCanvas.getContext('2d') as CanvasRenderingContext2D;
+  canvasContext.font = '10px "IBM Plex Mono"';
+
+  const { forwardStrandTracks, reverseStrandTracks } = tracks;
+  const labels: GeneLabelsStore['labels'] = {
+    forwardStrand: {},
+    reverseStrand: {}
+  }
+
+  for (let i = 0; i < forwardStrandTracks.length; i++) {
+    labels.forwardStrand[i] = [];
+  }
+  for (let i = 0; i < reverseStrandTracks.length; i++) {
+    labels.reverseStrand[i] = [];
+  }
+
+  return {
+    labels,
+    textMeasuringCanvas
   }
 };

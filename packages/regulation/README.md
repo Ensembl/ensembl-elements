@@ -57,7 +57,8 @@ import type {
   OverviewRegion,
   GeneInRegionOverview,
   RegulatoryFeature,
-  RegulatoryFeatureMetadata
+  RegulatoryFeatureMetadata,
+  Colors
 } from '@ensembl/ensembl-regulation/region-overview';
 ```
 
@@ -67,7 +68,7 @@ import type {
 - `GeneInRegionOverview` is the shape of a gene in that data
 - `RegulatoryFeature` is the shape of a regulatory feature in that data
 - `RegulatoryFeatureMetadata` is the shape of metadata about regulatory features
-
+- `Colors` is the shape of the object of configurable colours
 
 
 ## Epigenome Activity
