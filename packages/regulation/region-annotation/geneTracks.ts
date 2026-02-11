@@ -144,6 +144,7 @@ const renderGeneTrack = ({
         offsetTop: trackOffsetTop,
         color: isFocusGene ? colors.geneFocused : colors.gene,
         trackIndex,
+        allColors: colors,
         geneLabelsStore
       })}
       ${renderTranscriptionStartSites({
@@ -200,6 +201,7 @@ const renderGene = ({
   scale,
   offsetTop,
   color,
+  allColors,
   trackIndex,
   geneLabelsStore
 }: {
@@ -208,6 +210,7 @@ const renderGene = ({
   scale: ScaleLinear<number, number>;
   offsetTop: number;
   color: string;
+  allColors: Colors;
   trackIndex: number;
   geneLabelsStore: GeneLabelsStore;
 }) => {
@@ -273,7 +276,8 @@ const renderGene = ({
         offsetTop,
         scale,
         geneLabelsStore,
-        trackIndex
+        trackIndex,
+        colors: allColors
       })}
       ${renderInteractiveArea({
         gene,
@@ -446,14 +450,15 @@ const renderGeneLabel = ({
   offsetTop,
   scale,
   geneLabelsStore,
-  trackIndex
+  trackIndex,
+  colors
 }: {
   gene: GeneInTrack;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   geneLabelsStore: GeneLabelsStore;
   trackIndex: number;
-  // colors: Colors;
+  colors: Colors;
 }) => {
   const [ genomicViewportStart ] = scale.domain();
   const geneStrand = gene.data.strand;
@@ -474,8 +479,7 @@ const renderGeneLabel = ({
     ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT + 1
     : offsetTop - 3;
 
-  // const textColor = colors.geneLabel;
-  const textColor = '#6f8190';
+  const textColor = colors.geneLabel;
 
   const style = 'font-family: "IBM Plex Mono"; user-select: none';
 
