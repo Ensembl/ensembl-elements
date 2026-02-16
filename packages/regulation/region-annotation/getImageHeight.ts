@@ -15,7 +15,7 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
   const geneTracksTopOffset = RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET;
 
   // make sure there is space for at least 3 gene tracks for the forward strand
-  const forwardStrandGeneTracksCount = Math.max(forwardStrandTracks.length, 3);
+  const forwardStrandGeneTracksCount = Math.max(forwardStrandTracks.length, 2);
   const forwardStrandGeneTrackOffsets = [...Array(forwardStrandGeneTracksCount)]
     .map((_, index) => {
       return geneTracksTopOffset + index * GENE_TRACK_HEIGHT;
@@ -27,7 +27,7 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
     0.5 * GENE_TRACK_HEIGHT;
 
   // make sure there is space for at least 3 gene tracks for the reverse strand
-  const reverseStrandGeneTracksCount = Math.max(reverseStrandTracks.length, 3);
+  const reverseStrandGeneTracksCount = Math.max(reverseStrandTracks.length, 2);
   const reverseStrandGeneTrackOffsets = [...Array(reverseStrandGeneTracksCount)]
     .map((_, index) => {
       return strandDividerTopOffset
