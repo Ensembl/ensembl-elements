@@ -43,6 +43,7 @@ export class RegionOverview extends LitElement {
     svg {
       display: block;
       width: 100%;
+      touch-action: none;
     }
 
     /* Change cursor shape to a pointer:
