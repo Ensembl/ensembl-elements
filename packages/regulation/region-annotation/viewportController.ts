@@ -112,6 +112,7 @@ class ViewportController implements ReactiveController {
       }
     });
 
+    // NOTE: there doesn't seem to be any evidence that this improves performance in any way
     debouncedDispatchEvent({
       element: this.host,
       event: viewportChangeEvent
