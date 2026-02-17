@@ -210,7 +210,7 @@ export class RegionOverview extends LitElement {
     this.bedScale = scaleLinear().domain([
       toZeroBased(this.start),
       this.end
-    ]).rangeRound([
+    ]).range([
       0,
       this.imageWidth
     ]);
