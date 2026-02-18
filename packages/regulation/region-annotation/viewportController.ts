@@ -76,6 +76,11 @@ class ViewportController implements ReactiveController {
 
   #onPointerMove = (event: PointerEvent) => {
     if (!this.isDragging) {
+      // This code path would be executed during the first pointermove event.
+      // The reason this method (rather than onPointerDown) is used
+      // to make the event target capture all pointer events,
+      // is because running this logic on pointer down would prevent
+      // the click event on genes or regulatory features from registering.
       const eventTarget = event.target as HTMLElement;
       eventTarget.setPointerCapture(event.pointerId);
     }
