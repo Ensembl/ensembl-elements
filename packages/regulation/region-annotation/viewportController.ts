@@ -7,11 +7,15 @@ class ViewportController implements ReactiveController {
 
   host: ReactiveControllerHost;
 
-  isMouseDown = false;
+  isPointerDown = false;
   isDragging = false;
 
-  mouseDownX: number | null = null;
-  mouseDownY: number | null = null;
+  pointerDownX: number | null = null;
+
+  #start: number | null = null;
+  #end: number | null = null;
+  #regionLength: number| null = null;
+  #scale: ScaleLinear<number, number> | null = null;
 
   constructor(host: ReactiveControllerHost) {
     this.host = host;
@@ -27,19 +31,14 @@ class ViewportController implements ReactiveController {
   }
 
   #addListeners = () => {
-    (this.host as unknown as HTMLElement).addEventListener('mousedown', this.onMouseDown);
+    (this.host as unknown as HTMLElement).addEventListener('pointerdown', this.#onPointerDown);
   }
 
   #removeListeners = () => {
-    (this.host as unknown as HTMLElement).removeEventListener('mousedown', this.onMouseDown);
+    (this.host as unknown as HTMLElement).removeEventListener('pointerdown', this.#onPointerDown);
   }
 
-  #start: number | null = null;
-  #end: number | null = null;
-  #regionLength: number| null = null;
-  #scale: ScaleLinear<number, number> | null = null;
-
-  syncFromHost = () => {
+  #syncFromHost = () => {
     const host = this.host as RegionOverview;
     this.#scale = host.ensemblScale;
     this.#start = host.start;
@@ -47,42 +46,51 @@ class ViewportController implements ReactiveController {
     this.#regionLength = host.regionLength;
   }
 
-  isSelectionTrigger = (event: MouseEvent) => {
+  #isSelectionTrigger = (event: MouseEvent) => {
     const clickedElement = event.composedPath()[0] as HTMLElement;
     return Boolean(clickedElement.dataset.selectorTrigger);
   }
 
-  isClickOnTooltip = (event: MouseEvent) => {
+  #isClickOnTooltip = (event: PointerEvent) => {
     const tooltipSlot = (this.host as RegionOverview).shadowRoot!.querySelector('slot[name="tooltip"]');
     const isTooltipSlotInComposedPath = Boolean(event.composedPath().find(node => node === tooltipSlot));
     return isTooltipSlotInComposedPath;
   }
 
-  onMouseDown = (event: MouseEvent) => {
-    if (this.isClickOnTooltip(event) || this.isSelectionTrigger(event)) {
+  #onPointerDown = (event: PointerEvent) => {
+    if (this.#isClickOnTooltip(event) || this.#isSelectionTrigger(event)) {
       // ignore
       return;
     }
 
-    this.isMouseDown = true;
-    const { clientX: x, clientY: y } = event;
-    this.mouseDownX = x;
-    this.mouseDownY = y;
+    this.isPointerDown = true;
+    const { clientX: x } = event;
+    this.pointerDownX = x;
 
-    this.syncFromHost();
+    this.#syncFromHost();
 
-    document.addEventListener('mousemove', this.onMouseMove);
-    // document.addEventListener('mousemove', this.debouncedOnMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
+    const eventTarget = event.target as HTMLElement;
+    eventTarget.addEventListener('pointermove', this.#onPointerMove);
+    eventTarget.addEventListener('pointerup', this.#onPointerUp);
   }
 
-  onMouseMove = (event: MouseEvent) => {
+  #onPointerMove = (event: PointerEvent) => {
+    if (!this.isDragging) {
+      // This code path would be executed during the first pointermove event.
+      // The reason this method (rather than onPointerDown) is used
+      // to make the event target capture all pointer events,
+      // is because running this logic on pointer down would prevent
+      // the click event on genes or regulatory features from registering.
+      const eventTarget = event.target as HTMLElement;
+      eventTarget.setPointerCapture(event.pointerId);
+    }
+
     this.isDragging = true;
-    const mouseDownX = this.mouseDownX as number;
+    const pointerDownX = this.pointerDownX as number;
 
     const { clientX: x } = event;
 
-    const deltaX = x - mouseDownX;
+    const deltaX = x - pointerDownX;
 
     const directionCoefficient = deltaX >= 0 ? 1 : -1;
 
@@ -109,26 +117,27 @@ class ViewportController implements ReactiveController {
       }
     });
 
+    // NOTE: there doesn't seem to be any evidence that this improves performance in any way
     debouncedDispatchEvent({
       element: this.host,
       event: viewportChangeEvent
     });
 
-    // host.dispatchEvent(viewportChangeEvent);
+    // this.host.dispatchEvent(viewportChangeEvent);
   }
 
-  debouncedOnMouseMove = debounce(this.onMouseMove)
-
-  onMouseUp = () => {
+  #onPointerUp = (event: PointerEvent) => {
     this.isDragging = false;
-    this.isMouseDown = false;
-    this.mouseDownX = null;
-    this.mouseDownY = null;
+    this.isPointerDown = false;
+    this.pointerDownX = null;
 
-    document.removeEventListener('mousemove', this.onMouseMove);
-    // document.removeEventListener('mousemove', this.debouncedOnMouseMove);
+    const element = event.target as HTMLElement;
 
-    // FIXME: fire a confirmation event
+    element.releasePointerCapture(event.pointerId); // technically, this shouldn't be necessary
+    element.removeEventListener('pointermove', this.#onPointerMove);
+    element.removeEventListener('pointerup', this.#onPointerUp);
+
+    // TODO: fire a confirmation event
   }
 
 

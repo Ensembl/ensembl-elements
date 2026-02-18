@@ -2,8 +2,9 @@ export const GENE_TRACKS_TOP_OFFSET = 40;
 export const GENE_HEIGHT = 8;
 export const GENE_LABEL_HEIGHT = 10;
 export const GENE_TRACK_HEIGHT = GENE_HEIGHT + GENE_LABEL_HEIGHT + 3;
+export const MIN_GENE_TRACKS_COUNT = 2; // reserve space for at least this many gene tracks (per strand)
 
-export const REGULATORY_FEATURE_TRACKS_TOP_OFFSET = 38;
+export const REGULATORY_FEATURE_TRACKS_TOP_OFFSET = 20;
 
 export const REGULATORY_FEATURE_HEIGHT = 8;
 export const REGULATORY_FEATURE_CORE_HEIGHT = 8;

@@ -21,10 +21,10 @@ class AreaSelectionController implements ReactiveController {
 
   host: Host;
 
-  isMouseDown = false;
+  isPointerDown = false;
   isDragging = false;
 
-  mouseDownX: number | null = null;
+  #pointerDownX: number | null = null;
 
   #subscriptions: Set<Subscriber> = new Set()
 
@@ -52,11 +52,11 @@ class AreaSelectionController implements ReactiveController {
   }
 
   #addListeners = () => {
-    this.host.addEventListener('mousedown', this.#onMouseDown);
+    this.host.addEventListener('pointerdown', this.#onPointerDown);
   }
 
   #removeListeners = () => {
-    this.host.removeEventListener('mousedown', this.#onMouseDown);
+    this.host.removeEventListener('pointerdown', this.#onPointerDown);
   }
 
   #syncFromHost = () => {
@@ -65,7 +65,7 @@ class AreaSelectionController implements ReactiveController {
     this.#scale = host.ensemblScale;
   }
 
-  #onMouseDown = (event: MouseEvent) => {
+  #onPointerDown = (event: PointerEvent) => {
     // 1. Make sure that the click occurred on the area that should trigger the selector
     // Expect the area that triggers the selector to have a data attribute "data-selector-trigger"
     // const target = event.target as SVGSVGElement;
@@ -75,32 +75,35 @@ class AreaSelectionController implements ReactiveController {
       return;
     }
 
+    const eventTarget = event.target as HTMLElement;
+    eventTarget.setPointerCapture(event.pointerId);
+
     this.#syncFromHost();
 
-    this.isMouseDown = true;
+    this.isPointerDown = true;
     const { clientX: x } = event;
-    this.mouseDownX = x - this.#hostBoundingRect!.x;
+    this.#pointerDownX = x - this.#hostBoundingRect!.x;
 
-    document.addEventListener('mousemove', this.#onMouseMove);
-    document.addEventListener('mouseup', this.#onMouseUp);
+    document.addEventListener('pointermove', this.#onPointerMove);
+    document.addEventListener('pointerup', this.#onPointerUp);
     document.addEventListener('keyup', this.#onKeyUp);
   }
 
-  #onMouseMove = (event: MouseEvent) => {
+  #onPointerMove = (event: PointerEvent) => {
     this.isDragging = true;
-    const mouseDownX = this.mouseDownX as number;
+    const pointerDownX = this.#pointerDownX as number;
 
     const x = event.clientX - this.#hostBoundingRect!.x;
     
-    const deltaX = Math.abs(x - mouseDownX);
+    const deltaX = Math.abs(x - pointerDownX);
 
     if (deltaX < 2) {
       return;
     }
 
     const payload: SubscriptionPayload = {
-      xLeft: Math.min(x, mouseDownX),
-      xRight: Math.max(x, mouseDownX),
+      xLeft: Math.min(x, pointerDownX),
+      xRight: Math.max(x, pointerDownX),
       height: this.#hostBoundingRect!.height,
       imageWidth: this.#hostBoundingRect!.width
     };
@@ -112,16 +115,16 @@ class AreaSelectionController implements ReactiveController {
     this.#subscriptions.forEach(subscription => subscription(payload));
   }
 
-  #onMouseUp = (event: MouseEvent) => {
+  #onPointerUp = (event: PointerEvent) => {
     const x = event.clientX - this.#hostBoundingRect!.x;
     const scale = this.#scale;
-    const mouseDownX = this.mouseDownX as number;
+    const pointerDownX = this.#pointerDownX as number;
 
-    const deltaX = Math.abs(x - mouseDownX);
+    const deltaX = Math.abs(x - pointerDownX);
     const hasMoved = deltaX >= 2;
 
-    const xLeft = Math.min(x, mouseDownX);
-    const xRight = Math.max(x, mouseDownX);
+    const xLeft = Math.min(x, pointerDownX);
+    const xRight = Math.max(x, pointerDownX);
 
     if (hasMoved) {
       const newGenomicStart = Math.round(scale!.invert(xLeft));
@@ -150,11 +153,11 @@ class AreaSelectionController implements ReactiveController {
     this.#notifySubscriptions(null); // signal to subscribers that the selection has finished
 
     this.isDragging = false;
-    this.isMouseDown = false;
-    this.mouseDownX = null;
+    this.isPointerDown = false;
+    this.#pointerDownX = null;
 
-    document.removeEventListener('mousemove', this.#onMouseMove);
-    document.removeEventListener('mouseup', this.#onMouseUp);
+    document.removeEventListener('pointermove', this.#onPointerMove);
+    document.removeEventListener('pointerup', this.#onPointerUp);
     document.removeEventListener('keyup', this.#onKeyUp);
   }
 

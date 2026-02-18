@@ -43,6 +43,7 @@ export class RegionOverview extends LitElement {
     svg {
       display: block;
       width: 100%;
+      touch-action: none;
     }
 
     /* Change cursor shape to a pointer:
@@ -209,7 +210,7 @@ export class RegionOverview extends LitElement {
     this.bedScale = scaleLinear().domain([
       toZeroBased(this.start),
       this.end
-    ]).rangeRound([
+    ]).range([
       0,
       this.imageWidth
     ]);
