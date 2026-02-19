@@ -285,6 +285,10 @@ const renderInteractiveArea = (params: {
   const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
 
+  const height = REGULATORY_FEATURE_CORE_HEIGHT * 2;
+  const verticalMidline = offsetTop + REGULATORY_FEATURE_CORE_HEIGHT / 2;
+  const y = verticalMidline - height / 2;
+
   return svg`
     <rect
       data-feature-type="regulatory-feature"
@@ -292,8 +296,8 @@ const renderInteractiveArea = (params: {
       class="interactive-area"
       x=${x1}
       width=${width}
-      y=${offsetTop}
-      height=${REGULATORY_FEATURE_CORE_HEIGHT}
+      y=${y}
+      height=${height}
       fill="transparent"
     />
   `;

@@ -273,6 +273,7 @@ const renderGene = ({
       })}
       ${renderGeneLabel({
         gene,
+        regionName,
         offsetTop,
         scale,
         geneLabelsStore,
@@ -447,6 +448,7 @@ const renderGeneExtent = ({
 
 const renderGeneLabel = ({
   gene,
+  regionName,
   offsetTop,
   scale,
   geneLabelsStore,
@@ -454,6 +456,7 @@ const renderGeneLabel = ({
   colors
 }: {
   gene: GeneInTrack;
+  regionName: string;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   geneLabelsStore: GeneLabelsStore;
@@ -489,6 +492,9 @@ const renderGeneLabel = ({
   // At this font size, the width of a letter in this monospace font is 6
   return svg`
     <text
+      data-feature-type="gene"
+      data-feature=${JSON.stringify(prepareGeneInfo({ gene, regionName }))}
+      class="interactive-area"
       x=${labelX}
       y=${labelY}
       font-size="10"
@@ -518,6 +524,10 @@ const renderInteractiveArea = ({
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
 
+  const height = GENE_HEIGHT * 2;
+  const verticalMidline = offsetTop + GENE_HEIGHT / 2;
+  const y = verticalMidline - height / 2;
+
   return svg`
     <rect
       data-feature-type="gene"
@@ -525,8 +535,8 @@ const renderInteractiveArea = ({
       class="interactive-area"
       x=${start}
       width=${width}
-      y=${offsetTop}
-      height=${GENE_HEIGHT}
+      y=${y}
+      height=${height}
       fill="transparent"
     />
   `;
