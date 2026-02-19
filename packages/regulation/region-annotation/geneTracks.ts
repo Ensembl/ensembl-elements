@@ -518,6 +518,10 @@ const renderInteractiveArea = ({
   const end = scale(genomicEnd);
   const width = Math.max(end - start, 0.2);
 
+  const height = GENE_HEIGHT * 2;
+  const verticalMidline = offsetTop + GENE_HEIGHT / 2;
+  const y = verticalMidline - height / 2;
+
   return svg`
     <rect
       data-feature-type="gene"
@@ -525,8 +529,8 @@ const renderInteractiveArea = ({
       class="interactive-area"
       x=${start}
       width=${width}
-      y=${offsetTop}
-      height=${GENE_HEIGHT}
+      y=${y}
+      height=${height}
       fill="transparent"
     />
   `;
