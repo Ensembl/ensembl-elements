@@ -273,6 +273,7 @@ const renderGene = ({
       })}
       ${renderGeneLabel({
         gene,
+        regionName,
         offsetTop,
         scale,
         geneLabelsStore,
@@ -447,6 +448,7 @@ const renderGeneExtent = ({
 
 const renderGeneLabel = ({
   gene,
+  regionName,
   offsetTop,
   scale,
   geneLabelsStore,
@@ -454,6 +456,7 @@ const renderGeneLabel = ({
   colors
 }: {
   gene: GeneInTrack;
+  regionName: string;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   geneLabelsStore: GeneLabelsStore;
@@ -489,6 +492,9 @@ const renderGeneLabel = ({
   // At this font size, the width of a letter in this monospace font is 6
   return svg`
     <text
+      data-feature-type="gene"
+      data-feature=${JSON.stringify(prepareGeneInfo({ gene, regionName }))}
+      class="interactive-area"
       x=${labelX}
       y=${labelY}
       font-size="10"
