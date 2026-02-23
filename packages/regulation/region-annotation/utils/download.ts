@@ -28,6 +28,10 @@ export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
   svgClone.style.setProperty('overflow', 'hidden');
   svgClone.style.setProperty('width', `${svgElement.clientWidth}px`);
 
+  svgClone.querySelectorAll('rect.interactive-area').forEach(element => element.remove());
+
+  removeCommentNodesFromSvg(svgClone);
+
   const svgData = new XMLSerializer().serializeToString(svgClone);
   const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
@@ -82,6 +86,23 @@ const blobToDataUrl = async (blob: Blob) => {
   } catch {
     return;
   }
+};
+
+/** Remove Lit comment nodes */
+const removeCommentNodesFromSvg = (root: Node) => {
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_COMMENT,
+    null
+  );
+
+  const nodesToRemove = [];
+  while (walker.nextNode()) {
+    nodesToRemove.push(walker.currentNode);
+  }
+
+  // Remove nodes after walking to avoid traversal issues
+  nodesToRemove.forEach(node => (node as HTMLElement).remove());
 };
 
 const createStyleTagForFont = ({
