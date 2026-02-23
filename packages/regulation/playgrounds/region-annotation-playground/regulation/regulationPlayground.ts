@@ -10,7 +10,7 @@ import './zoomButtons';
 import { pickData } from './services/filterData';
 import chromosome1Data from './data/chr1-data.json';
 
-import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
+import type { OverviewRegion, RegionOverview } from '@ensembl/ensembl-regulation/region-overview';
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
 
@@ -65,6 +65,15 @@ export class RegulationPlayground extends LitElement {
     console.log('track positions:', event.detail);
   }
 
+  downloadImage(type: 'svg' | 'png') {
+    const annotationPanel = this.shadowRoot?.querySelector('ens-reg-region-annotation') as RegionOverview;
+    if (type === 'svg') {
+      annotationPanel.exportImage({ type: 'svg' });
+    } else if (type === 'png') {
+      annotationPanel.exportImage({ type: 'png' });
+    }
+  }
+
   render() {
     const data = pickData({
       data: chromosome1Data as OverviewRegion,
@@ -95,6 +104,14 @@ export class RegulationPlayground extends LitElement {
           .regionLength=${CHROMOSOME_LENGTH}
           @viewport-change=${this.onViewportChange}
         ></ens-reg-zoom-buttons>
+        <div>
+          <button @click=${() => this.downloadImage('svg')}>
+            Download svg
+          </button>
+          <button @click=${() => this.downloadImage('png')}>
+            Download png
+          </button>
+        </div>
       </div>
     `;
   }

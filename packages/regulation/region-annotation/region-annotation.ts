@@ -12,6 +12,7 @@ import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
 import { toZeroBased } from '../helpers/toZeroBased';
 import { COLORS, type Colors } from './constants';
+import { downloadAsSvg, downloadAsPng } from './utils/download';
 
 import ViewportController from './viewportController';
 import AreaSelectionController from './selection/area-selection-controller';
@@ -141,6 +142,24 @@ export class RegionOverview extends LitElement {
   async scheduleUpdate(): Promise<void> {
     await yieldToMain();
     super.scheduleUpdate();
+  }
+
+  exportImage({
+    type
+  }: {
+    type: 'svg' | 'png'
+  }): void {
+    const svg = this.shadowRoot?.querySelector('svg');
+
+    if (!svg) {
+      return;
+    }
+
+    if (type === 'svg') {
+      downloadAsSvg(svg);
+    } else {
+      downloadAsPng(svg);
+    }
   }
 
   observeHostSize = () => {
