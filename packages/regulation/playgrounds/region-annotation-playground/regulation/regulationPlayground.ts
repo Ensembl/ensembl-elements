@@ -10,7 +10,7 @@ import './zoomButtons';
 
 import { pickData } from './services/filterData';
 
-import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
+import type { OverviewRegion, RegionOverview } from '@ensembl/ensembl-regulation/region-overview';
 import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPayload } from '../../../types/featureClickEvent';
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
@@ -157,6 +157,15 @@ export class RegulationPlayground extends LitElement {
     `;
   }
 
+  downloadImage(type: 'svg' | 'png') {
+    const annotationPanel = this.shadowRoot?.querySelector('ens-reg-region-annotation') as RegionOverview;
+    if (type === 'svg') {
+      annotationPanel.exportImage({ type: 'svg' });
+    } else if (type === 'png') {
+      annotationPanel.exportImage({ type: 'png' });
+    }
+  }
+
   render() {
     if (!this.data) {
       return;
@@ -203,6 +212,12 @@ export class RegulationPlayground extends LitElement {
           ></ens-reg-zoom-buttons>
           <button @click=${() => this.isDarkMode = !this.isDarkMode}>
             Toggle dark mode
+          </button>
+          <button @click=${() => this.downloadImage('svg')}>
+            Download svg
+          </button>
+          <button @click=${() => this.downloadImage('png')}>
+            Download png
           </button>
         </div>
       </div>
