@@ -79,11 +79,6 @@ class ViewportController implements ReactiveController {
   }
 
   #onPointerMove = (event: PointerEvent) => {
-    if (!this.isDragging) {
-      // This code path would be executed during the first pointermove event.
-
-    }
-
     this.isDragging = true;
     const pointerDownX = this.pointerDownX as number;
 
