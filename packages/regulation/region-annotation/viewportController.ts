@@ -3,6 +3,8 @@ import type { ScaleLinear } from 'd3';
 
 import type { RegionOverview } from './index';
 
+const DRAG_THRESHOLD = 5; // pixels that the pointer has to move before event capturing is set
+
 class ViewportController implements ReactiveController {
 
   host: ReactiveControllerHost;
@@ -16,6 +18,7 @@ class ViewportController implements ReactiveController {
   #end: number | null = null;
   #regionLength: number| null = null;
   #scale: ScaleLinear<number, number> | null = null;
+  #isEventCaptureSet = false;
 
   constructor(host: ReactiveControllerHost) {
     this.host = host;
@@ -72,17 +75,13 @@ class ViewportController implements ReactiveController {
     const eventTarget = event.target as HTMLElement;
     eventTarget.addEventListener('pointermove', this.#onPointerMove);
     eventTarget.addEventListener('pointerup', this.#onPointerUp);
+    eventTarget.addEventListener('pointerleave', this.#onPointerLeave);
   }
 
   #onPointerMove = (event: PointerEvent) => {
     if (!this.isDragging) {
       // This code path would be executed during the first pointermove event.
-      // The reason this method (rather than onPointerDown) is used
-      // to make the event target capture all pointer events,
-      // is because running this logic on pointer down would prevent
-      // the click event on genes or regulatory features from registering.
-      const eventTarget = event.target as HTMLElement;
-      eventTarget.setPointerCapture(event.pointerId);
+
     }
 
     this.isDragging = true;
@@ -91,6 +90,16 @@ class ViewportController implements ReactiveController {
     const { clientX: x } = event;
 
     const deltaX = x - pointerDownX;
+
+    if (deltaX > DRAG_THRESHOLD && !this.#isEventCaptureSet) {
+      // Set the element (the svg itself) to be the capture target for the events
+      // after the pointer has moved over a slight distance,
+      // because capturing pointer events immediately would prevent
+      // click events on genes or regulatory features from registering.
+      const eventTarget = event.target as HTMLElement;
+      eventTarget.setPointerCapture(event.pointerId);
+      this.#isEventCaptureSet = true;
+    }
 
     const directionCoefficient = deltaX >= 0 ? 1 : -1;
 
@@ -127,17 +136,27 @@ class ViewportController implements ReactiveController {
   }
 
   #onPointerUp = (event: PointerEvent) => {
+    this.#cleanup(event);
+    // TODO: fire a confirmation event
+  }
+
+  #onPointerLeave = (event: PointerEvent) => {
+    if (!this.#isEventCaptureSet) {
+      this.#cleanup(event);
+    }
+  };
+
+  #cleanup = (event: PointerEvent) => {
     this.isDragging = false;
     this.isPointerDown = false;
     this.pointerDownX = null;
+    this.#isEventCaptureSet = false;
 
     const element = event.target as HTMLElement;
 
     element.releasePointerCapture(event.pointerId); // technically, this shouldn't be necessary
     element.removeEventListener('pointermove', this.#onPointerMove);
     element.removeEventListener('pointerup', this.#onPointerUp);
-
-    // TODO: fire a confirmation event
   }
 
 
