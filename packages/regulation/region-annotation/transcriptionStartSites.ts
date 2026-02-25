@@ -58,40 +58,37 @@ const renderTranscriptionStartSite = (params: Params & {
   const arrowheadBaseTopCoords = `${armEndX}, ${yEnd + ARROWHEAD_BASE_LENGTH / 2}`;
   const arrowheadPointCoords = `${arrowheadPointX}, ${yEnd}`;
 
-  return svg`
-    <g data-name="transcription start site">
-      <line
-        x1=${stemX}
-        x2=${stemX}
-        y1=${yStart}
-        y2=${yEnd}
-        stroke=${color}
-        strokeWidth="1"
-      />
-      <line
-        x1=${stemX}
-        x2=${armEndX}
-        y1=${yEnd}
-        y2=${yEnd}
-        stroke=${color}
-        strokeWidth="1"
-      />
-      ${isOverlapping ? svg`
-        <line
-          x1=${armEndX}
-          x2=${arrowheadPointX}
-          y1=${yEnd}
-          y2=${yEnd}
+  if (isOverlapping) {
+    // This transcription start site overlaps with the next one
+    // Just draw a right-angled path without an arrowhead
+    // (the horizontal arm of the path ends where the arrowhead tip would have otherwise ended)
+    const pathString = `M ${stemX} ${yStart} L ${stemX} ${yEnd} L ${arrowheadPointX} ${yEnd}`;
+    return svg`
+      <g data-name="transcription start site">
+        <path
+          d=${pathString}
+          fill="none"
           stroke=${color}
           strokeWidth="1"
-        />  
-      ` : svg`
-        <polygon
-          points=${`${arrowheadBaseBottomCoords} ${arrowheadPointCoords} ${arrowheadBaseTopCoords}`}
-          fill=${color}
         />
-      `
-      }
+      </g>
+    `;
+  }
+
+  const pathString = `M ${stemX} ${yStart} L ${stemX} ${yEnd} L ${armEndX} ${yEnd}`;
+
+  return svg`
+    <g data-name="transcription start site">
+      <path
+        d=${pathString}
+        fill="none"
+        stroke=${color}
+        strokeWidth="1"
+      />
+      <polygon
+        points=${`${arrowheadBaseBottomCoords} ${arrowheadPointCoords} ${arrowheadBaseTopCoords}`}
+        fill=${color}
+      />
     </g>
   `;
 };
