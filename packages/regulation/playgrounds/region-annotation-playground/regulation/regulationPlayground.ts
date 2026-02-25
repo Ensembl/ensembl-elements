@@ -20,8 +20,8 @@ const CHROMOSOME_LENGTH = 248956422;
 // A five-megabase viewport into chromosome 1
 // const INITIAL_START = 60_000_000;
 // const INITIAL_END = 65_000_000;
-const INITIAL_START = 852_188;
-const INITIAL_END = 863_869;
+const INITIAL_START = 1_168_656;
+const INITIAL_END = 1_262_112;
 
 // A location on chromosome 1 that has two features (promoter and enhancer) next to one another
 // Useful to make sure:
