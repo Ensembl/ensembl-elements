@@ -32,6 +32,10 @@ export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
 
   removeCommentNodesFromSvg(svgClone);
 
+  svgClone.querySelectorAll('[fill="transparent"]').forEach(element => {
+    element.setAttribute('fill', 'none');
+  });
+
   const svgData = new XMLSerializer().serializeToString(svgClone);
   const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
