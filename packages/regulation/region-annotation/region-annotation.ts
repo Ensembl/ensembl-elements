@@ -86,8 +86,8 @@ export class RegionOverview extends LitElement {
   @property({ type: String })
   focusGeneId: string | null = null;
 
-  @property({ type: String })
-  focusRegulatoryFeatureId: string | null = null;
+  @property({ type: Array })
+  focusRegulatoryFeatureIds: string[] = [];
 
   @state()
   featureTracks: FeatureTracks | null = null;
@@ -330,7 +330,7 @@ export class RegionOverview extends LitElement {
       featureTypes: this.data.regulatory_feature_types,
       scale: this.bedScale,
       regionName: this.regionName,
-      focusRegulatoryFeatureId: this.focusRegulatoryFeatureId,
+      focusRegulatoryFeatureIds: this.focusRegulatoryFeatureIds,
       offsetTop,
       colors
     });
