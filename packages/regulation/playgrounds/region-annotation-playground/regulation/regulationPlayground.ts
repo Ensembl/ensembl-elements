@@ -11,7 +11,7 @@ import './zoomButtons';
 import { pickData } from './services/filterData';
 import chromosome1Data from './data/chr1-data.json';
 
-import type { OverviewRegion, RegionOverview } from '@ensembl/ensembl-regulation/region-overview';
+import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
 import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPayload } from '../../../types/featureClickEvent';
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
@@ -179,10 +179,6 @@ export class RegionOverviewPopupContent extends LitElement {
 
     .row .extra-margin-left {
       margin-left: 2.5ch;
-    }
-
-    button {
-
     }
   `
 
