@@ -157,11 +157,13 @@ export class StructuralVariantsBrowser extends LitElement {
     const detail: ViewportChangePayload = {
       reference: {
         start: this.start,
-        end: this.end
+        end: this.end,
+        ...reference
       },
       alt: {
         start: this.altStart || this.start,
-        end: this.altEnd || this.end
+        end: this.altEnd || this.end,
+        ...alt
       }
     };
 

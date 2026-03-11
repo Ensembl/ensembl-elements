@@ -221,21 +221,22 @@ export class VariantAlignments extends LitElement {
       return;
     }
 
-    let genomicStart: number = 0;
+    let startAlignment: Alignment | null = null;
     const { alignments } = data;
 
     for (const alignment of alignments) {
-      const altStart = alignment.alt.start;
+      const refStart = alignment.reference.start;
+      const refEnd = alignment.reference.start + alignment.reference.length;
 
-      if (!genomicStart || altStart < genomicStart) {
-        genomicStart = altStart;
+      if (!startAlignment || refStart <= this.start && refEnd > this.start) {
+        startAlignment = alignment;
       }
     }
 
     const viewportGenomicDistance = this.end - this.start + 1;
 
-    this.altStart = genomicStart;
-    this.altEnd = genomicStart + viewportGenomicDistance;
+    this.altStart = startAlignment!.alt.start;
+    this.altEnd = this.altStart + viewportGenomicDistance;
 
     const eventData = {
       reference: {
