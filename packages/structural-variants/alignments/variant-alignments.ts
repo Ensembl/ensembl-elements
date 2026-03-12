@@ -214,6 +214,17 @@ export class VariantAlignments extends LitElement {
     return getStepBasedInterval({...params, step: 1_000_000});
   }
 
+  /**
+   * Summary:
+   * - Find the first alignment on reference genome that spans vieport start
+   * - Find the distance between the end of that alignment on the reference genome
+   *   and the start viewport coordinate on reference genome
+   * - Subtract same distance from the end of the alignment on the alternative genome
+   * - Set the resulting coordinate to be the start of the viewport for the alternative genome
+   * The hope is that now at least the visible part of the first alignment
+   * will have a rectangular shape, thus making the start viewport coordinate
+   * for the two genomes aligned.
+   */
   #getInitialAltSequenceCoords() {
     const data = this.data;
 
@@ -221,21 +232,26 @@ export class VariantAlignments extends LitElement {
       return;
     }
 
-    let genomicStart: number = 0;
+    let startAlignment: Alignment | null = null;
     const { alignments } = data;
 
     for (const alignment of alignments) {
-      const altStart = alignment.alt.start;
+      const refStart = alignment.reference.start;
+      const refEnd = alignment.reference.start + alignment.reference.length - 1;
 
-      if (!genomicStart || altStart < genomicStart) {
-        genomicStart = altStart;
+      if (!startAlignment || refStart <= this.start && refEnd > this.start) {
+        startAlignment = alignment;
       }
     }
 
     const viewportGenomicDistance = this.end - this.start + 1;
 
-    this.altStart = genomicStart;
-    this.altEnd = genomicStart + viewportGenomicDistance;
+    const refEnd = startAlignment!.reference.start + startAlignment!.reference.length - 1;
+    const refAlignmentDistanceToViewportStart = refEnd - this.start;
+
+    const altEnd = startAlignment!.alt.start + startAlignment!.alt.length - 1;
+    const altViewportStart = altEnd - refAlignmentDistanceToViewportStart;
+    const altViewportEnd = altViewportStart + viewportGenomicDistance;
 
     const eventData = {
       reference: {
@@ -243,10 +259,10 @@ export class VariantAlignments extends LitElement {
         end: this.end
       },
       alt: {
-        start: this.altStart,
-        end: this.altEnd
+        start: altViewportStart,
+        end: altViewportEnd
       }
-    }
+    };
 
     const viewportUpdateEvent = new CustomEvent('viewport-change-end', {
       bubbles: true,
@@ -254,6 +270,9 @@ export class VariantAlignments extends LitElement {
       detail: eventData
     });
     this.dispatchEvent(viewportUpdateEvent);
+
+    this.altStart = altViewportStart;
+    this.altEnd = altViewportEnd;
   };
 
   #onVariantClick = (event: VariantClickEvent) => {
