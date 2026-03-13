@@ -31,6 +31,8 @@ class AreaSelectionController implements ReactiveController {
   #scale: ScaleLinear<number, number> | null = null;
   #hostBoundingRect: DOMRect | null = null;
 
+  #pointerTarget: HTMLElement | null = null;
+
   constructor(host: Host) {
     this.host = host;
     host.addController(this);
@@ -75,8 +77,10 @@ class AreaSelectionController implements ReactiveController {
       return;
     }
 
+    event.preventDefault();
     const eventTarget = event.target as HTMLElement;
     eventTarget.setPointerCapture(event.pointerId);
+    this.#pointerTarget = eventTarget;
 
     this.#syncFromHost();
 
@@ -84,12 +88,13 @@ class AreaSelectionController implements ReactiveController {
     const { clientX: x } = event;
     this.#pointerDownX = x - this.#hostBoundingRect!.x;
 
-    document.addEventListener('pointermove', this.#onPointerMove);
-    document.addEventListener('pointerup', this.#onPointerUp);
+    eventTarget.addEventListener('pointermove', this.#onPointerMove);
+    eventTarget.addEventListener('pointerup', this.#onPointerUp);
     document.addEventListener('keyup', this.#onKeyUp);
   }
 
   #onPointerMove = (event: PointerEvent) => {
+    event.preventDefault();
     this.isDragging = true;
     const pointerDownX = this.#pointerDownX as number;
 
@@ -151,14 +156,18 @@ class AreaSelectionController implements ReactiveController {
 
   #cleanupAfterSelection = () => {
     this.#notifySubscriptions(null); // signal to subscribers that the selection has finished
+    const pointerTarget = this.#pointerTarget;
+
+    if (pointerTarget) {
+      pointerTarget.removeEventListener('pointermove', this.#onPointerMove);
+      pointerTarget.removeEventListener('pointerup', this.#onPointerUp);
+    }
+    document.removeEventListener('keyup', this.#onKeyUp);
 
     this.isDragging = false;
     this.isPointerDown = false;
     this.#pointerDownX = null;
-
-    document.removeEventListener('pointermove', this.#onPointerMove);
-    document.removeEventListener('pointerup', this.#onPointerUp);
-    document.removeEventListener('keyup', this.#onKeyUp);
+    this.#pointerTarget = null;
   }
 
 

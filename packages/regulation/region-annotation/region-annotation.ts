@@ -1,4 +1,4 @@
-import { html, css, LitElement, type PropertyValues } from 'lit';
+import { html, css, LitElement, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { scaleLinear, type ScaleLinear } from 'd3';
 import { yieldToMain } from '@ensembl/ensembl-elements-helpers';
@@ -95,6 +95,9 @@ export class RegionOverview extends LitElement {
   @state()
   imageWidth = 0;
 
+  @state()
+  isSelectingArea = false;
+
   bedScale: ScaleLinear<number, number> | null = null;
 
   ensemblScale: ScaleLinear<number, number> | null = null;
@@ -112,6 +115,7 @@ export class RegionOverview extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.observeHostSize();
+    this.#subscribeToAreaSelection();
   }
 
   willUpdate(changedProperties: PropertyValues) {
@@ -151,6 +155,16 @@ export class RegionOverview extends LitElement {
     });
 
     resizeObserver.observe(this);
+  }
+
+  #subscribeToAreaSelection = () => {
+    this.areaSelection.subscribe((payload) => {
+      if (payload && !this.isSelectingArea) {
+        this.isSelectingArea = true;
+      } else if (!payload) {
+        this.isSelectingArea = false;
+      }
+    });
   }
 
   handleClick = (e: MouseEvent) => {
@@ -252,7 +266,7 @@ export class RegionOverview extends LitElement {
         @click=${this.handleClick}
       >
         ${unselectedBackgroundFilter()}
-        <g filter="url(#unselected-background)">
+        <g filter="${this.isSelectingArea ? 'url(#unselected-background)' : nothing}">
           ${renderRuler({
             scale: this.ensemblScale,
             offsetTop: 0,
