@@ -7,7 +7,7 @@ const DRAG_THRESHOLD = 5; // pixels that the pointer has to move before event ca
 
 class ViewportController implements ReactiveController {
 
-  host: ReactiveControllerHost;
+  host: RegionOverview;
 
   isPointerDown = false;
   isDragging = false;
@@ -19,8 +19,10 @@ class ViewportController implements ReactiveController {
   #regionLength: number| null = null;
   #scale: ScaleLinear<number, number> | null = null;
   #isEventCaptureSet = false;
+  #newStart: number | null = null;
+  #newEnd: number | null = null;
 
-  constructor(host: ReactiveControllerHost) {
+  constructor(host: RegionOverview) {
     this.host = host;
     host.addController(this);
   }
@@ -42,11 +44,13 @@ class ViewportController implements ReactiveController {
   }
 
   #syncFromHost = () => {
-    const host = this.host as RegionOverview;
+    const host = this.host;
     this.#scale = host.ensemblScale;
     this.#start = host.start;
     this.#end = host.end;
     this.#regionLength = host.regionLength;
+    this.#newStart = this.#start;
+    this.#newEnd = this.#end;
   }
 
   #isSelectionTrigger = (event: MouseEvent) => {
@@ -110,6 +114,9 @@ class ViewportController implements ReactiveController {
     const newGenomicStart = Math.max(genomicStart - genomicDistance, 1);
     const newGenomicEnd = Math.min(genomicEnd - genomicDistance, regionLength);
 
+    this.#newStart = newGenomicStart;
+    this.#newEnd = newGenomicEnd;
+
     if (newGenomicStart === genomicStart || newGenomicEnd === genomicEnd) {
       return;      
     }
@@ -132,7 +139,17 @@ class ViewportController implements ReactiveController {
 
   #onPointerUp = (event: PointerEvent) => {
     this.#cleanup(event);
-    // TODO: fire a confirmation event
+
+    // Fire a confirmation event
+    if (this.#newStart !== this.#start || this.#newEnd !== this.#end) {
+      const viewportChangeEvent = new CustomEvent('viewport-change-end', {
+        detail: {
+          start: this.#newStart,
+          end: this.#newEnd
+        }
+      });
+      this.host.dispatchEvent(viewportChangeEvent);
+    }
   }
 
   #onPointerLeave = (event: PointerEvent) => {

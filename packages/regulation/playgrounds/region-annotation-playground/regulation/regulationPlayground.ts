@@ -81,6 +81,7 @@ export class RegulationPlayground extends LitElement {
         <ens-reg-region-overview-popup-injector>
           <ens-reg-region-annotation
             @viewport-change=${this.onViewportChange}
+            @viewport-change-end=${this.onViewportChange}
             @ens-reg-track-positions=${this.onTrackPositionsChange}
             .start=${this.start}
             .end=${this.end}

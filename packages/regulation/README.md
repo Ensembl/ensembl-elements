@@ -45,6 +45,7 @@ It also accepts the following optional properties:
 The component also emits the following events:
 
 - `viewport-change` - a custom event containing the new desired start and end genomic coordinates on the region (emitted when user drags the content of the component, or makes a selection within it)
+- `viewport-change-end` - a custom event that is similar to `viewport-change`, but is only emitted when the gesture that caused the viewport to change is completed: e.g. user has released the mouse button after dragging the viewport; or has finished selecting part of the viewport with a brush
 - `ens-reg-feature-click` - a custom event with information about the feature that the user clicked
 
 ### Exported types

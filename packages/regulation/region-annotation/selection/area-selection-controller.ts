@@ -135,7 +135,7 @@ class AreaSelectionController implements ReactiveController {
       const newGenomicStart = Math.round(scale!.invert(xLeft));
       const newGenomicEnd = Math.round(scale!.invert(xRight));
 
-      const viewportChangeEvent = new CustomEvent('viewport-change', {
+      const viewportChangeEvent = new CustomEvent('viewport-change-end', {
         detail: {
           start: newGenomicStart,
           end: newGenomicEnd
