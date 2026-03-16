@@ -1,4 +1,4 @@
-import { svg } from 'lit';
+import { svg, nothing } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 import {
@@ -181,6 +181,7 @@ const renderFeatureHiRes = (params: {
       ${renderBoundsRegion({...params, side: 'left'})}
       ${renderCoreRegion(params)}
       ${renderBoundsRegion({...params, side: 'right'})}
+      ${params.isFocusFeature ? renderFocusHalo(params) : nothing}
       ${renderInteractiveArea({ ...params })}
     </g>
   `;
@@ -206,11 +207,6 @@ const renderCoreRegion = ({
   const width = Math.max(x2 - x1, 2);
   let height = REGULATORY_FEATURE_CORE_HEIGHT;
   const color = featureTypes[feature.feature_type].color;
-
-  if (isFocusFeature) {
-    height = height * 2;
-    y = y - height / 4;
-  }
 
   return svg`
     <rect
@@ -267,11 +263,6 @@ const renderBoundsRegion = ({
   let y = offsetTop + REGULATORY_FEATURE_CORE_HEIGHT / 4;
   let height = REGULATORY_FEATURE_EXTENT_HEIGHT;
 
-  if (isFocusFeature) {
-    height = height * 2;
-    y = y - height / 4;
-  }
-
   return svg`
     <rect
       x=${start}
@@ -282,6 +273,55 @@ const renderBoundsRegion = ({
     />
   `;
 };
+
+const renderFocusHalo = ({
+  feature,
+  featureTypes,
+  offsetTop,
+  scale
+}: {
+  feature: RegulatoryFeature;
+  featureTypes: InputData['regulatory_feature_types'];
+  offsetTop: number;
+  regionName: string;
+  scale: ScaleLinear<number, number>;
+  colors: Colors;
+}) => {
+  const color = featureTypes[feature.feature_type].color;
+  const genomicStart = feature.extended_start ?? feature.start;
+  const genomicEnd = feature.extended_end ?? feature.end;
+  const x1 = scale(toZeroBased(genomicStart));
+  const x2 = scale(genomicEnd);
+  const width = Math.max(x2 - x1, 2);
+
+  const smudgeExtent = 20; // TODO: move to constant
+  const height = REGULATORY_FEATURE_CORE_HEIGHT + smudgeExtent * 2;
+  const y = offsetTop - height / 2 + REGULATORY_FEATURE_CORE_HEIGHT / 2;
+
+  const gradientId = `gradient-${feature.id}`;
+  const gradient = svg`
+    <defs>
+      <linearGradient id=${gradientId} x1="0%" x2="0%" y1="0%" y2="100%">
+        <stop offset="0%" stop-color=${color} stop-opacity="0" />
+        <stop offset="20%" stop-color=${color} stop-opacity="0.2" />
+        <stop offset="80%" stop-color=${color} stop-opacity="0.2" />
+        <stop offset="100%" stop-color=${color} stop-opacity="0" />
+      </linearGradient>
+    </defs>
+  `;
+
+  return svg`
+    ${gradient}
+    <rect
+      style="pointer-events: none;"
+      x=${x1}
+      width=${width}
+      y=${y}
+      height=${height}
+      fill="url(#${gradientId})"
+    />
+  `;
+}
 
 const renderInteractiveArea = (params: {
   feature: RegulatoryFeature;
