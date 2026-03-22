@@ -1,4 +1,4 @@
-import { html, css, LitElement} from 'lit';
+import { html, css, LitElement, nothing } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 
 // not using the RegionOverview class directly,
@@ -32,6 +32,15 @@ const INITIAL_END = 1_262_112;
 // const INITIAL_START = 609382;
 // const INITIAL_END = 609403;
 
+const darkModeColors = {
+  backgroundColor: '#374148',
+  rulerTick: '#d4d9df',
+  rulerLabel: '#d4d9df',
+  transcriptionStartSite: '#d4d9df',
+  geneFocused: '#d4d9df',
+  geneLabel: '#d4d9df'
+};
+
 
 @customElement('regulation-playground')
 export class RegulationPlayground extends LitElement {
@@ -39,11 +48,16 @@ export class RegulationPlayground extends LitElement {
     .grid {
       display: grid;
       grid-template-columns: [left] 150px [middle] 1fr [right] 150px;
+      column-gap: 1rem;
       margin-top: 2em;
     }
 
     ens-reg-region-annotation {
       grid-column: middle;
+    }
+
+    ens-reg-region-annotation[dark-mode] {
+      background-color: #374148;
     }
 
     ens-reg-zoom-buttons {
@@ -62,6 +76,9 @@ export class RegulationPlayground extends LitElement {
 
   @state()
   clickedFeatureData: FeatureClickPayload | null = null;
+
+  @state()
+  isDarkMode = false;
 
   #onViewportChange = (event: CustomEvent) => {
     const { start, end } = event.detail;
@@ -133,6 +150,7 @@ export class RegulationPlayground extends LitElement {
     });
     const tooltipData = this.clickedFeatureData;
 
+
     return html`
       <h1>This should test region overview rendering using svg</h1>
       <div class="grid">
@@ -149,16 +167,24 @@ export class RegulationPlayground extends LitElement {
             .regionName=${"1"}
             .focusRegulatoryFeatureIds=${this.focusRegulatoryFeatureIds}
             .regionLength=${CHROMOSOME_LENGTH}
-            .data=${data}>
+            .data=${data}
+            .colors=${this.isDarkMode ? darkModeColors : null}
+            dark-mode=${this.isDarkMode ? true : nothing}
+          >
           </ens-reg-region-annotation>
           ${ tooltipData && this.#renderTooltip(tooltipData) }
         </div>
-        <ens-reg-zoom-buttons
-          .start=${this.start}
-          .end=${this.end}
-          .regionLength=${CHROMOSOME_LENGTH}
-          @viewport-change=${this.#onViewportChange}
-        ></ens-reg-zoom-buttons>
+        <div>
+          <ens-reg-zoom-buttons
+            .start=${this.start}
+            .end=${this.end}
+            .regionLength=${CHROMOSOME_LENGTH}
+            @viewport-change=${this.#onViewportChange}
+          ></ens-reg-zoom-buttons>
+          <button @click=${() => this.isDarkMode = !this.isDarkMode}>
+            Toggle dark mode
+          </button>
+        </div>
       </div>
     `;
   }

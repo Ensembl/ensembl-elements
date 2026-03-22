@@ -238,6 +238,7 @@ export class RegionOverview extends LitElement {
   }
 
   render() {
+    console.log('this.colors', this.colors);
     if (
       !this.imageWidth ||
       !this.bedScale ||
