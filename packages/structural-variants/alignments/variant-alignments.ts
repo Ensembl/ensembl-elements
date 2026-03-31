@@ -60,6 +60,10 @@ export class VariantAlignments extends LitElement {
   @property({ type: Number })
   altEnd = 0;
 
+  // name of the region on the alternative genome
+  @property({ type: String })
+  altRegionName = '';
+
   // length of the alternative genome region
   @property({ type: Number })
   altRegionLength = 0;
@@ -116,7 +120,7 @@ export class VariantAlignments extends LitElement {
     this.#altToRefAlignmentsDataService = createAlignmentsDataService({
       referenceGenomeId: this.referenceGenomeId,
       altGenomeId: this.altGenomeId,
-      regionName: this.regionName,
+      regionName: this.altRegionName,
       endpoint: this.endpoints!.alignments as string,
       isReference: false
     });

@@ -81,6 +81,9 @@ export class StructuralVariantsBrowser extends LitElement {
   @property({ type: Number })
   altEnd = 0;
 
+  @property({ type: String })
+  altRegionName = '';
+
   @property({ type: Number })
   altRegionLength = Infinity;
 
@@ -282,6 +285,7 @@ export class StructuralVariantsBrowser extends LitElement {
       .end=${this.end}
       .altStart=${altStart}
       .altEnd=${altEnd}
+      .altRegionName=${this.altRegionName}
       .altRegionLength=${this.altRegionLength}
       .endpoints=${this.endpoints}
       @viewport-change=${this.#onViewportChange}
@@ -291,7 +295,7 @@ export class StructuralVariantsBrowser extends LitElement {
     <ens-sv-genome-browser
       .tracks=${this.altTracks}
       .genomeId=${this.altGenomeId}
-      .regionName=${this.regionName}
+      .regionName=${this.altRegionName}
       .regionLength=${this.regionLength}
       .start=${altStart}
       .end=${altEnd}

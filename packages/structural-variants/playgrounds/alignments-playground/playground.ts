@@ -89,11 +89,12 @@ export class StructuralVariantsPlayground extends LitElement {
         .referenceGenomeId=${REFERENCE_GENOME_ID}
         .altGenomeId=${ALT_GENOME_ID}
         .regionName=${this.regionName}
+        .regionLength=${INITIAL_VIEWPORT.regionLength}
         .start=${this.start}
         .end=${this.end}
         .altStart=${this.altStart}
         .altEnd=${this.altEnd}
-        .regionLength=${INITIAL_VIEWPORT.regionLength}
+        .altRegionName=${this.regionName}
         .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         .endpoints=${ENDPOINTS}
       ></ens-sv-alignments>
