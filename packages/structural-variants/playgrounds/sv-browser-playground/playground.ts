@@ -95,6 +95,7 @@ export class SvBrowserPlayground extends LitElement {
         .end=${this.end}
         .altStart=${altStart}
         .altEnd=${altEnd}
+        .altRegionName=${this.regionName}
         .altRegionLength=${INITIAL_VIEWPORT.regionLength}
         .endpoints=${ENDPOINTS}
         @viewport-change=${this.onViewportChange}
