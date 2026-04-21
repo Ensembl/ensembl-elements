@@ -5,6 +5,7 @@ import {
   REGULATORY_FEATURE_TRACK_HEIGHT,
   REGULATORY_FEATURE_CORE_HEIGHT,
   REGULATORY_FEATURE_EXTENT_HEIGHT,
+  SPACE_BETWEEN_REGULATORY_TRACKS,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 import { toZeroBased } from '../helpers/toZeroBased';
@@ -294,7 +295,7 @@ const renderFocusOutline = ({
   const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
 
-  const outlineExtent = 2; // TODO: move to constant
+  const outlineExtent = SPACE_BETWEEN_REGULATORY_TRACKS / 2 - 1; // TODO: move to constant
   const halfHeight = REGULATORY_FEATURE_CORE_HEIGHT / 2 + outlineExtent;
   const height = halfHeight * 2;
   const y = offsetTop - height / 2 + REGULATORY_FEATURE_CORE_HEIGHT / 2;
