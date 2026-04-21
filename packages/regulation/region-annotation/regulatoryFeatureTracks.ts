@@ -181,7 +181,7 @@ const renderFeatureHiRes = (params: {
       ${renderBoundsRegion({...params, side: 'left'})}
       ${renderCoreRegion(params)}
       ${renderBoundsRegion({...params, side: 'right'})}
-      ${params.isFocusFeature ? renderFocusHalo(params) : nothing}
+      ${params.isFocusFeature ? renderFocusOutline(params) : nothing}
       ${renderInteractiveArea({ ...params })}
     </g>
   `;
@@ -274,7 +274,7 @@ const renderBoundsRegion = ({
   `;
 };
 
-const renderFocusHalo = ({
+const renderFocusOutline = ({
   feature,
   featureTypes,
   offsetTop,
@@ -294,31 +294,21 @@ const renderFocusHalo = ({
   const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
 
-  const smudgeExtent = 20; // TODO: move to constant
+  const smudgeExtent = REGULATORY_FEATURE_CORE_HEIGHT / 2 + 2; // TODO: move to constant
   const height = REGULATORY_FEATURE_CORE_HEIGHT + smudgeExtent * 2;
   const y = offsetTop - height / 2 + REGULATORY_FEATURE_CORE_HEIGHT / 2;
 
-  const gradientId = `gradient-${feature.id}`;
-  const gradient = svg`
-    <defs>
-      <linearGradient id=${gradientId} x1="0%" x2="0%" y1="0%" y2="100%">
-        <stop offset="0%" stop-color=${color} stop-opacity="0" />
-        <stop offset="20%" stop-color=${color} stop-opacity="0.2" />
-        <stop offset="80%" stop-color=${color} stop-opacity="0.2" />
-        <stop offset="100%" stop-color=${color} stop-opacity="0" />
-      </linearGradient>
-    </defs>
-  `;
-
   return svg`
-    ${gradient}
     <rect
       style="pointer-events: none;"
       x=${x1}
       width=${width}
       y=${y}
       height=${height}
-      fill="url(#${gradientId})"
+      stroke=${color}
+      stroke-width="0.8"
+      fill=${color}
+      fill-opacity="0.2"
     />
   `;
 }
