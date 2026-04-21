@@ -294,8 +294,9 @@ const renderFocusOutline = ({
   const x2 = scale(genomicEnd);
   const width = Math.max(x2 - x1, 2);
 
-  const smudgeExtent = REGULATORY_FEATURE_CORE_HEIGHT / 2 + 2; // TODO: move to constant
-  const height = REGULATORY_FEATURE_CORE_HEIGHT + smudgeExtent * 2;
+  const outlineExtent = 2; // TODO: move to constant
+  const halfHeight = REGULATORY_FEATURE_CORE_HEIGHT / 2 + outlineExtent;
+  const height = halfHeight * 2;
   const y = offsetTop - height / 2 + REGULATORY_FEATURE_CORE_HEIGHT / 2;
 
   return svg`
