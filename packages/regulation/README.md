@@ -40,7 +40,7 @@ The component expects the following properties in order to work:
 It also accepts the following optional properties:
 - `colors` - a configuration object that is a map of configurable colours. To see which colours of the regulatory annotation panel are configurable, inspect the `Colors` type exported from the package.
 - `focusGeneId` - id of the gene that is "in focus" (it is coloured differently from the others)
-- `focusRegulatoryFeatureId` - id of the regulatory feature that is "in focus" (it is coloured differently from the others)
+- `focusRegulatoryFeatureIds` - ids of regulatory features that are "in focus" (they display an outline)
 
 The component also emits the following events:
 
