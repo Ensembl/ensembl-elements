@@ -1,4 +1,4 @@
-import { html, css, LitElement, nothing } from 'lit';
+import { html, css, LitElement, nothing, unsafeCSS } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 
 // not using the RegionOverview class directly,
@@ -57,7 +57,7 @@ export class RegulationPlayground extends LitElement {
     }
 
     ens-reg-region-annotation[dark-mode] {
-      background-color: #374148;
+      background-color: ${unsafeCSS(darkModeColors.backgroundColor)}
     }
 
     ens-reg-zoom-buttons {
