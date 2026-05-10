@@ -1,10 +1,11 @@
-import { svg } from 'lit';
+import { svg, nothing } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 import {
   REGULATORY_FEATURE_TRACK_HEIGHT,
   REGULATORY_FEATURE_CORE_HEIGHT,
   REGULATORY_FEATURE_EXTENT_HEIGHT,
+  SPACE_BETWEEN_REGULATORY_TRACKS,
   MAX_SLICE_LENGTH_FOR_DETAILED_VIEW
 } from './constants';
 import { toZeroBased } from '../helpers/toZeroBased';
@@ -19,7 +20,7 @@ export const renderRegulatoryFeatureTracks = ({
   featureTypes,
   scale,
   regionName,
-  focusRegulatoryFeatureId,
+  focusRegulatoryFeatureIds,
   offsetTop,
   colors
 }: {
@@ -27,7 +28,7 @@ export const renderRegulatoryFeatureTracks = ({
   featureTypes: InputData['regulatory_feature_types'];
   scale: ScaleLinear<number, number>;
   regionName: string;
-  focusRegulatoryFeatureId: string | null;
+  focusRegulatoryFeatureIds: string[];
   offsetTop: number;
   colors: Colors;
 }) => {
@@ -38,7 +39,7 @@ export const renderRegulatoryFeatureTracks = ({
         featureTypes,
         scale,
         regionName,
-        focusRegulatoryFeatureId,
+        focusRegulatoryFeatureIds,
         offsetTop: offsetTop + index * REGULATORY_FEATURE_TRACK_HEIGHT,
         colors
       }))}
@@ -51,7 +52,7 @@ const renderTrack = ({
   featureTypes,
   scale,
   regionName,
-  focusRegulatoryFeatureId,
+  focusRegulatoryFeatureIds,
   offsetTop,
   colors
 }: {
@@ -59,7 +60,7 @@ const renderTrack = ({
   featureTypes: InputData['regulatory_feature_types'];
   scale: ScaleLinear<number, number>;
   regionName: string;
-  focusRegulatoryFeatureId: string | null;
+  focusRegulatoryFeatureIds: string[];
   offsetTop: number;
   colors: Colors;
 }) => {
@@ -98,7 +99,7 @@ const renderTrack = ({
       featureTypes,
       offsetTop,
       regionName,
-      focusRegulatoryFeatureId,
+      focusRegulatoryFeatureIds,
       scale,
       isLowRes: shouldRenderLowRes,
       colors
@@ -117,21 +118,23 @@ const renderRegulatoryFeature = (params: {
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   regionName: string;
-  focusRegulatoryFeatureId: string | null;
+  focusRegulatoryFeatureIds: string[];
   scale: ScaleLinear<number, number>;
   isLowRes: boolean;
   colors: Colors;
 }) => {
+  const isFocusFeature = params.focusRegulatoryFeatureIds.includes(params.feature.id);
+
   if (params.isLowRes) {
-    return renderFeatureLowRes(params);
+    return renderFeatureLowRes({...params, isFocusFeature});
   } else {
-    return renderFeatureHiRes(params);
+    return renderFeatureHiRes({...params, isFocusFeature});
   }
 };
 
 const renderFeatureLowRes = (params: {
   feature: RegulatoryFeature;
-  focusRegulatoryFeatureId: string | null;
+  isFocusFeature: boolean;
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   scale: ScaleLinear<number, number>;
@@ -142,19 +145,23 @@ const renderFeatureLowRes = (params: {
   const genomicEnd = feature.extended_end ?? feature.end;
   const x1 = scale(toZeroBased(genomicStart));
   const x2 = scale(genomicEnd);
+  let y = offsetTop;
   const width = Math.max(x2 - x1, 2);
-  let color = featureTypes[feature.feature_type].color;
+  let height = REGULATORY_FEATURE_CORE_HEIGHT;
+  const color = featureTypes[feature.feature_type].color;
 
-  if (params.focusRegulatoryFeatureId && feature.id !== params.focusRegulatoryFeatureId) {
-    color = params.colors.regulatoryFeatureUnfocused;
+  if (params.isFocusFeature) {
+    // make the feature twice as tall
+    height = height * 2;
+    y = y - height / 4;
   }
 
   return svg`
     <rect
       x=${x1}
       width=${width}
-      y=${offsetTop}
-      height=${REGULATORY_FEATURE_CORE_HEIGHT}
+      y=${y}
+      height=${height}
       fill=${color}
     />
   `;
@@ -162,18 +169,20 @@ const renderFeatureLowRes = (params: {
 
 const renderFeatureHiRes = (params: {
   feature: RegulatoryFeature;
+  isFocusFeature: boolean;
   featureTypes: InputData['regulatory_feature_types'];
-  focusRegulatoryFeatureId: string | null;
   offsetTop: number;
   regionName: string;
   scale: ScaleLinear<number, number>;
   colors: Colors;
 }) => {
+
   return svg`
     <g>
       ${renderBoundsRegion({...params, side: 'left'})}
       ${renderCoreRegion(params)}
       ${renderBoundsRegion({...params, side: 'right'})}
+      ${params.isFocusFeature ? renderFocusOutline(params) : nothing}
       ${renderInteractiveArea({ ...params })}
     </g>
   `;
@@ -181,14 +190,13 @@ const renderFeatureHiRes = (params: {
 
 const renderCoreRegion = ({
   feature,
-  focusRegulatoryFeatureId,
+  isFocusFeature,
   featureTypes,
   scale,
-  offsetTop,
-  colors
+  offsetTop
 }: {
   feature: RegulatoryFeature;
-  focusRegulatoryFeatureId: string | null;
+  isFocusFeature: boolean;
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   scale: ScaleLinear<number, number>;
@@ -196,19 +204,17 @@ const renderCoreRegion = ({
 }) => {
   const x1 = scale(toZeroBased(feature.start));
   const x2 = scale(feature.end);
+  let y = offsetTop;
   const width = Math.max(x2 - x1, 2);
-  let color = featureTypes[feature.feature_type].color;
-
-  if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = colors.regulatoryFeatureUnfocused;
-  }
+  let height = REGULATORY_FEATURE_CORE_HEIGHT;
+  const color = featureTypes[feature.feature_type].color;
 
   return svg`
     <rect
       x=${x1}
       width=${width}
-      y=${offsetTop}
-      height=${REGULATORY_FEATURE_CORE_HEIGHT}
+      y=${y}
+      height=${height}
       fill=${color}
     />
   `;
@@ -216,15 +222,14 @@ const renderCoreRegion = ({
 
 const renderBoundsRegion = ({
   feature,
-  focusRegulatoryFeatureId,
+  isFocusFeature,
   featureTypes,
   scale,
   offsetTop,
-  side,
-  colors
+  side
 }: {
   feature: RegulatoryFeature;
-  focusRegulatoryFeatureId: string | null;
+  isFocusFeature: boolean;
   featureTypes: InputData['regulatory_feature_types'];
   offsetTop: number;
   scale: ScaleLinear<number, number>;
@@ -255,22 +260,60 @@ const renderBoundsRegion = ({
   }
 
   const start = side === 'left' ? extentX : scale(feature.end);
-  let color = featureTypes[feature.feature_type].color;
-
-  if (focusRegulatoryFeatureId && feature.id !== focusRegulatoryFeatureId) {
-    color = colors.regulatoryFeatureUnfocused;
-  }
+  const color = featureTypes[feature.feature_type].color;
+  let y = offsetTop + REGULATORY_FEATURE_CORE_HEIGHT / 4;
+  let height = REGULATORY_FEATURE_EXTENT_HEIGHT;
 
   return svg`
     <rect
       x=${start}
       width=${width}
-      y=${offsetTop + REGULATORY_FEATURE_CORE_HEIGHT / 4}
-      height=${REGULATORY_FEATURE_EXTENT_HEIGHT}
+      y=${y}
+      height=${height}
       fill=${color}
     />
   `;
 };
+
+const renderFocusOutline = ({
+  feature,
+  featureTypes,
+  offsetTop,
+  scale
+}: {
+  feature: RegulatoryFeature;
+  featureTypes: InputData['regulatory_feature_types'];
+  offsetTop: number;
+  regionName: string;
+  scale: ScaleLinear<number, number>;
+  colors: Colors;
+}) => {
+  const color = featureTypes[feature.feature_type].color;
+  const genomicStart = feature.extended_start ?? feature.start;
+  const genomicEnd = feature.extended_end ?? feature.end;
+  const x1 = scale(toZeroBased(genomicStart));
+  const x2 = scale(genomicEnd);
+  const width = Math.max(x2 - x1, 2);
+
+  const outlineExtent = SPACE_BETWEEN_REGULATORY_TRACKS / 2 - 1; // TODO: move to constant
+  const halfHeight = REGULATORY_FEATURE_CORE_HEIGHT / 2 + outlineExtent;
+  const height = halfHeight * 2;
+  const y = offsetTop - height / 2 + REGULATORY_FEATURE_CORE_HEIGHT / 2;
+
+  return svg`
+    <rect
+      style="pointer-events: none;"
+      x=${x1}
+      width=${width}
+      y=${y}
+      height=${height}
+      stroke=${color}
+      stroke-width="0.8"
+      fill=${color}
+      fill-opacity="0.2"
+    />
+  `;
+}
 
 const renderInteractiveArea = (params: {
   feature: RegulatoryFeature;
