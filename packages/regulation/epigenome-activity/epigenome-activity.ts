@@ -25,7 +25,7 @@ export class EpigenomeActivity extends LitElement {
 
   static styles = css`
     :host {
-      display: block;
+      display: flex;
     }
   `
 
