@@ -25,7 +25,7 @@ const selections = [
   },
   {
     start: INITIAL_START + viewportDistance * 0.2,
-    end: INITIAL_START + viewportDistance * 0.21
+    end: INITIAL_START + viewportDistance * 0.202
   },
   {
     start: INITIAL_START + viewportDistance * 0.4,
