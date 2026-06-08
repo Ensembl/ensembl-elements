@@ -83,7 +83,8 @@ This component displays epigenome activity data.
 - `start` - start coordinate on a region
 - `end` - end coordinate on a region
 - `tracks` - an array of `TrackData` objects (see exported types)
-- `trackMetadata` a `TrackMetadata` object (see exported types)
+- `trackMetadata` - a `TrackMetadata` object (see exported types)
+- `selectedLocations` - an array of `SelectedLocation` objects, which have a `start` and an `end` field; intended to mark the locations of selected features
 
 ### Events
 - `track-positions-change` - see exported `TrackPositionsChangeEvent` type
