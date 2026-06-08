@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: [
+        'components/input/input.ts',
         'components/checkbox/checkbox.ts',
         'components/checkbox/checkbox-only.ts',
         'components/external-link/external-link.ts',
