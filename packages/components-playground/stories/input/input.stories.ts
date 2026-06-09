@@ -60,7 +60,7 @@ export const Shaded = () => {
     </div>
     <div class="example">
       <p class="title">Input with a label</p>
-      <ens-input id="first" label="Label for this input" appearance="shaded">
+      <ens-input id="first" label="Label for this input" appearance="shaded" placeholder="placeholder text">
       </ens-input>
     </div>
     <div class="example">

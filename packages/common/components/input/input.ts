@@ -66,14 +66,12 @@ export class EnsInput extends LitElement {
       input {
         width: 100%;
       }
+
+      input::placeholder {
+        font-weight: var(--font-weight-light);
+      }
     `
   ];
-
-  @query('input')
-  input!: HTMLInputElement;
-
-  @query('label slot')
-  labelSlot!: HTMLSlotElement;
 
   @property({ attribute: 'value' })
   value: string = this.getAttribute('value') || '';
@@ -87,8 +85,17 @@ export class EnsInput extends LitElement {
   @property({ reflect: true })
   size: 'large' | 'regular' = 'regular';
 
+  @property()
+  placeholder = '';
+
   @state()
   hasSlottedLabel: boolean = false;
+
+  @query('input')
+  input!: HTMLInputElement;
+
+  @query('label slot')
+  labelSlot!: HTMLSlotElement;
 
   #internals: ElementInternals;
 
@@ -163,6 +170,7 @@ export class EnsInput extends LitElement {
             .value=${live(this.value)}
             autocomplete="off"
             aria-label=${ariaLabel ?? nothing}
+            placeholder=${this.placeholder}
             @change=${this.#onChange}
             @input=${this.#onInput}
           />
