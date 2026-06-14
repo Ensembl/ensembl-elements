@@ -11,7 +11,7 @@ import {
   renderHistoneGappedPeaks
 } from './render-track';
 
-import { TRACK_HEIGHT } from './constants';
+import { TRACK_HEIGHT, COLORS, type Colors } from './constants';
 
 import type {
   TrackData,
@@ -43,6 +43,9 @@ export class EpigenomeActivity extends LitElement {
 
   @property({ type: Array })
   selectedLocations: SelectedLocation[] = [];
+
+  @property({ type: Object })
+  colors: Partial<Colors> | null = null;
 
   @state()
   imageWidth = 0;
@@ -146,11 +149,13 @@ export class EpigenomeActivity extends LitElement {
       return [
         renderOpenChromatinSignals({
           trackData: track,
-          offsetTop: index * TRACK_HEIGHT
+          offsetTop: index * TRACK_HEIGHT,
+          colors: this.colors
         }),
         renderOpenChromatinPeaks({
           trackData: track,
-          offsetTop: index * TRACK_HEIGHT
+          offsetTop: index * TRACK_HEIGHT,
+          colors: this.colors
         }),
         renderHistoneNarrowPeaks({
           trackData: track,
