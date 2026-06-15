@@ -11,7 +11,7 @@ import {
   renderHistoneGappedPeaks
 } from './render-track';
 
-import { TRACK_HEIGHT, COLORS, type Colors } from './constants';
+import { TRACK_HEIGHT, type Colors } from './constants';
 
 import type {
   TrackData,
@@ -180,7 +180,7 @@ export class EpigenomeActivity extends LitElement {
     }
 
     return this.selectedLocations.map(location => {
-      const startX = scale(location.start);
+      const startX = scale(toZeroBased(location.start));
       const endX = scale(location.end);
 
       return svg`
