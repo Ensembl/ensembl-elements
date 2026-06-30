@@ -79,11 +79,34 @@ This component displays epigenome activity data.
 ### Component name
 `ens-reg-epigenome-activity`
 
+### How to use
+Run a side-effectful import:
+
+`import '@ensembl/ensembl-regulation/epigenome-activity'`
+
+This will register the `ens-reg-epigenome-activity` element with the browser's custom elements registry.
+
 ### Input properties
 - `start` - start coordinate on a region
 - `end` - end coordinate on a region
 - `tracks` - an array of `TrackData` objects (see exported types)
-- `trackMetadata` a `TrackMetadata` object (see exported types)
+- `trackMetadata` - a `TrackMetadata` object (see exported types)
+- `selectedLocations` - an array of `SelectedLocation` objects, which have a `start` and an `end` field; intended to mark the locations of selected features
+- `colors` - a configuration object that is a map of configurable colours. To see which colours of the epigenomes activity panel are configurable, inspect the `Colors` type exported from the package.
 
 ### Events
 - `track-positions-change` - see exported `TrackPositionsChangeEvent` type
+
+### Exported types
+The package exports the following types for the epigenomes activity panel:
+
+```ts
+import type {
+  TrackData,
+  TrackMetadata,
+  TrackPositionsChangeEvent,
+  TrackPositionsPayload,
+  SelectedLocation,
+  Colors
+} from '@ensembl/ensembl-regulation/epigenome-activity';
+```

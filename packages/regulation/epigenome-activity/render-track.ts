@@ -1,5 +1,4 @@
 import { svg } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
 import { scaleLinear, interpolateHcl } from 'd3';
 
 import {
@@ -11,18 +10,29 @@ import {
   HISTONE_NARROW_PEAK_HEIGHT,
   HISTONE_GAPPED_PEAK_OFFSET_TOP,
   HISTONE_GAPPED_PEAK_BLOCK_HEIGHT,
-  HISTONE_GAPPED_PEAK_CONNECTOR_HEIGHT
+  HISTONE_GAPPED_PEAK_CONNECTOR_HEIGHT,
+  COLORS,
+  type Colors
 } from './constants';
 
 import type { TrackDataForDisplay } from './prepare-data';
 
 export const renderOpenChromatinSignals = ({
   trackData,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   trackData: TrackDataForDisplay;
   offsetTop: number;
+  colors: Partial<Colors> | null;
 }) => {
+  const colorFrom = colors?.openChromatinLow ?? COLORS.openChromatinLow;
+  const colorTo = colors?.openChromatinHigh ?? COLORS.openChromatinHigh;
+  const colorScale = createSignalColorScale({
+    colorFrom,
+    colorTo
+  });
+
   return trackData.openChromatin.signals.map((signal) => {
     return svg`
       <rect
@@ -30,7 +40,7 @@ export const renderOpenChromatinSignals = ({
         y=${offsetTop + OPEN_CHROMATIN_SIGNAL_OFFSET_TOP}
         width=${signal.width}
         height=${OPEN_CHROMATIN_SIGNAL_HEIGHT}
-        fill=${getSignalColor(signal.value)}
+        fill=${colorScale(signal.value)}
       />
     `;
   });
@@ -38,11 +48,15 @@ export const renderOpenChromatinSignals = ({
 
 export const renderOpenChromatinPeaks = ({
   trackData,
-  offsetTop
+  offsetTop,
+  colors
 }: {
   trackData: TrackDataForDisplay;
   offsetTop: number;
+  colors: Partial<Colors> | null;
 }) => {
+  const strokeColor = colors?.openChromatinPeak ?? COLORS.openChromatinPeak;
+
   return trackData.openChromatin.peaks.map(peak => {
     return svg`
       <rect
@@ -51,7 +65,7 @@ export const renderOpenChromatinPeaks = ({
         width=${peak.width}
         height=${OPEN_CHROMATIN_PEAK_HEIGHT}
         data-type="open-chromatin-peak"
-        stroke="black"
+        stroke=${strokeColor}
         fill="none"
       />
     `;
@@ -143,11 +157,15 @@ export const renderHistoneGappedPeaks = ({
   });
 };
 
-const signalColorScale = scaleLinear<string>()
-  .domain([1, 9])
-  .range(['#f1f1f1', '#474747'])
-  .interpolate(interpolateHcl);
-
-const getSignalColor = (value: number) => {
-  return signalColorScale(value);
+const createSignalColorScale = ({
+  colorFrom,
+  colorTo
+}: {
+  colorFrom: string;
+  colorTo: string;
+}) => {
+  return scaleLinear<string>()
+    .domain([1, 9])
+    .range([colorFrom, colorTo])
+    .interpolate(interpolateHcl);
 };
