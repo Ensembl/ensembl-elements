@@ -57,6 +57,12 @@ export type HistoneGappedPeak = {
 };
 
 
+export type SelectedLocation = {
+  start: number;
+  end: number;
+};
+
+
 /* EVENTS */
 
 export type TrackPositionPayload = {

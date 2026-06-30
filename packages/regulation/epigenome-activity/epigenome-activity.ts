@@ -1,4 +1,4 @@
-import { html, css, LitElement, type PropertyValues } from 'lit';
+import { html, css, svg, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { scaleLinear, type ScaleLinear } from 'd3';
 
@@ -11,16 +11,21 @@ import {
   renderHistoneGappedPeaks
 } from './render-track';
 
-import { TRACK_HEIGHT } from './constants';
+import { TRACK_HEIGHT, type Colors } from './constants';
 
-import type { TrackData, TrackMetadata, TrackPositionsPayload } from './types';
+import type {
+  TrackData,
+  TrackMetadata,
+  TrackPositionsPayload,
+  SelectedLocation
+} from './types';
 
 @customElement('ens-reg-epigenome-activity')
 export class EpigenomeActivity extends LitElement {
 
   static styles = css`
     :host {
-      display: block;
+      display: flex;
     }
   `
 
@@ -35,6 +40,12 @@ export class EpigenomeActivity extends LitElement {
 
   @property({ type: Object })
   trackMetadata: TrackMetadata | null = null;
+
+  @property({ type: Array })
+  selectedLocations: SelectedLocation[] = [];
+
+  @property({ type: Object })
+  colors: Partial<Colors> | null = null;
 
   @state()
   imageWidth = 0;
@@ -124,6 +135,7 @@ export class EpigenomeActivity extends LitElement {
         style="width: 100%; height: ${imageHeight}px;"
       >
         ${this.#renderTracks({ tracks: preparedTracksData })}
+        ${this.#renderVerticalRules({ imageHeight })}
       </svg>
     `
   }
@@ -137,11 +149,13 @@ export class EpigenomeActivity extends LitElement {
       return [
         renderOpenChromatinSignals({
           trackData: track,
-          offsetTop: index * TRACK_HEIGHT
+          offsetTop: index * TRACK_HEIGHT,
+          colors: this.colors
         }),
         renderOpenChromatinPeaks({
           trackData: track,
-          offsetTop: index * TRACK_HEIGHT
+          offsetTop: index * TRACK_HEIGHT,
+          colors: this.colors
         }),
         renderHistoneNarrowPeaks({
           trackData: track,
@@ -152,6 +166,42 @@ export class EpigenomeActivity extends LitElement {
           offsetTop: index * TRACK_HEIGHT
         })
       ];
+    });
+  }
+
+  #renderVerticalRules({
+    imageHeight
+  }: {
+    imageHeight: number;
+  }) {
+    const scale = this.bedScale;
+    if (!scale) {
+      return null;
+    }
+
+    return this.selectedLocations.map(location => {
+      const startX = scale(toZeroBased(location.start));
+      const endX = scale(location.end);
+
+      return svg`
+        <line
+          x1=${startX}
+          x2=${startX}
+          y1="0"
+          y2=${imageHeight}
+          stroke="red"
+          stroke-dasharray="2"
+        />
+
+        <line
+          x1=${endX}
+          x2=${endX}
+          y1="0"
+          y2=${imageHeight}
+          stroke="red"
+          stroke-dasharray="2"
+        />
+      `;
     });
   }
 }

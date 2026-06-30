@@ -4,5 +4,10 @@ export type {
   TrackData,
   TrackMetadata,
   TrackPositionsChangeEvent,
-  TrackPositionsPayload
+  TrackPositionsPayload,
+  SelectedLocation,
 } from './types';
+
+export type {
+  Colors
+} from './constants';

@@ -1,4 +1,4 @@
-import { html, LitElement} from 'lit';
+import { html, css, LitElement} from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { fetchEpigenomeActivityData } from './data/fetchData'; 
@@ -16,8 +16,38 @@ import type { TrackData, TrackMetadata, TrackPositionsPayload } from '../../epig
 const INITIAL_START = 26_291_508;
 const INITIAL_END = 26_372_680;
 
+const viewportDistance = INITIAL_END - INITIAL_START;
+
+const selections = [
+  {
+    start: INITIAL_START + viewportDistance * 0.14,
+    end: INITIAL_START + viewportDistance * 0.175
+  },
+  {
+    start: INITIAL_START + viewportDistance * 0.2,
+    end: INITIAL_START + viewportDistance * 0.202
+  },
+  {
+    start: INITIAL_START + viewportDistance * 0.4,
+    end: INITIAL_START + viewportDistance * 0.5
+  }
+];
+
 @customElement('epigenomes-activity-playground')
 export class RegulationPlayground extends LitElement {
+
+  static styles = css`
+    :host {
+      display: grid;
+      grid-template-columns: 10% [epigenome-activity] 1fr 10%;
+      padding-top: 2em;
+    }
+
+    ens-reg-epigenome-activity {
+      grid-column: epigenome-activity;
+      border: 1px dashed black;
+    }
+  `  
 
   @state()
   tracks: TrackData[] = [];
@@ -45,6 +75,7 @@ export class RegulationPlayground extends LitElement {
         .tracks=${this.tracks}
         .start=${INITIAL_START}
         .end=${INITIAL_END}
+        .selectedLocations=${selections}
         @track-positions-change=${this.#onTrackPositionsChange}
       ></ens-reg-epigenome-activity>
     `;
