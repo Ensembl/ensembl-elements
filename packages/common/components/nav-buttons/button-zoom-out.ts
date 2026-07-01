@@ -25,7 +25,7 @@ export class NavButtonZoomOut extends LitElement {
   @property({ type: Boolean }) disabled = false;
 
   @property({ type: String })
-  label = 'Move left';
+  label = 'Zoom out';
 
   render() {
     return html`
