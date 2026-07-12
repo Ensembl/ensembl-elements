@@ -25,7 +25,7 @@ export class NavButtonZoomIn extends LitElement {
   @property({ type: Boolean }) disabled = false;
 
   @property({ type: String })
-  label = 'Move left';
+  label = 'Zoom in';
 
   render() {
     return html`

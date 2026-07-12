@@ -1,8 +1,60 @@
-import { defineConfig } from 'vite';
+import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { defineConfig, type Plugin } from 'vite';
 import dts from 'vite-plugin-dts';
+
+const rawDefaultImportPattern = /import\s+([A-Za-z_$][\w$]*)\s+from\s+(['"])([^'"]+\?[^'"]*\braw\b[^'"]*)\2\s*;?/g;
+
+const inlineRawImports = (): Plugin => ({
+  name: 'inline-raw-imports',
+  enforce: 'pre',
+  async transform(code: string, id: string) {
+    if (!code.includes('?raw') || id.includes('/node_modules/')) {
+      return null;
+    }
+
+    const replacements: Array<{ start: number; end: number; code: string }> = [];
+
+    for (const match of code.matchAll(rawDefaultImportPattern)) {
+      const importName = match[1];
+      const importPath = match[3];
+      const [filePath] = importPath.split('?');
+
+      if (!filePath.startsWith('.') && !path.isAbsolute(filePath)) {
+        continue;
+      }
+
+      const importerPath = id.split('?')[0];
+      const absolutePath = path.resolve(path.dirname(importerPath), filePath);
+      const contents = await readFile(absolutePath, 'utf8');
+
+      replacements.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        code: `const ${importName} = ${JSON.stringify(contents)};`
+      });
+    }
+
+    if (!replacements.length) {
+      return null;
+    }
+
+    let transformedCode = code;
+
+    for (const replacement of replacements.reverse()) {
+      transformedCode = `${transformedCode.slice(0, replacement.start)}${replacement.code}${transformedCode.slice(replacement.end)}`;
+    }
+
+    return {
+      code: transformedCode,
+      map: null
+    };
+  }
+});
 
 export default defineConfig({
   plugins: [
+    inlineRawImports(),
     dts()
     // dts({
     //   strictOutput: true,
