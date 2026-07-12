@@ -3,6 +3,8 @@
  * to the helpers package
  */
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
 export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
   const svgClone = svgElement.cloneNode(true) as HTMLElement;
 
@@ -19,7 +21,7 @@ export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
     let defs = (svgClone as HTMLElement).querySelector('defs');
     
     if (!defs) {
-      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs = document.createElementNS(SVG_NAMESPACE, 'defs');
       svgClone.insertBefore(defs, svgClone.firstChild);
     }
     defs.appendChild(styleTag);
@@ -35,6 +37,8 @@ export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
   svgClone.querySelectorAll('[fill="transparent"]').forEach(element => {
     element.setAttribute('fill', 'none');
   });
+
+  addClipPath(svgClone as unknown as SVGSVGElement);
 
   const svgData = new XMLSerializer().serializeToString(svgClone);
   const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
@@ -126,6 +130,45 @@ const createStyleTagForFont = ({
   `;
 
   return style;
+};
+
+const addClipPath = (svg: SVGSVGElement) => {
+  // Determine viewport size
+  const width = svg.viewBox.baseVal.width;
+  const height = svg.viewBox.baseVal.height;
+
+  let defs = svg.querySelector('defs');
+  if (!defs) {
+    defs = document.createElementNS(SVG_NAMESPACE, 'defs');
+    svg.insertBefore(defs, svg.firstChild);
+  }
+
+  const clipId = 'clip-viewport-size';
+
+  const clipPath = document.createElementNS(SVG_NAMESPACE, 'clipPath');
+  clipPath.setAttribute('id', clipId);
+
+  const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
+  rect.setAttribute('x', '0');
+  rect.setAttribute('y', '0');
+  rect.setAttribute('width', `${width}`);
+  rect.setAttribute('height', `${height}`);
+
+  clipPath.appendChild(rect);
+  defs.appendChild(clipPath);
+
+  // Create wrapper group
+  const g = document.createElementNS(SVG_NAMESPACE, 'g');
+  g.setAttribute('clip-path', `url(#${clipId})`);
+
+  // Move all children except <defs> into the group
+  [...svg.childNodes].forEach(node => {
+    if (node !== defs) {
+      g.appendChild(node);
+    }
+  });
+
+  svg.appendChild(g);
 };
 
 
