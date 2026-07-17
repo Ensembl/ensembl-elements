@@ -301,7 +301,10 @@ const prepareHistoneGappedPeaksForTrack = ({
           location.start
         );
         const blockSize = histonePeak.block_sizes[i];
-        const blockEnd = Math.min(blockStart + blockSize - 1, location.end);
+        const blockEnd = Math.min(
+          histonePeak.start + blockRelativeStart + blockSize - 1,
+          location.end
+        );
 
         // exclude the data that is outside of the viewport
         if (blockStart > location.end || blockEnd < location.start) {
