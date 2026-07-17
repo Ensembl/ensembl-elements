@@ -209,14 +209,14 @@ const prepareHistoneNarrowPeaksForTrack = ({
 
   const result: PreparedHistoneNarrowPeak[] = [];
 
-  for (const hisoneName of Object.keys(allHistoneData)) {
-    if (!narrowPeakHistoneNames.includes(hisoneName)) {
+  for (const histoneName of Object.keys(allHistoneData)) {
+    if (!narrowPeakHistoneNames.includes(histoneName)) {
       continue;
     }
 
-    const order = narrowPeakHistoneNames.indexOf(hisoneName);
+    const order = narrowPeakHistoneNames.indexOf(histoneName);
 
-    const histonePeaks = allHistoneData[hisoneName];
+    const histonePeaks = allHistoneData[histoneName];
 
     for (const histonePeak of histonePeaks) {
       // exclude the data that is outside of the viewport
@@ -241,8 +241,8 @@ const prepareHistoneNarrowPeaksForTrack = ({
         type: 'narrow_peak',
         x: peakX,
         width: peakWidth,
-        label: allHistoneMetadata[hisoneName].label,
-        color: allHistoneMetadata[hisoneName].color,
+        label: allHistoneMetadata[histoneName].label,
+        color: allHistoneMetadata[histoneName].color,
         order
       } as const;
 
@@ -273,14 +273,14 @@ const prepareHistoneGappedPeaksForTrack = ({
 
   const result: PreparedHistoneGappedPeak[] = [];
 
-  for (const hisoneName of Object.keys(allHistoneData)) {
-    if (!gappedPeakHistoneNames.includes(hisoneName)) {
+  for (const histoneName of Object.keys(allHistoneData)) {
+    if (!gappedPeakHistoneNames.includes(histoneName)) {
       continue;
     }
 
-    const order = gappedPeakHistoneNames.indexOf(hisoneName);
+    const order = gappedPeakHistoneNames.indexOf(histoneName);
 
-    const histonePeaks = allHistoneData[hisoneName] as HistoneGappedPeak[];
+    const histonePeaks = allHistoneData[histoneName] as HistoneGappedPeak[];
 
     for (const histonePeak of histonePeaks) {
       // exclude the data that is outside of the viewport
@@ -387,7 +387,7 @@ const prepareHistoneGappedPeaksForTrack = ({
           return true;
         });
 
-      const peakLabel = allHistoneMetadata[hisoneName].label;
+      const peakLabel = allHistoneMetadata[histoneName].label;
       const peakId = `gapped-peak-${peakLabel}-${blocks.map((block) => `${block.x}-${block.width}`)}`;
 
       const trackPeakData = {
@@ -396,7 +396,7 @@ const prepareHistoneGappedPeaksForTrack = ({
         blocks: filteredBlocks,
         connectors: filteredConnectors,
         label: peakLabel,
-        color: allHistoneMetadata[hisoneName].color,
+        color: allHistoneMetadata[histoneName].color,
         order
       } as const;
 
