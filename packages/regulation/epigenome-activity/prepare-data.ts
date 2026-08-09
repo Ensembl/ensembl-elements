@@ -126,24 +126,11 @@ const prepareOpenChromatinSignalsForTrack = ({
     const signalX = scale(toZeroBased(signalStart));
     const signalWidth = scale(signalEnd) - signalX;
 
-    const previousPreparedSignal = result.at(-1);
-
-    const distanceFromPreviousSignal = previousPreparedSignal
-      ? signalX - previousPreparedSignal.x
-      : 1;
-
-    if (distanceFromPreviousSignal >= 1) {
-      const signal = {
-        x: signalX,
-        width: Math.max(signalWidth, 1),
-        value: signalValue
-      };
-      result.push(signal);
-    } else {
-      // combine current signal with the previous signal
-      const newValue = Math.round((signalValue + previousPreparedSignal!.value) / 2);
-      previousPreparedSignal!.value = newValue;
-    }
+    result.push({
+      x: signalX,
+      width: signalWidth,
+      value: signalValue
+    });
   }
 
   return result;

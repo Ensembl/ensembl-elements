@@ -78,7 +78,7 @@ export class EpigenomeActivity extends LitElement {
     const resizeObserver = new ResizeObserver((entries) => {
       const [hostElementEntry] = entries;
       const { width: hostWidth } = hostElementEntry.contentRect;
-      this.imageWidth = hostWidth;
+      this.imageWidth = Math.round(hostWidth);
     });
 
     resizeObserver.observe(this);
@@ -88,7 +88,7 @@ export class EpigenomeActivity extends LitElement {
     this.bedScale = scaleLinear().domain([
       toZeroBased(this.start),
       this.end
-    ]).rangeRound([
+    ]).range([
       0,
       this.imageWidth
     ]);
