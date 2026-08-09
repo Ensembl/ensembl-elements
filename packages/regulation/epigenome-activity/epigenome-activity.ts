@@ -2,7 +2,10 @@ import { html, css, svg, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { scaleLinear, type ScaleLinear } from 'd3';
 
-import { prepareActivityDataForDisplay } from './prepare-data';
+import {
+  prepareActivityDataForDisplay,
+  type TrackDataForDisplay
+} from './prepare-data';
 import { toZeroBased } from '../helpers/toZeroBased';
 import {
   renderOpenChromatinSignals,
@@ -53,6 +56,9 @@ export class EpigenomeActivity extends LitElement {
   @state()
   bedScale: ScaleLinear<number, number> | null = null;
 
+  @state()
+  preparedTracksData: TrackDataForDisplay[] = [];
+
   trackIds: string[][] = [];
 
   connectedCallback(): void {
@@ -61,12 +67,21 @@ export class EpigenomeActivity extends LitElement {
   }
 
   willUpdate(changedProperties: PropertyValues) {
-    if (
+    const shouldUpdateScale =
       changedProperties.has('start') ||
       changedProperties.has('end') ||
-      changedProperties.has('imageWidth')
-    ) {
+      changedProperties.has('imageWidth');
+
+    if (shouldUpdateScale) {
       this.#updateScale();
+    }
+
+    if (
+      shouldUpdateScale ||
+      changedProperties.has('tracks') ||
+      changedProperties.has('trackMetadata')
+    ) {
+      this.#updatePreparedTracksData();
     }
   }
 
@@ -94,6 +109,21 @@ export class EpigenomeActivity extends LitElement {
     ]);
   }
 
+  #updatePreparedTracksData() {
+    const bedScale = this.bedScale;
+    if (!bedScale || !this.trackMetadata || !this.tracks.length) {
+      this.preparedTracksData = [];
+      return;
+    }
+
+    this.preparedTracksData = prepareActivityDataForDisplay({
+      location: { start: this.start, end: this.end },
+      scale: bedScale,
+      trackMetadata: this.trackMetadata,
+      tracks: this.tracks
+    });
+  }
+
   #reportTrackPositions() {
     // Check if the list of track ids has changed since previous render,
     // and report to outside if it did
@@ -117,24 +147,18 @@ export class EpigenomeActivity extends LitElement {
   }
 
   render() {
-    if(!this.bedScale || !this.trackMetadata || !this.tracks.length) {
+    if (!this.bedScale || !this.preparedTracksData.length) {
       return null;
     }
 
-    const preparedTracksData = prepareActivityDataForDisplay({
-      location: { start: this.start, end: this.end },
-      scale: this.bedScale,
-      trackMetadata: this.trackMetadata,
-      tracks: this.tracks
-    });
-    const imageHeight = TRACK_HEIGHT * preparedTracksData.length;
+    const imageHeight = TRACK_HEIGHT * this.preparedTracksData.length;
 
     return html`
       <svg
         viewBox="0 0 ${this.imageWidth} ${imageHeight}"
         style="width: 100%; height: ${imageHeight}px;"
       >
-        ${this.#renderTracks({ tracks: preparedTracksData })}
+        ${this.#renderTracks({ tracks: this.preparedTracksData })}
         ${this.#renderVerticalRules({ imageHeight })}
       </svg>
     `
@@ -143,30 +167,34 @@ export class EpigenomeActivity extends LitElement {
   #renderTracks({
     tracks
   }: {
-    tracks: ReturnType<typeof prepareActivityDataForDisplay>
+    tracks: TrackDataForDisplay[]
   }) {
-    return tracks.map((track, index) => {
-      return [
-        renderOpenChromatinSignals({
+    const renderedTracks: ReturnType<typeof svg>[] = [];
+
+    for (const [index, track] of tracks.entries()) {
+      renderedTracks.push(
+        ...renderOpenChromatinSignals({
           trackData: track,
           offsetTop: index * TRACK_HEIGHT,
           colors: this.colors
         }),
-        renderOpenChromatinPeaks({
+        ...renderOpenChromatinPeaks({
           trackData: track,
           offsetTop: index * TRACK_HEIGHT,
           colors: this.colors
         }),
-        renderHistoneNarrowPeaks({
+        ...renderHistoneNarrowPeaks({
           trackData: track,
           offsetTop: index * TRACK_HEIGHT
         }),
-        renderHistoneGappedPeaks({
+        ...renderHistoneGappedPeaks({
           trackData: track,
           offsetTop: index * TRACK_HEIGHT
         })
-      ];
-    });
+      );
+    }
+
+    return renderedTracks;
   }
 
   #renderVerticalRules({
