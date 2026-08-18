@@ -224,8 +224,8 @@ const renderGene = ({
   for (let i = 1; i < merged_exons.length; i++) {
     const prevExon = merged_exons[i - 1];
     const currentExon = merged_exons[i];
-    const start = prevExon.end;
-    const end = currentExon.start;
+    const start = prevExon.end + 1;
+    const end = currentExon.start - 1;
     introns.push({ start, end });
   }
 

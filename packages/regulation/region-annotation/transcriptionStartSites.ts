@@ -3,6 +3,8 @@ import { type ScaleLinear } from 'd3';
 
 import { GENE_HEIGHT } from './constants';
 
+import { toZeroBased } from '../helpers/toZeroBased';
+
 import type { GeneInRegionOverview } from '../types/regionOverview';
 import type { GeneTrack } from './prepareFeatureTracks';
 
@@ -110,7 +112,7 @@ const prepareTssData = ({
   let lastX = -Infinity;
 
   for (const site of tss) {
-    const x = scale(site.position);
+    const x = scale(toZeroBased(site.position));
     if (x - lastX < minDistanceBetweenTss) {
       const lastPreparedTss = mergedTss.at(-1);
       if (!lastPreparedTss) {
@@ -233,7 +235,7 @@ const getYStart = ({
 
   for (const track of tracksWithPossiblyOverlappingGenes) {
     for (const gene of track) {
-      const geneStartX = scale(gene.data.start);
+      const geneStartX = scale(toZeroBased(gene.data.start));
       const geneEndX = scale(gene.data.end);
 
       let hasOverlap = false;
