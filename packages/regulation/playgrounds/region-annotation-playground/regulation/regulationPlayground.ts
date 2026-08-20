@@ -9,12 +9,13 @@ import '@ensembl/ensembl-elements-common/components/text-button/text-button.ts';
 import './zoomButtons';
 
 import { pickData } from './services/filterData';
-import chromosome1Data from './data/chr1-data.json';
 
 import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
 import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPayload } from '../../../types/featureClickEvent';
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
+
+const CHROMOSOME_DATA_URL = 'https://regulation.ensembl.org/api/annotation/v0.11/release/2025-12/assembly/GCA_000001405.29?location=1:1-248956422';
 
 // length of chromosome 1
 const CHROMOSOME_LENGTH = 248956422;
@@ -22,8 +23,8 @@ const CHROMOSOME_LENGTH = 248956422;
 // A five-megabase viewport into chromosome 1
 // const INITIAL_START = 60_000_000;
 // const INITIAL_END = 65_000_000;
-const INITIAL_START = 1_168_656;
-const INITIAL_END = 1_262_112;
+const INITIAL_START = 1_280_215;
+const INITIAL_END = 1_282_263;
 
 // A location on chromosome 1 that has two features (promoter and enhancer) next to one another
 // Useful to make sure:
@@ -66,6 +67,9 @@ export class RegulationPlayground extends LitElement {
   `;
 
   @state()
+  data: OverviewRegion | null = null;
+
+  @state()
   start = INITIAL_START;
 
   @state()
@@ -79,6 +83,17 @@ export class RegulationPlayground extends LitElement {
 
   @state()
   isDarkMode = false;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.#fetchData();
+  }
+
+  #fetchData() {
+    fetch(CHROMOSOME_DATA_URL)
+      .then(response => response.json())
+      .then((data) => this.data = data);
+  }
 
   #onViewportChange = (event: CustomEvent) => {
     const { start, end } = event.detail;
@@ -143,8 +158,12 @@ export class RegulationPlayground extends LitElement {
   }
 
   render() {
+    if (!this.data) {
+      return;
+    }
+
     const data = pickData({
-      data: chromosome1Data as OverviewRegion,
+      data: this.data,
       start: this.start,
       end: this.end
     });
