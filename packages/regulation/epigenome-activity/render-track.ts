@@ -17,6 +17,8 @@ import {
 
 import type { TrackDataForDisplay } from './prepare-data';
 
+type PathResult = ReturnType<typeof svg>;
+
 export const renderOpenChromatinSignals = ({
   trackData,
   offsetTop,
@@ -25,7 +27,7 @@ export const renderOpenChromatinSignals = ({
   trackData: TrackDataForDisplay;
   offsetTop: number;
   colors: Partial<Colors> | null;
-}) => {
+}): PathResult[] => {
   const colorFrom = colors?.openChromatinLow ?? COLORS.openChromatinLow;
   const colorTo = colors?.openChromatinHigh ?? COLORS.openChromatinHigh;
   const colorScale = createSignalColorScale({
@@ -33,17 +35,30 @@ export const renderOpenChromatinSignals = ({
     colorTo
   });
 
-  return trackData.openChromatin.signals.map((signal) => {
-    return svg`
-      <rect
-        x=${signal.x}
-        y=${offsetTop + OPEN_CHROMATIN_SIGNAL_OFFSET_TOP}
-        width=${signal.width}
-        height=${OPEN_CHROMATIN_SIGNAL_HEIGHT}
-        fill=${colorScale(signal.value)}
-      />
-    `;
-  });
+  const pathsByValue = new Map<number, string[]>();
+  for (const signal of trackData.openChromatin.signals) {
+    const currentPaths = pathsByValue.get(signal.value) ?? [];
+    currentPaths.push(
+      rectToPath({
+        x: signal.x,
+        y: offsetTop + OPEN_CHROMATIN_SIGNAL_OFFSET_TOP,
+        width: signal.width,
+        height: OPEN_CHROMATIN_SIGNAL_HEIGHT
+      })
+    );
+    pathsByValue.set(signal.value, currentPaths);
+  }
+
+  return [...pathsByValue.entries()].map(([value, paths]) => {
+      return svg`
+        <path
+          d=${paths.join(' ')}
+          fill=${colorScale(value)}
+          data-type="open-chromatin-signal"
+          data-value=${value}
+        />
+      `;
+    });
 };
 
 export const renderOpenChromatinPeaks = ({
@@ -54,22 +69,31 @@ export const renderOpenChromatinPeaks = ({
   trackData: TrackDataForDisplay;
   offsetTop: number;
   colors: Partial<Colors> | null;
-}) => {
+}): PathResult[] => {
   const strokeColor = colors?.openChromatinPeak ?? COLORS.openChromatinPeak;
+  const paths = trackData.openChromatin.peaks.map(peak =>
+    rectToPath({
+      x: peak.x,
+      y: offsetTop + OPEN_CHROMATIN_PEAK_OFFSET_TOP,
+      width: peak.width,
+      height: OPEN_CHROMATIN_PEAK_HEIGHT
+    })
+  );
 
-  return trackData.openChromatin.peaks.map(peak => {
-    return svg`
-      <rect
-        x=${peak.x}
-        y=${offsetTop + OPEN_CHROMATIN_PEAK_OFFSET_TOP}
-        width=${peak.width}
-        height=${OPEN_CHROMATIN_PEAK_HEIGHT}
-        data-type="open-chromatin-peak"
+  if (paths.length === 0) {
+    return [];
+  }
+
+  return [
+    svg`
+      <path
+        d=${paths.join(' ')}
         stroke=${strokeColor}
         fill="none"
+        data-type="open-chromatin-peak"
       />
-    `;
-  });
+    `
+  ];
 };
 
 export const renderHistoneNarrowPeaks = ({
@@ -78,26 +102,34 @@ export const renderHistoneNarrowPeaks = ({
 }: {
   trackData: TrackDataForDisplay;
   offsetTop: number;
-}) => {
-  return trackData.histones.narrowPeaks.map(peak => {
-    const order = peak.order;
-    const trackOffsetTop = offsetTop;
+}): PathResult[] => {
+  const pathsByColor = new Map<string, string[]>();
+
+  for (const peak of trackData.histones.narrowPeaks) {
     const peakOffsetTop =
-      trackOffsetTop +
+      offsetTop +
       OPEN_CHROMATIN_PEAK_HEIGHT +
       HISTONE_NARROW_PEAK_OFFSET_TOP +
-      order * (HISTONE_NARROW_PEAK_HEIGHT + HISTONE_NARROW_PEAK_OFFSET_TOP);
+      peak.order * (HISTONE_NARROW_PEAK_HEIGHT + HISTONE_NARROW_PEAK_OFFSET_TOP);
 
+    const currentPaths = pathsByColor.get(peak.color) ?? [];
+    currentPaths.push(
+      rectToPath({
+        x: peak.x,
+        y: peakOffsetTop,
+        width: peak.width,
+        height: HISTONE_NARROW_PEAK_HEIGHT
+      })
+    );
+    pathsByColor.set(peak.color, currentPaths);
+  }
+
+  return [...pathsByColor.entries()].map(([color, paths]) => {
     return svg`
-      <rect
-        x=${peak.x}
-        y=${peakOffsetTop}
-        width=${peak.width}
-        height=${HISTONE_NARROW_PEAK_HEIGHT}
+      <path
+        d=${paths.join(' ')}
+        fill=${color}
         data-type="histone-narrow-peak"
-        data-order=${order}
-        data-track-offset-top=${trackOffsetTop}
-        fill=${peak.color}
       />
     `;
   });
@@ -109,13 +141,16 @@ export const renderHistoneGappedPeaks = ({
 }: {
   trackData: TrackDataForDisplay;
   offsetTop: number;
-}) => {
+}): PathResult[] => {
   // calculate the additional distance from the top based on how many narrow peaks have been rendered
   const narrowPeakTracksCount = trackData.histones.narrowPeaks.reduce((acc, peak) => {
     return Math.max(acc, peak.order);
   }, 0);
 
-  return trackData.histones.gappedPeaks.map(peak => {
+  const blocksByColor = new Map<string, string[]>();
+  const connectorsByColor = new Map<string, string[]>();
+
+  for (const peak of trackData.histones.gappedPeaks) {
     const offsetTop =
       trackOffsetTop +
       OPEN_CHROMATIN_PEAK_HEIGHT +
@@ -123,38 +158,84 @@ export const renderHistoneGappedPeaks = ({
       narrowPeakTracksCount * (HISTONE_NARROW_PEAK_HEIGHT + HISTONE_NARROW_PEAK_OFFSET_TOP) +
       HISTONE_GAPPED_PEAK_OFFSET_TOP +
       peak.order * (HISTONE_GAPPED_PEAK_BLOCK_HEIGHT + HISTONE_GAPPED_PEAK_OFFSET_TOP);
-    
+
     const connectorOffsetTop = offsetTop + HISTONE_GAPPED_PEAK_BLOCK_HEIGHT / 2;
 
-    const blocks = peak.blocks.map((block) => {
+    const blockPaths = blocksByColor.get(peak.color) ?? [];
+    for (const block of peak.blocks) {
+      blockPaths.push(
+        rectToPath({
+          x: block.x,
+          y: offsetTop,
+          width: block.width,
+          height: HISTONE_GAPPED_PEAK_BLOCK_HEIGHT
+        })
+      );
+    }
+    blocksByColor.set(peak.color, blockPaths);
+
+    const connectorPaths = connectorsByColor.get(peak.color) ?? [];
+    for (const connector of peak.connectors) {
+      connectorPaths.push(
+        lineToPath({
+          x1: connector.x,
+          x2: connector.x + connector.width,
+          y: connectorOffsetTop
+        })
+      );
+    }
+    connectorsByColor.set(peak.color, connectorPaths);
+  }
+
+  return [
+    ...[...blocksByColor.entries()].map(([color, paths]) => {
       return svg`
-        <rect
-          x=${block.x}
-          y=${offsetTop}
-          width=${block.width}
-          height=${HISTONE_GAPPED_PEAK_BLOCK_HEIGHT}
+        <path
+          d=${paths.join(' ')}
+          fill=${color}
           data-type="histone-gapped-peak-block"
-          fill=${peak.color}
-        />      
+        />
       `;
-    });
-
-    const connectors = peak.connectors.map((connector) => {
-      return svg `
-        <line
-          x1=${connector.x}
-          x2=${connector.x + connector.width}
-          y1=${connectorOffsetTop}
-          y2=${connectorOffsetTop}
-          strokeWidth=${HISTONE_GAPPED_PEAK_CONNECTOR_HEIGHT}
-          stroke=${peak.color}
-          strokeDasharray="1"
-        /> 
+    }),
+    ...[...connectorsByColor.entries()].map(([color, paths]) => {
+      return svg`
+        <path
+          d=${paths.join(' ')}
+          stroke-width=${HISTONE_GAPPED_PEAK_CONNECTOR_HEIGHT}
+          stroke=${color}
+          stroke-dasharray="1"
+          fill="none"
+          data-type="histone-gapped-peak-connector"
+        />
       `;
-    });
+    })
+  ];
+};
 
-    return [blocks, connectors];
-  });
+const rectToPath = ({
+  x,
+  y,
+  width,
+  height
+}: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}) => {
+  return `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
+};
+
+const lineToPath = ({
+  x1,
+  x2,
+  y
+}: {
+  x1: number;
+  x2: number;
+  y: number;
+}) => {
+  return `M ${x1} ${y} H ${x2}`;
 };
 
 const createSignalColorScale = ({
