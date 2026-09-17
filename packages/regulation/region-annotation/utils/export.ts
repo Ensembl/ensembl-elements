@@ -50,10 +50,6 @@ export const exportAsSvg = async (svgElement: SVGSVGElement) => {
     element.setAttribute('fill', 'none');
   });
 
-  // MAKE SURE SVG SHAPES DO NOT EXTEND BEYOND THE VIEWBOX OF THE SVG
-
-  addClipPath(svgClone as unknown as SVGSVGElement);
-
   // SHOULD THE SVG BE SERIALIZED TO STRING? OR RETURNED AS A DOM NODE?
 
   const svgData = new XMLSerializer().serializeToString(svgClone);
@@ -147,46 +143,6 @@ const createStyleTagForFont = ({
 
   return style;
 };
-
-const addClipPath = (svg: SVGSVGElement) => {
-  // Determine viewport size
-  const width = svg.viewBox.baseVal.width;
-  const height = svg.viewBox.baseVal.height;
-
-  let defs = svg.querySelector('defs');
-  if (!defs) {
-    defs = document.createElementNS(SVG_NAMESPACE, 'defs');
-    svg.insertBefore(defs, svg.firstChild);
-  }
-
-  const clipId = 'clip-viewport-size';
-
-  const clipPath = document.createElementNS(SVG_NAMESPACE, 'clipPath');
-  clipPath.setAttribute('id', clipId);
-
-  const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
-  rect.setAttribute('x', '0');
-  rect.setAttribute('y', '0');
-  rect.setAttribute('width', `${width}`);
-  rect.setAttribute('height', `${height}`);
-
-  clipPath.appendChild(rect);
-  defs.appendChild(clipPath);
-
-  // Create wrapper group
-  const g = document.createElementNS(SVG_NAMESPACE, 'g');
-  g.setAttribute('clip-path', `url(#${clipId})`);
-
-  // Move all children except <defs> into the group
-  [...svg.childNodes].forEach(node => {
-    if (node !== defs) {
-      g.appendChild(node);
-    }
-  });
-
-  svg.appendChild(g);
-};
-
 
 export const exportAsBitmap = async (svgElement: SVGSVGElement) => {
   const svgClone = svgElement.cloneNode(true);

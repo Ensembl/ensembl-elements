@@ -284,29 +284,39 @@ export class RegionOverview extends LitElement {
         style="width: 100%; height: ${imageHeight}px;"
         @click=${this.handleClick}
       >
+        <defs>
+          <clipPath id="clip-viewport-size">
+            <rect
+              width="${this.imageWidth}"
+              height="${imageHeight}"
+            ></rect>
+          </clipPath>
+        </defs>
         ${unselectedBackgroundFilter()}
-        <g filter="${this.isSelectingArea ? 'url(#unselected-background)' : nothing}">
-          ${renderRuler({
-            scale: this.ensemblScale,
-            offsetTop: 0,
-            colors
-          })}
-          ${this.renderGeneTracks({
-            forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
-            reverseStrandTopOffsets: reverseStrandGeneTrackOffsets,
-            strandDividerTopOffset,
-            colors
-          })}
-          ${this.renderRegulatoryFeatureTracks({
-            offsetTop: regulatoryFeatureTracksTopOffset,
-            colors
-          })}
-          ${renderRuler({
-            scale: this.ensemblScale,
-            offsetTop: bottomRulerTopOffset,
-            colors
-          })}
-          ${areaSelection()}
+        <g clip-path="url(#clip-viewport-size)">
+          <g filter="${this.isSelectingArea ? 'url(#unselected-background)' : nothing}">
+            ${renderRuler({
+              scale: this.ensemblScale,
+              offsetTop: 0,
+              colors
+            })}
+            ${this.renderGeneTracks({
+              forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
+              reverseStrandTopOffsets: reverseStrandGeneTrackOffsets,
+              strandDividerTopOffset,
+              colors
+            })}
+            ${this.renderRegulatoryFeatureTracks({
+              offsetTop: regulatoryFeatureTracksTopOffset,
+              colors
+            })}
+            ${renderRuler({
+              scale: this.ensemblScale,
+              offsetTop: bottomRulerTopOffset,
+              colors
+            })}
+            ${areaSelection()}
+          </g>
         </g>
       </svg>
       <slot name="tooltip"></slot>
