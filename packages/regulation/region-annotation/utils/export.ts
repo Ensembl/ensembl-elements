@@ -1,14 +1,19 @@
 /**
- * This files contains generic download logic, which should probably be moved
+ * This file contains generic download logic, which should probably be moved
  * to the helpers package
  */
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+const ENSEMBL_FONT_FAMILY = 'IBM Plex Mono';
 
-export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
+export const exportAsSvg = async (svgElement: SVGSVGElement) => {
   const svgClone = svgElement.cloneNode(true) as HTMLElement;
 
-  const fontFamily = 'IBM Plex Mono';
+  // Get and embed the appropriate font
+
+
+
+  const fontFamily = ENSEMBL_FONT_FAMILY;
   const fontFileBlob = await fetchFontFile(fontFamily);
 
   let fontFileDataUrl: string | undefined;
@@ -27,18 +32,29 @@ export const downloadAsSvg = async (svgElement: SVGSVGElement) => {
     defs.appendChild(styleTag);
   }
 
-  svgClone.style.setProperty('overflow', 'hidden');
-  svgClone.style.setProperty('width', `${svgElement.clientWidth}px`);
+  // svgClone.style.setProperty('overflow', 'hidden');
+  // svgClone.style.setProperty('width', `${svgElement.clientWidth}px`);
+
+
+  // REMOVE DEDICATED TRANSPARENT RECTANGLES USED AS INTERACTIVE AREAS
 
   svgClone.querySelectorAll('rect.interactive-area').forEach(element => element.remove());
 
+  // REMOVE LIT COMMENT NODES THAT IT PEPPERS THE DOM WITH
+
   removeCommentNodesFromSvg(svgClone);
+
+  // MAKE SURE THAT ANYTHING THAT HAS A FILL TRANSPARENT ON IT, USES FILL NONE INSTEAD
 
   svgClone.querySelectorAll('[fill="transparent"]').forEach(element => {
     element.setAttribute('fill', 'none');
   });
 
+  // MAKE SURE SVG SHAPES DO NOT EXTEND BEYOND THE VIEWBOX OF THE SVG
+
   addClipPath(svgClone as unknown as SVGSVGElement);
+
+  // SHOULD THE SVG BE SERIALIZED TO STRING? OR RETURNED AS A DOM NODE?
 
   const svgData = new XMLSerializer().serializeToString(svgClone);
   const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
@@ -172,7 +188,7 @@ const addClipPath = (svg: SVGSVGElement) => {
 };
 
 
-export const downloadAsPng = async (svgElement: SVGSVGElement) => {
+export const exportAsBitmap = async (svgElement: SVGSVGElement) => {
   const svgClone = svgElement.cloneNode(true);
 
   const fontFamily = 'IBM Plex Mono';
