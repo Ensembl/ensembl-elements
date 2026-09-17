@@ -9,8 +9,9 @@ import '@ensembl/ensembl-elements-common/components/text-button/text-button.ts';
 import './zoomButtons';
 
 import { pickData } from './services/filterData';
+import { downloadSvgString, downloadPng } from '../../../region-annotation//utils/export';
 
-import type { OverviewRegion } from '@ensembl/ensembl-regulation/region-overview';
+import type { OverviewRegion, RegionOverview } from '@ensembl/ensembl-regulation/region-overview';
 import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPayload } from '../../../types/featureClickEvent';
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
@@ -157,6 +158,17 @@ export class RegulationPlayground extends LitElement {
     `;
   }
 
+  async downloadImage(type: 'svg' | 'png') {
+    const annotationPanel = this.shadowRoot?.querySelector('ens-reg-region-annotation') as RegionOverview;
+    if (type === 'svg') {
+      const svgString = await annotationPanel.exportAsSvg({ exportTo: 'string' });
+      downloadSvgString({ svgString: svgString as string });      
+    } else if (type === 'png') {
+      const canvas = await annotationPanel.exportAsPng();
+      downloadPng({ canvas: canvas as HTMLCanvasElement });
+    }
+  }
+
   render() {
     if (!this.data) {
       return;
@@ -203,6 +215,12 @@ export class RegulationPlayground extends LitElement {
           ></ens-reg-zoom-buttons>
           <button @click=${() => this.isDarkMode = !this.isDarkMode}>
             Toggle dark mode
+          </button>
+          <button @click=${() => this.downloadImage('svg')}>
+            Download svg
+          </button>
+          <button @click=${() => this.downloadImage('png')}>
+            Download png
           </button>
         </div>
       </div>

@@ -48,6 +48,10 @@ The component also emits the following events:
 - `viewport-change-end` - a custom event that is similar to `viewport-change`, but is only emitted when the gesture that caused the viewport to change is completed: e.g. user has released the mouse button after dragging the viewport; or has finished selecting part of the viewport with a brush
 - `ens-reg-feature-click` - a custom event with information about the feature that the user clicked
 
+The component as a DOM element also provides the following methods:
+- `.exportAsSvg` — can export the annotation component as either an SVG DOM element (for further DOM manipulation by the caller) or as an string that can be downloaded as an image. The choice between whether the export should be a string or a DOM element is made through an `exportTo` option, which is a string that can be either `"string"` or `"element"` 
+- `.exportAsPng` -  exports the annotation component as a PNG
+
 ### Exported types
 The package exports several useful types:
 

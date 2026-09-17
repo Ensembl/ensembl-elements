@@ -12,6 +12,7 @@ import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
 import { toZeroBased } from '../helpers/toZeroBased';
 import { COLORS, type Colors } from './constants';
+import { exportAsSvg, exportAsBitmap, type SVGExportTo } from './utils/export';
 
 import ViewportController from './viewportController';
 import AreaSelectionController from './selection/area-selection-controller';
@@ -147,6 +148,35 @@ export class RegionOverview extends LitElement {
     super.scheduleUpdate();
   }
 
+  exportAsSvg({
+    exportTo
+  }: {
+    exportTo?: SVGExportTo;
+  }) {
+    const svgElement = this.shadowRoot?.querySelector('svg');
+
+    if (!svgElement) {
+      // this should never happen
+      return;
+    }
+
+    return exportAsSvg({
+      svgSource: svgElement,
+      exportTo
+    });
+  }
+
+  exportAsPng() {
+    const svgElement = this.shadowRoot?.querySelector('svg');
+
+    if (!svgElement) {
+      // this should never happen
+      return;
+    }
+
+    return exportAsBitmap(svgElement);
+  }
+
   observeHostSize = () => {
     const resizeObserver = new ResizeObserver((entries) => {
       const [hostElementEntry] = entries;
@@ -265,29 +295,39 @@ export class RegionOverview extends LitElement {
         style="width: 100%; height: ${imageHeight}px;"
         @click=${this.handleClick}
       >
+        <defs>
+          <clipPath id="clip-viewport-size">
+            <rect
+              width="${this.imageWidth}"
+              height="${imageHeight}"
+            ></rect>
+          </clipPath>
+        </defs>
         ${unselectedBackgroundFilter()}
-        <g filter="${this.isSelectingArea ? 'url(#unselected-background)' : nothing}">
-          ${renderRuler({
-            scale: this.ensemblScale,
-            offsetTop: 0,
-            colors
-          })}
-          ${this.renderGeneTracks({
-            forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
-            reverseStrandTopOffsets: reverseStrandGeneTrackOffsets,
-            strandDividerTopOffset,
-            colors
-          })}
-          ${this.renderRegulatoryFeatureTracks({
-            offsetTop: regulatoryFeatureTracksTopOffset,
-            colors
-          })}
-          ${renderRuler({
-            scale: this.ensemblScale,
-            offsetTop: bottomRulerTopOffset,
-            colors
-          })}
-          ${areaSelection()}
+        <g clip-path="url(#clip-viewport-size)">
+          <g filter="${this.isSelectingArea ? 'url(#unselected-background)' : nothing}">
+            ${renderRuler({
+              scale: this.ensemblScale,
+              offsetTop: 0,
+              colors
+            })}
+            ${this.renderGeneTracks({
+              forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
+              reverseStrandTopOffsets: reverseStrandGeneTrackOffsets,
+              strandDividerTopOffset,
+              colors
+            })}
+            ${this.renderRegulatoryFeatureTracks({
+              offsetTop: regulatoryFeatureTracksTopOffset,
+              colors
+            })}
+            ${renderRuler({
+              scale: this.ensemblScale,
+              offsetTop: bottomRulerTopOffset,
+              colors
+            })}
+            ${areaSelection()}
+          </g>
         </g>
       </svg>
       <slot name="tooltip"></slot>
