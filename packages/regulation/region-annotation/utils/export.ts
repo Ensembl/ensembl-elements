@@ -6,13 +6,47 @@
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 const ENSEMBL_FONT_FAMILY = 'IBM Plex Mono';
 
-export const exportAsSvg = async (svgElement: SVGSVGElement) => {
-  const svgClone = svgElement.cloneNode(true) as HTMLElement;
+export type SVGExportTo =
+  | 'string'
+  | 'element';
+
+export const exportAsSvg = async ({
+  svgSource,
+  exportTo = 'element'
+}: {
+  svgSource: SVGSVGElement;
+  exportTo?: SVGExportTo; // whether the exported svg needs to be serialized to string
+}) => {
+  const svgClone = svgSource.cloneNode(true) as HTMLElement;
 
   // Get and embed the appropriate font
+  await embedEnsemblFont(svgClone);
 
+  // Remove crud
+  // - remove dedicated transparent rectangles that are used as interactive areas
+  svgClone.querySelectorAll('rect.interactive-area')
+    .forEach(element => element.remove());
+  
+  // - remove the comment nodes that Lit peppers the DOM with
+  removeCommentNodesFromSvg(svgClone);
 
+  // Make sure that anything that still has a "fill=transparent" on it
+  // uses "fill=none" instead ("fill=transparent" doesn't play nice with graphics software)
+  svgClone.querySelectorAll('[fill="transparent"]').forEach(element => {
+    element.setAttribute('fill', 'none');
+  });
 
+  // Return the result (as a DOM element or a string depending on the passed options)
+  if (exportTo === 'string') {
+    // serialize the DOM element to a string
+    return new XMLSerializer().serializeToString(svgClone);
+  } else {
+    // return the svg element itself
+    return svgClone;
+  }
+};
+
+const embedEnsemblFont = async (svgElement: HTMLElement) => {
   const fontFamily = ENSEMBL_FONT_FAMILY;
   const fontFileBlob = await fetchFontFile(fontFamily);
 
@@ -23,42 +57,14 @@ export const exportAsSvg = async (svgElement: SVGSVGElement) => {
 
   if (fontFileDataUrl) {
     const styleTag = createStyleTagForFont({ fontFamily, base64Font: fontFileDataUrl });
-    let defs = (svgClone as HTMLElement).querySelector('defs');
+    let defs = (svgElement as HTMLElement).querySelector('defs');
     
     if (!defs) {
       defs = document.createElementNS(SVG_NAMESPACE, 'defs');
-      svgClone.insertBefore(defs, svgClone.firstChild);
+      svgElement.insertBefore(defs, svgElement.firstChild);
     }
     defs.appendChild(styleTag);
   }
-
-  // svgClone.style.setProperty('overflow', 'hidden');
-  // svgClone.style.setProperty('width', `${svgElement.clientWidth}px`);
-
-
-  // REMOVE DEDICATED TRANSPARENT RECTANGLES USED AS INTERACTIVE AREAS
-
-  svgClone.querySelectorAll('rect.interactive-area').forEach(element => element.remove());
-
-  // REMOVE LIT COMMENT NODES THAT IT PEPPERS THE DOM WITH
-
-  removeCommentNodesFromSvg(svgClone);
-
-  // MAKE SURE THAT ANYTHING THAT HAS A FILL TRANSPARENT ON IT, USES FILL NONE INSTEAD
-
-  svgClone.querySelectorAll('[fill="transparent"]').forEach(element => {
-    element.setAttribute('fill', 'none');
-  });
-
-  // SHOULD THE SVG BE SERIALIZED TO STRING? OR RETURNED AS A DOM NODE?
-
-  const svgData = new XMLSerializer().serializeToString(svgClone);
-  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'image.svg';
-  link.click();
 };
 
 const fetchFontFile = async (fontFamily: string) => {
@@ -188,14 +194,40 @@ export const exportAsBitmap = async (svgElement: SVGSVGElement) => {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0);
-  
+
+  return canvas;
+};
+
+
+export const downloadSvgString = ({
+  svgString,
+  fileName = 'image.svg'
+}: {
+  svgString: string;
+  fileName?: string;
+}) => {
+  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+};
+
+export const downloadPng = ({
+  canvas,
+  fileName = 'image.png'
+}: {
+  canvas: HTMLCanvasElement;
+  fileName?: string;
+}) => {
   const pngDataUrl = canvas.toDataURL('image/png');
 
   const downloadLink = document.createElement('a');
   downloadLink.href = pngDataUrl;
-  downloadLink.download = 'image.png';
+  downloadLink.download = fileName;
   downloadLink.click();
 
-  // Cleanup
+  // cleanup
   URL.revokeObjectURL(pngDataUrl);
 };

@@ -12,7 +12,7 @@ import { areaSelection } from './selection/area-selection-directive';
 import { unselectedBackgroundFilter } from './selection/unselected-background-directive';
 import { toZeroBased } from '../helpers/toZeroBased';
 import { COLORS, type Colors } from './constants';
-import { exportAsSvg, exportAsBitmap } from './utils/export';
+import { exportAsSvg, exportAsBitmap, type SVGExportTo } from './utils/export';
 
 import ViewportController from './viewportController';
 import AreaSelectionController from './selection/area-selection-controller';
@@ -148,22 +148,33 @@ export class RegionOverview extends LitElement {
     super.scheduleUpdate();
   }
 
-  exportImage({
-    type
+  exportAsSvg({
+    exportTo
   }: {
-    type: 'svg' | 'png'
-  }): void {
+    exportTo?: SVGExportTo;
+  }) {
     const svgElement = this.shadowRoot?.querySelector('svg');
 
     if (!svgElement) {
+      // this should never happen
       return;
     }
 
-    if (type === 'svg') {
-      exportAsSvg(svgElement);
-    } else {
-      exportAsBitmap(svgElement);
+    return exportAsSvg({
+      svgSource: svgElement,
+      exportTo
+    });
+  }
+
+  exportAsPng() {
+    const svgElement = this.shadowRoot?.querySelector('svg');
+
+    if (!svgElement) {
+      // this should never happen
+      return;
     }
+
+    return exportAsBitmap(svgElement);
   }
 
   observeHostSize = () => {

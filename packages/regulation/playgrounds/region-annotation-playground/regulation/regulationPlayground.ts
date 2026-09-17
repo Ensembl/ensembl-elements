@@ -9,6 +9,7 @@ import '@ensembl/ensembl-elements-common/components/text-button/text-button.ts';
 import './zoomButtons';
 
 import { pickData } from './services/filterData';
+import { downloadSvgString, downloadPng } from '../../../region-annotation//utils/export';
 
 import type { OverviewRegion, RegionOverview } from '@ensembl/ensembl-regulation/region-overview';
 import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPayload } from '../../../types/featureClickEvent';
@@ -157,12 +158,14 @@ export class RegulationPlayground extends LitElement {
     `;
   }
 
-  downloadImage(type: 'svg' | 'png') {
+  async downloadImage(type: 'svg' | 'png') {
     const annotationPanel = this.shadowRoot?.querySelector('ens-reg-region-annotation') as RegionOverview;
     if (type === 'svg') {
-      annotationPanel.exportImage({ type: 'svg' });
+      const svgString = await annotationPanel.exportAsSvg({ exportTo: 'string' });
+      downloadSvgString({ svgString: svgString as string });      
     } else if (type === 'png') {
-      annotationPanel.exportImage({ type: 'png' });
+      const canvas = await annotationPanel.exportAsPng();
+      downloadPng({ canvas: canvas as HTMLCanvasElement });
     }
   }
 
