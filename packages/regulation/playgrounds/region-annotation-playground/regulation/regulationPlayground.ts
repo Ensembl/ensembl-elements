@@ -16,7 +16,7 @@ import type { FeatureClickPayload, GeneClickPayload, RegulatoryFeatureClickPaylo
 
 import '@ensembl/ensembl-elements-common/styles/fonts.css';
 
-const CHROMOSOME_DATA_URL = 'https://regulation.ensembl.org/api/annotation/v0.11/release/2025-12/assembly/GCA_000001405.29?location=1:1-248956422';
+const CHROMOSOME_DATA_URL = 'https://regulation.ensembl.org/api/annotation/v0.15/release/2025-12/assembly/GCA_000001405.29?location=1:1-248956422';
 
 // length of chromosome 1
 const CHROMOSOME_LENGTH = 248956422;
