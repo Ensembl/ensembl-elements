@@ -1,0 +1,13 @@
+.title {
+  margin-bottom: 1rem;
+  width: max-content;
+  text-transform: uppercase;
+}
+
+.example {
+  max-width: 450px;
+}
+
+.example + .example {
+  margin-top: 2.5rem;
+}
