@@ -58,15 +58,15 @@ export class SortableTableColumnHead extends LitElement {
     `
   ];
 
-  @property({ type: String })
-  'sort-order': 'asc' | 'desc' | null = null;
+  @property({ type: String, attribute: 'sort-order' })
+  sortOrder: 'asc' | 'desc' | null = null;
 
   render() {
-    const isActive = this['sort-order'] !== null;
+    const isActive = this.sortOrder !== null;
     const buttonClasses = {
       active: isActive,
-      'sort-ascending': this['sort-order'] === 'asc',
-      'sort-descending': this['sort-order'] === 'desc'
+      'sort-ascending': this.sortOrder === 'asc',
+      'sort-descending': this.sortOrder === 'desc'
     };
 
     return html`

@@ -3,7 +3,8 @@ import '@ensembl/ensembl-elements-common/components/checkbox/checkbox-only.js';
 
 import '@ensembl/ensembl-elements-common/components/button/button.js';
 
-import { EnsCheckbox } from '@ensembl/ensembl-elements-common/components/checkbox/checkbox.js';
+import type { EnsCheckbox } from '@ensembl/ensembl-elements-common/components/checkbox/checkbox.js';
+import type { EnsButton } from '@ensembl/ensembl-elements-common/components/button/button.js';
 
 import './checkbox.stories.css';
 
@@ -46,10 +47,10 @@ export const Default = () => {
     </div>
   `;
   element.innerHTML = innerHtml;
-  const firstCheckbox = element.querySelector('ens-checkbox');
+  const firstCheckbox = element.querySelector('ens-checkbox') as EnsCheckbox;
   firstCheckbox.addEventListener('change', () => { console.log('heard change!') });
 
-  const checkboxControllerButton = element.querySelector('#checkbox-controller');
+  const checkboxControllerButton = element.querySelector('#checkbox-controller') as EnsButton;
   const controlledCheckbox = checkboxControllerButton.nextElementSibling as EnsCheckbox;
   checkboxControllerButton.addEventListener('click', () => {
     controlledCheckbox.checked = !controlledCheckbox.checked;
@@ -57,23 +58,3 @@ export const Default = () => {
 
   return element;
 };
-
-
-
-
-
-
-
-// export const Default = () => {
-//   const element = document.createElement('div');
-//   const innerHtml = `
-//     <ens-checkbox>
-//       <label>
-//         <input type="checkbox" />
-//         Hello
-//       </label>
-//     </ens-checkbox>
-//   `;
-//   element.innerHTML = innerHtml;
-//   return element;
-// };

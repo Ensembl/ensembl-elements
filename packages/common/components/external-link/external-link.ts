@@ -27,15 +27,15 @@ export class ExternalLink extends LitElement {
   /**
    * By default, external links open pages in a new browser tab
    */
-  @property({ type: Boolean })
-  'open-new': boolean = true;
+  @property({ type: Boolean, attribute: 'open-new' })
+  openNew: boolean = true;
 
   render() {
     return html`
       <a
         href=${this.href}
-        target=${this['open-new'] ? '_blank' : nothing}
-        rel=${this['open-new'] ? 'noopener noreferrer' : nothing}
+        target=${this.openNew ? '_blank' : nothing}
+        rel=${this.openNew ? 'noopener noreferrer' : nothing}
       >
         ${unsafeSVG(icon)}
         <slot>

@@ -69,18 +69,18 @@ export class Paginator extends LitElement {
     `
   ];
 
-  @property({ type: Number })
-  'current-page' = 1;
+  @property({ type: Number, attribute: 'current-page' })
+  currentPage = 1;
 
-  @property({ type: Number })
-  'total-pages' = 1;
+  @property({ type: Number, attribute: 'total-pages' })
+  totalPages = 1;
 
   #hasPreviousPage = () => {
-    return this['current-page'] > 1;
+    return this.currentPage > 1;
   }
 
   #hasNextPage = () => {
-    return this['current-page'] < this['total-pages'];
+    return this.currentPage < this.totalPages;
   }
 
   #handleSubmit = (event: Event) => {
@@ -96,17 +96,17 @@ export class Paginator extends LitElement {
   }
 
   #onNextPageClick = () => {
-    const newPage = this['current-page'] + 1;
+    const newPage = this.currentPage + 1;
     this.dispatchNewPageEvent(newPage);
   }
 
   #onPreviousPageClick = () => {
-    const newPage = this['current-page'] - 1;
+    const newPage = this.currentPage - 1;
     this.dispatchNewPageEvent(newPage);
   }
 
   dispatchNewPageEvent = (newPage: number) => {
-    if (newPage < 1 || newPage > this['total-pages']) {
+    if (newPage < 1 || newPage > this.totalPages) {
       return;
     }
 
@@ -130,11 +130,11 @@ export class Paginator extends LitElement {
         </button>
         <input
           name="page-number"
-          value=${this['current-page']}
+          value=${this.currentPage}
           aria-label="Page number"
         />
         <span class="total">
-          of ${this['total-pages']}
+          of ${this.totalPages}
         </span>
         <button
           type="button"
