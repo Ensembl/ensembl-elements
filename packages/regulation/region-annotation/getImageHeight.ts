@@ -9,13 +9,15 @@ import {
 
 import { type FeatureTracks } from './prepareFeatureTracks';
 
-export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
+export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks, showTss = true) => {
   const { geneTracks, regulatoryFeatureTracks } = featureTracks;
   const { forwardStrandTracks, reverseStrandTracks } = geneTracks;
 
-  const geneTracksTopOffset = RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET;
+  // TSS extends 2 px from the gene, plus a 12 px arm and 3 px arrowhead half-height.
+  const reclaimedTssPadding = showTss ? 0 : 17;
+  const geneTracksTopOffset = RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET - reclaimedTssPadding;
 
-  // make sure there is space for at least 3 gene tracks for the forward strand
+  // make sure there is space for at least 2 gene tracks for the forward strand
   const forwardStrandGeneTracksCount = Math.max(forwardStrandTracks.length, MIN_GENE_TRACKS_COUNT);
   const forwardStrandGeneTrackOffsets = [...Array(forwardStrandGeneTracksCount)]
     .map((_, index) => {
@@ -27,7 +29,7 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
     forwardStrandGeneTracksCount * GENE_TRACK_HEIGHT +
     0.5 * GENE_TRACK_HEIGHT;
 
-  // make sure there is space for at least 3 gene tracks for the reverse strand
+  // make sure there is space for at least 2 gene tracks for the reverse strand
   const reverseStrandGeneTracksCount = Math.max(reverseStrandTracks.length, MIN_GENE_TRACKS_COUNT);
   const reverseStrandGeneTrackOffsets = [...Array(reverseStrandGeneTracksCount)]
     .map((_, index) => {
@@ -40,10 +42,9 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
     strandDividerTopOffset +
     GENE_TRACK_HEIGHT +
     reverseStrandGeneTracksCount * GENE_TRACK_HEIGHT +
-    REGULATORY_FEATURE_TRACKS_TOP_OFFSET;
+    REGULATORY_FEATURE_TRACKS_TOP_OFFSET - reclaimedTssPadding;
 
-  // make sure there is space for at least 3 tracks of regulatory features
-  const regulatoryFeatureTracksCount = Math.max(regulatoryFeatureTracks.length, 3);
+  const regulatoryFeatureTracksCount = regulatoryFeatureTracks.length;
   const regulatoryFeatureTrackOffsets = [...Array(regulatoryFeatureTracksCount)]
     .map((_, index) => {
       return regulatoryFeatureTracksTopOffset + index * REGULATORY_FEATURE_TRACK_HEIGHT;

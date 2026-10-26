@@ -1,4 +1,4 @@
-import { svg } from 'lit';
+import { svg, nothing } from 'lit';
 import type { ScaleLinear } from 'd3';
 
 import {
@@ -27,6 +27,7 @@ export const renderGeneTracks = ({
   start,
   end,
   focusGeneId,
+  showTss,
   forwardStrandTopOffsets,
   reverseStrandTopOffsets,
   strandDividerTopOffset,
@@ -40,6 +41,7 @@ export const renderGeneTracks = ({
   start: number;
   end: number;
   focusGeneId: string | null;
+  showTss: boolean;
   forwardStrandTopOffsets: number[];
   reverseStrandTopOffsets: number[];
   strandDividerTopOffset: number;
@@ -70,6 +72,7 @@ export const renderGeneTracks = ({
       start,
       end,
       focusGeneId,
+      showTss,
       colors,
       geneLabelsStore
     }))
@@ -103,6 +106,7 @@ const renderGeneTrack = ({
   start,
   end,
   focusGeneId,
+  showTss,
   colors,
   geneLabelsStore
 }: {
@@ -116,6 +120,7 @@ const renderGeneTrack = ({
   start: number;
   end: number;
   focusGeneId: string | null;
+  showTss: boolean;
   colors: Colors;
   geneLabelsStore: GeneLabelsStore;
 }) => {
@@ -151,7 +156,7 @@ const renderGeneTrack = ({
         allColors: colors,
         geneLabelsStore
       })}
-      ${renderTranscriptionStartSites({
+      ${showTss ? renderTranscriptionStartSites({
         tss: gene.data.tss,
         strand: gene.data.strand,
         geneTracks: tracks,
@@ -159,7 +164,7 @@ const renderGeneTrack = ({
         scale,
         trackOffsetsTop,
         color: colors.transcriptionStartSite
-      })}
+      }) : nothing}
     `;
   });
 
