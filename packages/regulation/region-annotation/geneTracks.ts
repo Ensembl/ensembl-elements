@@ -124,7 +124,11 @@ const renderGeneTrack = ({
   const shouldDisplayLowResGenes =
     end - start > MAX_SLICE_LENGTH_FOR_DETAILED_VIEW;
 
-  const geneElements = track.map((gene) => {
+  const genesInLabelPriorityOrder = shouldDisplayLowResGenes
+    ? track
+    : track.toSorted((a, b) => b.data.start - a.data.start);
+
+  const geneElements = genesInLabelPriorityOrder.map((gene) => {
     const isFocusGene = gene.data.stable_id === focusGeneId;
     
     if (shouldDisplayLowResGenes) {
@@ -473,11 +477,12 @@ const renderGeneLabel = ({
 
   const labelX = scale(Math.max(gene.data.start, genomicViewportStart));
 
-  if (prevLabel && prevLabel.end >= labelX) {
+  const labelText = gene.data.symbol ?? gene.data.stable_id;
+  const labelWidth = Math.ceil(geneLabelsStore.textMeasuringCanvas.getContext('2d')!.measureText(labelText).width);
+
+  if (prevLabel && labelX + labelWidth >= prevLabel.start) {
     return null;
   }
-
-  const labelText = gene.data.symbol ?? gene.data.stable_id;
   const labelY = geneStrand === 'forward'
     ? offsetTop + GENE_HEIGHT + GENE_LABEL_HEIGHT + 1
     : offsetTop - 3;
@@ -486,8 +491,7 @@ const renderGeneLabel = ({
 
   const style = 'font-family: "IBM Plex Mono"; user-select: none';
 
-  const labelWidth = Math.ceil(geneLabelsStore.textMeasuringCanvas.getContext('2d')!.measureText(labelText).width);
-  labelsForTrack.push({ start: labelX, end: labelX + labelWidth });
+  labelsForTrack.push({ start: labelX });
 
   // At this font size, the width of a letter in this monospace font is 6
   return svg`
@@ -566,8 +570,8 @@ const prepareGeneInfo = ({
 
 type GeneLabelsStore = {
   labels: {
-    forwardStrand: Record<string, { start: number, end: number }[]>;
-    reverseStrand: Record<string, { start: number, end: number }[]>;
+    forwardStrand: Record<string, { start: number }[]>;
+    reverseStrand: Record<string, { start: number }[]>;
   },
   textMeasuringCanvas: HTMLCanvasElement;
 };
