@@ -12,7 +12,8 @@ export const renderRuler = ({
   offsetTop: number;
   colors: Colors;
 }) => {
-  const ticksCount = 5; // this could potentially be dynamically changed based on viewport width 
+  const width = scale.range()[1];
+  const ticksCount = Math.max(1, Math.min(5, Math.floor(width / 120)));
   const prettyTicks = scale.ticks(ticksCount);
   const numberFormatter = new Intl.NumberFormat("en-GB");
 
@@ -23,8 +24,6 @@ export const renderRuler = ({
     numberFormatter,
     colors
   }));
-
-  const width = scale.range()[1];
 
   return svg`
     <g

@@ -81,6 +81,9 @@ export class RegionOverview extends LitElement {
   @property({ type: Object })
   data: InputData | null = null;
 
+  @property({ type: Boolean })
+  showTss = true;
+
   @property({ type: Object })
   colors: Partial<Colors> | null = null;
 
@@ -277,7 +280,7 @@ export class RegionOverview extends LitElement {
       return;
     }
 
-    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks, this.showTss);
     const {
       imageHeight,
       forwardStrandGeneTrackOffsets,
@@ -356,6 +359,7 @@ export class RegionOverview extends LitElement {
       reverseStrandTopOffsets,
       scale: this.bedScale,
       tracks: geneTracks,
+      showTss: this.showTss,
       start: this.start,
       regionName: this.regionName,
       end: this.end,
