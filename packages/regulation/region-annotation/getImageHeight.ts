@@ -4,7 +4,8 @@ import {
   MIN_GENE_TRACKS_COUNT,
   REGULATORY_FEATURE_TRACKS_TOP_OFFSET,
   REGULATORY_FEATURE_TRACK_HEIGHT,
-  RULER_HEIGHT
+  RULER_HEIGHT,
+  MIN_EMPTY_PLOT_HEIGHT
 } from './constants';
 
 import { type FeatureTracks } from './prepareFeatureTracks';
@@ -68,10 +69,11 @@ export const getImageHeightAndTopOffsets = ({
       return regulatoryFeatureTracksTopOffset + index * REGULATORY_FEATURE_TRACK_HEIGHT;
     });
 
-  const imageHeight =
-    regulatoryFeatureTracksTopOffset +
-    regulatoryFeatureTracksCount * REGULATORY_FEATURE_TRACK_HEIGHT
-    + RULER_HEIGHT;
+  const imageHeight = !showGenes && regulatoryFeatureTracksCount === 0
+    ? 2 * RULER_HEIGHT + MIN_EMPTY_PLOT_HEIGHT
+    : regulatoryFeatureTracksTopOffset +
+      regulatoryFeatureTracksCount * REGULATORY_FEATURE_TRACK_HEIGHT +
+      RULER_HEIGHT;
 
   const bottomRulerTopOffset = imageHeight - RULER_HEIGHT;
 
