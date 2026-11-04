@@ -33,7 +33,7 @@ export const renderGeneTracks = ({
   width,
   colors
 }: {
-  tracks: FeatureTracks['geneTracks'];
+  tracks: NonNullable<FeatureTracks['geneTracks']>;
   scale: ScaleLinear<number, number>;
   width: number;
   regionName: string;
@@ -148,7 +148,7 @@ const renderGeneTrack = ({
         geneLabelsStore
       })}
       ${renderTranscriptionStartSites({
-        tss: gene.data.tss,
+        tss: gene.data.tss ?? [],
         strand: gene.data.strand,
         geneTracks: tracks,
         trackIndex,
@@ -572,7 +572,7 @@ type GeneLabelsStore = {
   textMeasuringCanvas: HTMLCanvasElement;
 };
 
-const createGeneLabelsStore = ({ tracks }: { tracks: FeatureTracks['geneTracks'] }): GeneLabelsStore => {
+const createGeneLabelsStore = ({ tracks }: { tracks: NonNullable<FeatureTracks['geneTracks']> }): GeneLabelsStore => {
   const textMeasuringCanvas = document.createElement('canvas');
   const canvasContext = textMeasuringCanvas.getContext('2d') as CanvasRenderingContext2D;
   canvasContext.font = '10px "IBM Plex Mono"';

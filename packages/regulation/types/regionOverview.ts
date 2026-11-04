@@ -22,7 +22,7 @@ export type GeneInRegionOverview = {
   end: number;
   strand: ForwardOrReverseStrand;
   representative_transcript: RepresentativeTranscriptInRegionOverview;
-  tss: TranscriptionStartSite[];
+  tss?: TranscriptionStartSite[];
   merged_exons: ExonInRegionOverview[];
   cds_counts: OverlappingCDSFragment[];
 };

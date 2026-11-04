@@ -277,7 +277,9 @@ export class RegionOverview extends LitElement {
       return;
     }
 
-    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets({
+      tracks: this.featureTracks
+    });
     const {
       imageHeight,
       forwardStrandGeneTrackOffsets,
@@ -350,6 +352,9 @@ export class RegionOverview extends LitElement {
     }
 
     const { geneTracks } = this.featureTracks;
+    if (!geneTracks) {
+      return;
+    }
 
     return renderGeneTracks({
       forwardStrandTopOffsets,
@@ -381,7 +386,7 @@ export class RegionOverview extends LitElement {
 
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,
-      featureTypes: this.data.regulatory_feature_types,
+      featureTypes: this.data.regulatory_feature_types ?? {},
       scale: this.bedScale,
       regionName: this.regionName,
       focusRegulatoryFeatureIds: this.focusRegulatoryFeatureIds,

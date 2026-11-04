@@ -37,7 +37,7 @@ export type FeatureTracks = ReturnType<typeof prepareFeatureTracks>;
 export const prepareFeatureTracks = (params: Params) => {
   const { data } = params;
 
-  const geneTracks = prepareGeneTracks({ data });
+  const geneTracks = data.genes === undefined ? null : prepareGeneTracks({ data });
   const regulatoryFeatureTracks = prepareRegulatoryFeatureTracks({ data });
 
   return {
@@ -54,7 +54,7 @@ const prepareGeneTracks = (params: {
   const forwardStrandTracks: GeneTrack[] = [];
   const reverseStrandTracks: GeneTrack[] = [];
 
-  for (const gene of data.genes) {
+  for (const gene of data.genes ?? []) {
     const geneTracks =
       gene.strand === 'forward' ? forwardStrandTracks : reverseStrandTracks;
 
@@ -110,9 +110,18 @@ const prepareRegulatoryFeatureTracks = (params: {
   data: InputData;
 }) => {
   const { data } = params;
-  const { regulatory_feature_types: featureTypesMap } = data;
+  if (data.regulatory_features === undefined) {
+    return [];
+  }
 
-  let featureTracks: RegulatoryFeature[][] = [];
+  const featureTypesMap = data.regulatory_feature_types ?? {};
+
+  // Reserve selected metadata rows even when they contain no viewport features.
+  const trackIndices = [...new Set(Object.values(featureTypesMap).map(type => type.track_index))]
+    .sort((a, b) => a - b);
+  const featureTracks = new Map<number, RegulatoryFeature[]>(
+    trackIndices.map(index => [index, []])
+  );
 
   for (const feature of data.regulatory_features) {
     const trackIndex = featureTypesMap[feature.feature_type]?.track_index;
@@ -122,16 +131,8 @@ const prepareRegulatoryFeatureTracks = (params: {
       continue;
     }
 
-    const track = featureTracks[trackIndex];
-
-    if (!track) {
-      featureTracks[trackIndex] = [feature];
-    } else {
-      track.push(feature);
-    }
+    featureTracks.get(trackIndex)?.push(feature);
   }
 
-  // just in case: make sure there are no empty indices in the tracks array
-  featureTracks = featureTracks.filter((track) => !!track);
-  return featureTracks;
+  return [...featureTracks.values()];
 };

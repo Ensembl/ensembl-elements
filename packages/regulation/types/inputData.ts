@@ -10,7 +10,8 @@ import type {
 } from './regionOverview';
 
 export type InputData = {
-  genes: GeneInRegionOverview[];
-  regulatory_features: RegulatoryFeature[];
-  regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
+  // Omit a collection to hide its section; an empty collection keeps reserved rows.
+  genes?: GeneInRegionOverview[];
+  regulatory_features?: RegulatoryFeature[];
+  regulatory_feature_types?: Record<string, RegulatoryFeatureMetadata>;
 };

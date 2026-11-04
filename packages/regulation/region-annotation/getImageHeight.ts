@@ -9,14 +9,27 @@ import {
 
 import { type FeatureTracks } from './prepareFeatureTracks';
 
-export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
-  const { geneTracks, regulatoryFeatureTracks } = featureTracks;
-  const { forwardStrandTracks, reverseStrandTracks } = geneTracks;
+export const getImageHeightAndTopOffsets = ({
+  tracks
+}: {
+  tracks: FeatureTracks;
+}) => {
+  const { geneTracks, regulatoryFeatureTracks } = tracks;
+  const { forwardStrandTracks = [], reverseStrandTracks = [] } = geneTracks ?? {};
 
-  const geneTracksTopOffset = RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET;
+  // TSS extends 2 px from the gene, plus a 12 px arm and 3 px arrowhead half-height.
+  const hasTss = (tracks: typeof forwardStrandTracks) =>
+    tracks.some(track => track.some(gene => (gene.data.tss?.length ?? 0) > 0));
+  const reclaimedForwardTssPadding = hasTss(forwardStrandTracks) ? 0 : 17;
+  const reclaimedReverseTssPadding = hasTss(reverseStrandTracks) ? 0 : 17;
+  const geneTracksTopOffset = geneTracks
+    ? RULER_HEIGHT + GENE_TRACKS_TOP_OFFSET - reclaimedForwardTssPadding
+    : RULER_HEIGHT;
 
-  // make sure there is space for at least 3 gene tracks for the forward strand
-  const forwardStrandGeneTracksCount = Math.max(forwardStrandTracks.length, MIN_GENE_TRACKS_COUNT);
+  // make sure there is space for at least 2 gene tracks for the forward strand
+  const forwardStrandGeneTracksCount = geneTracks
+    ? Math.max(forwardStrandTracks.length, MIN_GENE_TRACKS_COUNT)
+    : 0;
   const forwardStrandGeneTrackOffsets = [...Array(forwardStrandGeneTracksCount)]
     .map((_, index) => {
       return geneTracksTopOffset + index * GENE_TRACK_HEIGHT;
@@ -25,10 +38,12 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
   const strandDividerTopOffset =
     geneTracksTopOffset +
     forwardStrandGeneTracksCount * GENE_TRACK_HEIGHT +
-    0.5 * GENE_TRACK_HEIGHT;
+    (geneTracks ? 0.5 * GENE_TRACK_HEIGHT : 0);
 
-  // make sure there is space for at least 3 gene tracks for the reverse strand
-  const reverseStrandGeneTracksCount = Math.max(reverseStrandTracks.length, MIN_GENE_TRACKS_COUNT);
+  // make sure there is space for at least 2 gene tracks for the reverse strand
+  const reverseStrandGeneTracksCount = geneTracks
+    ? Math.max(reverseStrandTracks.length, MIN_GENE_TRACKS_COUNT)
+    : 0;
   const reverseStrandGeneTrackOffsets = [...Array(reverseStrandGeneTracksCount)]
     .map((_, index) => {
       return strandDividerTopOffset
@@ -36,14 +51,14 @@ export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks) => {
         + index * GENE_TRACK_HEIGHT;
     });
 
-  const regulatoryFeatureTracksTopOffset =
-    strandDividerTopOffset +
-    GENE_TRACK_HEIGHT +
-    reverseStrandGeneTracksCount * GENE_TRACK_HEIGHT +
-    REGULATORY_FEATURE_TRACKS_TOP_OFFSET;
+  const regulatoryFeatureTracksTopOffset = geneTracks
+    ? strandDividerTopOffset +
+      GENE_TRACK_HEIGHT +
+      reverseStrandGeneTracksCount * GENE_TRACK_HEIGHT +
+      REGULATORY_FEATURE_TRACKS_TOP_OFFSET - reclaimedReverseTssPadding
+    : RULER_HEIGHT + (regulatoryFeatureTracks.length ? REGULATORY_FEATURE_TRACKS_TOP_OFFSET : 0);
 
-  // make sure there is space for at least 3 tracks of regulatory features
-  const regulatoryFeatureTracksCount = Math.max(regulatoryFeatureTracks.length, 3);
+  const regulatoryFeatureTracksCount = regulatoryFeatureTracks.length;
   const regulatoryFeatureTrackOffsets = [...Array(regulatoryFeatureTracksCount)]
     .map((_, index) => {
       return regulatoryFeatureTracksTopOffset + index * REGULATORY_FEATURE_TRACK_HEIGHT;
