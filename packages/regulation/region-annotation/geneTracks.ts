@@ -153,7 +153,7 @@ const renderGeneTrack = ({
         geneLabelsStore
       })}
       ${showTss ? renderTranscriptionStartSites({
-        tss: gene.data.tss,
+        tss: gene.data.tss ?? [],
         strand: gene.data.strand,
         geneTracks: tracks,
         trackIndex,

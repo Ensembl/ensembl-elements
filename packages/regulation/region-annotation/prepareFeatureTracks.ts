@@ -54,7 +54,7 @@ const prepareGeneTracks = (params: {
   const forwardStrandTracks: GeneTrack[] = [];
   const reverseStrandTracks: GeneTrack[] = [];
 
-  for (const gene of data.genes) {
+  for (const gene of data.genes ?? []) {
     const geneTracks =
       gene.strand === 'forward' ? forwardStrandTracks : reverseStrandTracks;
 
@@ -110,7 +110,7 @@ const prepareRegulatoryFeatureTracks = (params: {
   data: InputData;
 }) => {
   const { data } = params;
-  const { regulatory_feature_types: featureTypesMap } = data;
+  const featureTypesMap = data.regulatory_feature_types ?? {};
 
   // Reserve selected metadata rows even when they contain no viewport features.
   const trackIndices = [...new Set(Object.values(featureTypesMap).map(type => type.track_index))]
@@ -119,7 +119,7 @@ const prepareRegulatoryFeatureTracks = (params: {
     trackIndices.map(index => [index, []])
   );
 
-  for (const feature of data.regulatory_features) {
+  for (const feature of data.regulatory_features ?? []) {
     const trackIndex = featureTypesMap[feature.feature_type]?.track_index;
 
     if (typeof trackIndex !== 'number') {
