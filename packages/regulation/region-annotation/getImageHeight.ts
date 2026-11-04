@@ -9,8 +9,14 @@ import {
 
 import { type FeatureTracks } from './prepareFeatureTracks';
 
-export const getImageHeightAndTopOffsets = (featureTracks: FeatureTracks, showTss = true) => {
-  const { geneTracks, regulatoryFeatureTracks } = featureTracks;
+export const getImageHeightAndTopOffsets = ({
+  tracks,
+  showTss = true
+}: {
+  tracks: FeatureTracks;
+  showTss?: boolean;
+}) => {
+  const { geneTracks, regulatoryFeatureTracks } = tracks;
   const { forwardStrandTracks, reverseStrandTracks } = geneTracks;
 
   // TSS extends 2 px from the gene, plus a 12 px arm and 3 px arrowhead half-height.

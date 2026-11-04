@@ -280,7 +280,10 @@ export class RegionOverview extends LitElement {
       return;
     }
 
-    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks, this.showTss);
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets({
+      tracks: this.featureTracks,
+      showTss: this.showTss
+    });
     const {
       imageHeight,
       forwardStrandGeneTrackOffsets,
