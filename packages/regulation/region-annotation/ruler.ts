@@ -6,16 +6,21 @@ import { RULER_HEIGHT, type Colors } from './constants';
 export const renderRuler = ({
   scale,
   offsetTop,
-  colors
+  colors,
+  rootElement
 }: {
   scale: ScaleLinear<number, number>;
   offsetTop: number;
   colors: Colors;
+  rootElement: HTMLElement;
 }) => {
   const width = scale.range()[1];
-  const ticksCount = Math.max(1, Math.min(5, Math.floor(width / 120)));
-  const prettyTicks = scale.ticks(ticksCount);
   const numberFormatter = new Intl.NumberFormat("en-GB");
+  const prettyTicks = getTicks({
+    scale,
+    numberFormatter,
+    rootElement
+  });
 
   const tickElements = prettyTicks.map(tick => renderLabelledTick({
     coord: tick,
@@ -41,6 +46,48 @@ export const renderRuler = ({
     </g>
   `;
 }
+
+const getTicks = ({
+  scale,
+  numberFormatter,
+  rootElement
+}: {
+  scale: ScaleLinear<number, number>;
+  rootElement: HTMLElement;
+  numberFormatter: Intl.NumberFormat;
+}) => {
+  const width = scale.range()[1];
+  const textMeasuringCanvas = document.createElement('canvas');
+  const canvasContext = textMeasuringCanvas.getContext('2d') as CanvasRenderingContext2D;
+  const styles = window.getComputedStyle(rootElement);
+
+  const fontSize = styles.fontSize;
+
+  canvasContext.font = `${fontSize} "IBM Plex Mono"`;
+
+  // variable names minTicksCount and maxTicksCount below are a convenient lie;
+  // in fact, d3 will generate uniformly-spaced ticks in the number *approximately equal* to the count
+  const minTicksCount = 1;
+  const maxTicksCount = 5;
+  const minimumLabelGap = 20;
+
+  let prettyTicks: number[] = [];
+
+  for (let ticksCount = maxTicksCount; ticksCount >= minTicksCount; ticksCount--) {
+    prettyTicks = scale.ticks(ticksCount);
+    const allTickLabelsString = prettyTicks.reduce((acc, tick) => {
+      const label = numberFormatter.format(tick);
+      return acc + label;
+    }, '');
+    const tickLabelsWidth = canvasContext.measureText(allTickLabelsString).width;
+    const combinedLabelsGapWidth = minimumLabelGap * (ticksCount - 1);
+    if (width >= tickLabelsWidth + combinedLabelsGapWidth) {
+      return prettyTicks;
+    }
+  }
+
+  return prettyTicks;
+};
 
 const renderLabelledTick = ({
   coord,

@@ -309,7 +309,8 @@ export class RegionOverview extends LitElement {
             ${renderRuler({
               scale: this.ensemblScale,
               offsetTop: 0,
-              colors
+              colors,
+              rootElement: this
             })}
             ${this.renderGeneTracks({
               forwardStrandTopOffsets: forwardStrandGeneTrackOffsets,
@@ -324,7 +325,8 @@ export class RegionOverview extends LitElement {
             ${renderRuler({
               scale: this.ensemblScale,
               offsetTop: bottomRulerTopOffset,
-              colors
+              colors,
+              rootElement: this
             })}
             ${areaSelection()}
           </g>
