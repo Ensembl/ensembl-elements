@@ -22,7 +22,7 @@ const ARROWHEAD_HEIGHT = 6.75; // the height of the triangle that represents the
 const VERTICAL_OFFSET_FROM_GENE = 2;
 
 type Params = {
-  tss: GeneInRegionOverview['tss']; // an array of genomic coordinates related to this transcription start site
+  tss: NonNullable<GeneInRegionOverview['tss']>; // an array of genomic coordinates related to this transcription start site
   strand: 'forward' | 'reverse';
   scale: ScaleLinear<number, number>;
   geneTracks: GeneTrack[];

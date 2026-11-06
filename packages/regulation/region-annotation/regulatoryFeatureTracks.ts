@@ -25,7 +25,7 @@ export const renderRegulatoryFeatureTracks = ({
   colors
 }: {
   tracks: RegulatoryFeature[][];
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   scale: ScaleLinear<number, number>;
   regionName: string;
   focusRegulatoryFeatureIds: string[];
@@ -57,7 +57,7 @@ const renderTrack = ({
   colors
 }: {
   track: RegulatoryFeature[];
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   scale: ScaleLinear<number, number>;
   regionName: string;
   focusRegulatoryFeatureIds: string[];
@@ -115,7 +115,7 @@ const renderTrack = ({
 
 const renderRegulatoryFeature = (params: {
   feature: RegulatoryFeature;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   regionName: string;
   focusRegulatoryFeatureIds: string[];
@@ -135,7 +135,7 @@ const renderRegulatoryFeature = (params: {
 const renderFeatureLowRes = (params: {
   feature: RegulatoryFeature;
   isFocusFeature: boolean;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   colors: Colors;
@@ -170,7 +170,7 @@ const renderFeatureLowRes = (params: {
 const renderFeatureHiRes = (params: {
   feature: RegulatoryFeature;
   isFocusFeature: boolean;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   regionName: string;
   scale: ScaleLinear<number, number>;
@@ -197,7 +197,7 @@ const renderCoreRegion = ({
 }: {
   feature: RegulatoryFeature;
   isFocusFeature: boolean;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   colors: Colors;
@@ -230,7 +230,7 @@ const renderBoundsRegion = ({
 }: {
   feature: RegulatoryFeature;
   isFocusFeature: boolean;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   scale: ScaleLinear<number, number>;
   side: 'left' | 'right';
@@ -282,7 +282,7 @@ const renderFocusOutline = ({
   scale
 }: {
   feature: RegulatoryFeature;
-  featureTypes: InputData['regulatory_feature_types'];
+  featureTypes: NonNullable<InputData['regulatory_feature_types']>;
   offsetTop: number;
   regionName: string;
   scale: ScaleLinear<number, number>;

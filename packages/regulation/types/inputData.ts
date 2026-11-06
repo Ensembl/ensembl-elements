@@ -10,7 +10,8 @@ import type {
 } from './regionOverview';
 
 export type InputData = {
-  genes: GeneInRegionOverview[];
-  regulatory_features: RegulatoryFeature[];
-  regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
+  // Missing collections are treated as empty; component properties control visibility.
+  genes?: GeneInRegionOverview[];
+  regulatory_features?: RegulatoryFeature[];
+  regulatory_feature_types?: Record<string, RegulatoryFeatureMetadata>;
 };
