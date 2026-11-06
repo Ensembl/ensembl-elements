@@ -112,7 +112,12 @@ const prepareRegulatoryFeatureTracks = (params: {
   const { data } = params;
   const { regulatory_feature_types: featureTypesMap } = data;
 
-  let featureTracks: RegulatoryFeature[][] = [];
+  // Reserve selected metadata rows even when they contain no viewport features.
+  const trackIndices = [...new Set(Object.values(featureTypesMap).map(type => type.track_index))]
+    .sort((a, b) => a - b);
+  const featureTracks = new Map<number, RegulatoryFeature[]>(
+    trackIndices.map(index => [index, []])
+  );
 
   for (const feature of data.regulatory_features) {
     const trackIndex = featureTypesMap[feature.feature_type]?.track_index;
@@ -122,16 +127,8 @@ const prepareRegulatoryFeatureTracks = (params: {
       continue;
     }
 
-    const track = featureTracks[trackIndex];
-
-    if (!track) {
-      featureTracks[trackIndex] = [feature];
-    } else {
-      track.push(feature);
-    }
+    featureTracks.get(trackIndex)?.push(feature);
   }
 
-  // just in case: make sure there are no empty indices in the tracks array
-  featureTracks = featureTracks.filter((track) => !!track);
-  return featureTracks;
+  return [...featureTracks.values()];
 };
