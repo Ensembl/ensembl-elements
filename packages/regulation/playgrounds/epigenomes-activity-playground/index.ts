@@ -59,7 +59,7 @@ export class RegulationPlayground extends LitElement {
     super.connectedCallback();
     fetchEpigenomeActivityData({ start: INITIAL_START, end: INITIAL_END })
       .then((data) => {
-        this.tracks = data.track_data;
+        this.tracks = data.groups;
         this.trackMetadata = data.track_metadata
       });
   }

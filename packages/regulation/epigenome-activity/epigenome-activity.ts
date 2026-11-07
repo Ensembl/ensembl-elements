@@ -7,12 +7,7 @@ import {
   type TrackDataForDisplay
 } from './prepare-data';
 import { toZeroBased } from '../helpers/toZeroBased';
-import {
-  renderOpenChromatinSignals,
-  renderOpenChromatinPeaks,
-  renderHistoneNarrowPeaks,
-  renderHistoneGappedPeaks
-} from './render-track';
+import { renderTrack } from './render-track';
 
 import { TRACK_HEIGHT, type Colors } from './constants';
 
@@ -172,26 +167,13 @@ export class EpigenomeActivity extends LitElement {
     const renderedTracks: ReturnType<typeof svg>[] = [];
 
     for (const [index, track] of tracks.entries()) {
-      renderedTracks.push(
-        ...renderOpenChromatinSignals({
-          trackData: track,
+      for (const preparedTrack of track.tracks) {
+        renderedTracks.push(...renderTrack({
+          trackData: preparedTrack,
           offsetTop: index * TRACK_HEIGHT,
           colors: this.colors
-        }),
-        ...renderOpenChromatinPeaks({
-          trackData: track,
-          offsetTop: index * TRACK_HEIGHT,
-          colors: this.colors
-        }),
-        ...renderHistoneNarrowPeaks({
-          trackData: track,
-          offsetTop: index * TRACK_HEIGHT
-        }),
-        ...renderHistoneGappedPeaks({
-          trackData: track,
-          offsetTop: index * TRACK_HEIGHT
-        })
-      );
+        }));
+      }
     }
 
     return renderedTracks;
