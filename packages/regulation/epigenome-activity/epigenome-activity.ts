@@ -8,11 +8,13 @@ import {
 } from './prepare-data';
 import { toZeroBased } from '../helpers/toZeroBased';
 import { renderTrack } from './render-track';
+import { getActivityLayout } from './layout';
 
-import { TRACK_HEIGHT, type Colors } from './constants';
+import { type Colors } from './constants';
 
 import type {
   TrackData,
+  TrackVisibility,
   TrackMetadata,
   TrackPositionsPayload,
   SelectedLocation
@@ -39,6 +41,16 @@ export class EpigenomeActivity extends LitElement {
   @property({ type: Object })
   trackMetadata: TrackMetadata | null = null;
 
+  @property({ attribute: false })
+  trackVisibility: TrackVisibility = {};
+
+  @property({ type: Number })
+  minimumRowHeight = 32;
+
+  get layout() {
+    return getActivityLayout(this.trackMetadata ?? {}, this.trackVisibility, this.minimumRowHeight);
+  }
+
   @property({ type: Array })
   selectedLocations: SelectedLocation[] = [];
 
@@ -54,7 +66,7 @@ export class EpigenomeActivity extends LitElement {
   @state()
   preparedTracksData: TrackDataForDisplay[] = [];
 
-  trackIds: string[][] = [];
+  #reportedPositions = '';
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -74,7 +86,9 @@ export class EpigenomeActivity extends LitElement {
     if (
       shouldUpdateScale ||
       changedProperties.has('tracks') ||
-      changedProperties.has('trackMetadata')
+      changedProperties.has('trackMetadata') ||
+      changedProperties.has('trackVisibility') ||
+      changedProperties.has('minimumRowHeight')
     ) {
       this.#updatePreparedTracksData();
     }
@@ -115,29 +129,20 @@ export class EpigenomeActivity extends LitElement {
       location: { start: this.start, end: this.end },
       scale: bedScale,
       trackMetadata: this.trackMetadata,
-      tracks: this.tracks
+      tracks: this.tracks,
+      trackVisibility: this.trackVisibility,
+      minimumRowHeight: this.minimumRowHeight
     });
   }
 
   #reportTrackPositions() {
-    // Check if the list of track ids has changed since previous render,
-    // and report to outside if it did
-    const trackIds = this.tracks.map(track => track.epigenome_ids);
-    const stringifiedTrackIds = JSON.stringify(trackIds);
-    const stringifiedSavedTrackIds = JSON.stringify(this.trackIds);
-    if (stringifiedTrackIds !== stringifiedSavedTrackIds) {
-      this.trackIds = trackIds;
-      const trackPositionsPayload: TrackPositionsPayload = trackIds.map((id, index) => {
-        return {
-          id,
-          y: index * TRACK_HEIGHT,
-          height: TRACK_HEIGHT
-        };
-      });
-      const event = new CustomEvent('track-positions-change', {
-        detail: trackPositionsPayload
-      });
-      this.dispatchEvent(event);
+    const height = this.layout.rowHeight;
+    const positions: TrackPositionsPayload = this.tracks.map(track => track.epigenome_ids)
+      .map((id, index) => ({ id: [...id], y: index * height, height }));
+    const serialized = JSON.stringify(positions);
+    if (serialized !== this.#reportedPositions) {
+      this.#reportedPositions = serialized;
+      this.dispatchEvent(new CustomEvent('track-positions-change', { detail: positions }));
     }
   }
 
@@ -146,7 +151,7 @@ export class EpigenomeActivity extends LitElement {
       return null;
     }
 
-    const imageHeight = TRACK_HEIGHT * this.preparedTracksData.length;
+    const imageHeight = this.layout.rowHeight * this.preparedTracksData.length;
 
     return html`
       <svg
@@ -170,7 +175,7 @@ export class EpigenomeActivity extends LitElement {
       for (const preparedTrack of track.tracks) {
         renderedTracks.push(...renderTrack({
           trackData: preparedTrack,
-          offsetTop: index * TRACK_HEIGHT,
+          offsetTop: index * this.layout.rowHeight,
           colors: this.colors
         }));
       }

@@ -96,10 +96,14 @@ This will register the `ens-reg-epigenome-activity` element with the browser's c
 - `tracks` - an array of `TrackData` objects (see exported types)
 - `trackMetadata` - a `TrackMetadata` object (see exported types)
 - `selectedLocations` - an array of `SelectedLocation` objects, which have a `start` and an `end` field; intended to mark the locations of selected features
+- `trackVisibility` - visibility by track type and data type (`signal`, `narrow_peaks`, `gapped_peaks`). Missing entries are visible; replace the object when changing visibility.
+- `minimumRowHeight` - minimum epigenome row height in pixels (default 32). Disabled assays do not reserve slots; all rows share the same calculated height, including empty groups.
 - `colors` - a configuration object that is a map of configurable colours. To see which colours of the epigenomes activity panel are configurable, inspect the `Colors` type exported from the package.
 
+The exported `getActivityLayout(metadata, visibility, minimumRowHeight)` helper returns `rowHeight` and assay offsets for the same layout used by the component. Signal and peak outlines share a slot; hiding both removes it.
+
 ### Events
-- `track-positions-change` - see exported `TrackPositionsChangeEvent` type
+- `track-positions-change` - emitted when row IDs, offsets, or heights change; see exported `TrackPositionsChangeEvent` type
 
 ### Exported types
 The package exports the following types for the epigenomes activity panel:

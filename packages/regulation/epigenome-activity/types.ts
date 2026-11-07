@@ -1,5 +1,10 @@
+export type TrackDataType = 'signal' | 'narrow_peaks' | 'gapped_peaks';
+
+/** Missing entries are visible. Replace this object to trigger a component update. */
+export type TrackVisibility = Record<string, Partial<Record<TrackDataType, boolean>>>;
+
 export type TrackLegendItem = {
-  data_type: 'signal' | 'narrow_peaks' | 'gapped_peaks';
+  data_type: TrackDataType;
   label: string;
   fill_color: string;
   stroke_color?: string;

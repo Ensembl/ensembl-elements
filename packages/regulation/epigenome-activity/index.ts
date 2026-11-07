@@ -2,6 +2,8 @@ export * from './epigenome-activity';
 
 export type {
   TrackData,
+  TrackDataType,
+  TrackVisibility,
   ActivityTrack,
   ActivityTrackMetadata,
   TrackLegendItem,
@@ -15,4 +17,4 @@ export type {
 export type {
   Colors
 } from './constants';
-export { TRACK_HEIGHT } from './constants';
+export { getActivityLayout, type ActivityLayout } from './layout';

@@ -1,11 +1,16 @@
 import type { ScaleLinear } from 'd3';
 
+import { getActivityLayout, type ActivityLayout } from './layout';
+import type { TrackVisibility } from './types';
+
 import { toZeroBased } from '../helpers/toZeroBased';
 
 import type { ActivityTrack, ActivityTrackMetadata, TrackData, TrackMetadata } from './types';
 
 type InputParams = {
   tracks: TrackData[];
+  trackVisibility?: TrackVisibility;
+  minimumRowHeight?: number;
   trackMetadata: TrackMetadata;
   location: {
     start: number;
@@ -33,14 +38,15 @@ type PreparedGappedPeak = {
 
 type PreparedTrackBase = {
   track_type: string;
+  offsetTop: number;
   label: string;
   source_epigenome_ids: string[];
 };
 
 export type PreparedTrack = PreparedTrackBase & (
   | { render_style: 'signal_with_peak_outlines'; signals: PreparedSignal[]; peaks: PreparedPeak[] }
-  | { render_style: 'solid_peaks'; peaks: PreparedPeak[]; color: string; order: number }
-  | { render_style: 'gapped_peaks'; peaks: PreparedGappedPeak[]; color: string; order: number }
+  | { render_style: 'solid_peaks'; peaks: PreparedPeak[]; color: string }
+  | { render_style: 'gapped_peaks'; peaks: PreparedGappedPeak[]; color: string }
 );
 
 export type TrackDataForDisplay = {
@@ -51,9 +57,12 @@ export type TrackDataForDisplay = {
 export const prepareActivityDataForDisplay = (
   params: InputParams
 ): TrackDataForDisplay[] => {
+  const layout = getActivityLayout(params.trackMetadata, params.trackVisibility, params.minimumRowHeight);
   const preparedTracks = params.tracks.map((track) =>
     prepareSingleTrackData({
       metadata: params.trackMetadata,
+      visibility: params.trackVisibility ?? {},
+      layout,
       track,
       location: params.location,
       scale: params.scale
@@ -65,23 +74,25 @@ export const prepareActivityDataForDisplay = (
 
 const prepareSingleTrackData = (params: {
   metadata: TrackMetadata;
+  visibility: TrackVisibility;
+  layout: ActivityLayout;
   track: TrackData;
   location: InputParams['location'];
   scale: InputParams['scale'];
 }): TrackDataForDisplay => {
   const orderedMetadata = Object.entries(params.metadata)
     .sort(([, a], [, b]) => a.track_index - b.track_index);
-  const peakTypes = orderedMetadata
-    .filter(([, metadata]) => metadata.render_style !== 'signal_with_peak_outlines')
-    .map(([type]) => type);
   const tracks: PreparedTrack[] = [];
 
   for (const [trackType, metadata] of orderedMetadata) {
     const track = params.track.tracks.find(item => item.track_type === trackType);
-    if (!track) continue;
+    const offsetTop = params.layout.offsets[trackType];
+    if (!track || offsetTop === undefined) continue;
+    const visible = params.visibility[trackType];
 
     const base = {
       track_type: trackType,
+      offsetTop,
       label: metadata.label,
       source_epigenome_ids: track.data.source_epigenome_ids
     };
@@ -91,24 +102,22 @@ const prepareSingleTrackData = (params: {
         tracks.push({
           ...base,
           render_style: metadata.render_style,
-          signals: prepareSignals(input),
-          peaks: prepareNarrowPeaks(input)
+          signals: visible?.signal === false ? [] : prepareSignals(input),
+          peaks: visible?.narrow_peaks === false ? [] : prepareNarrowPeaks(input)
         });
         break;
       case 'solid_peaks':
         tracks.push({
           ...base,
           render_style: metadata.render_style,
-          order: peakTypes.indexOf(trackType),
           color: metadata.legend_items.find(item => item.data_type === 'narrow_peaks')?.fill_color ?? 'currentColor',
-          peaks: prepareNarrowPeaks(input)
+          peaks: visible?.narrow_peaks === false ? [] : prepareNarrowPeaks(input)
         });
         break;
       case 'gapped_peaks':
         tracks.push({
           ...base,
           render_style: metadata.render_style,
-          order: peakTypes.indexOf(trackType),
           color: metadata.legend_items.find(item => item.data_type === 'gapped_peaks')?.fill_color ?? 'currentColor',
           peaks: prepareGappedPeaks({ ...input, metadata })
         });

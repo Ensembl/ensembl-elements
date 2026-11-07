@@ -6,9 +6,7 @@ import {
   OPEN_CHROMATIN_SIGNAL_OFFSET_TOP,
   OPEN_CHROMATIN_PEAK_OFFSET_TOP,
   OPEN_CHROMATIN_PEAK_HEIGHT,
-  NARROW_PEAK_OFFSET_TOP,
   NARROW_PEAK_HEIGHT,
-  GAPPED_PEAK_OFFSET_TOP,
   GAPPED_PEAK_BLOCK_HEIGHT,
   GAPPED_PEAK_CONNECTOR_HEIGHT,
   COLORS,
@@ -59,7 +57,7 @@ export const renderSignals = ({
     currentPaths.push(
       rectToPath({
         x: signal.x,
-        y: offsetTop + OPEN_CHROMATIN_SIGNAL_OFFSET_TOP,
+        y: offsetTop + trackData.offsetTop + OPEN_CHROMATIN_SIGNAL_OFFSET_TOP,
         width: signal.width,
         height: OPEN_CHROMATIN_SIGNAL_HEIGHT
       })
@@ -92,7 +90,7 @@ export const renderPeakOutlines = ({
   const paths = trackData.peaks.map(peak =>
     rectToPath({
       x: peak.x,
-      y: offsetTop + OPEN_CHROMATIN_PEAK_OFFSET_TOP,
+      y: offsetTop + trackData.offsetTop + OPEN_CHROMATIN_PEAK_OFFSET_TOP,
       width: peak.width,
       height: OPEN_CHROMATIN_PEAK_HEIGHT
     })
@@ -124,12 +122,7 @@ export const renderNarrowPeaks = ({
   const pathsByColor = new Map<string, string[]>();
 
   for (const peak of trackData.peaks) {
-    const peakOffsetTop =
-      offsetTop +
-      OPEN_CHROMATIN_PEAK_OFFSET_TOP +
-      OPEN_CHROMATIN_PEAK_HEIGHT +
-      NARROW_PEAK_OFFSET_TOP +
-      trackData.order * (NARROW_PEAK_HEIGHT + NARROW_PEAK_OFFSET_TOP);
+    const peakOffsetTop = offsetTop + trackData.offsetTop;
 
     const currentPaths = pathsByColor.get(trackData.color) ?? [];
     currentPaths.push(
@@ -165,12 +158,7 @@ export const renderGappedPeaks = ({
   const connectorsByColor = new Map<string, string[]>();
 
   for (const peak of trackData.peaks) {
-    const offsetTop =
-      trackOffsetTop +
-      OPEN_CHROMATIN_PEAK_OFFSET_TOP +
-      OPEN_CHROMATIN_PEAK_HEIGHT +
-      NARROW_PEAK_OFFSET_TOP +
-      trackData.order * (GAPPED_PEAK_BLOCK_HEIGHT + GAPPED_PEAK_OFFSET_TOP);
+    const offsetTop = trackOffsetTop + trackData.offsetTop;
 
     const connectorOffsetTop = offsetTop + GAPPED_PEAK_BLOCK_HEIGHT / 2;
 

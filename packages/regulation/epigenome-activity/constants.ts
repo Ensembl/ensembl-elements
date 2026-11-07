@@ -1,5 +1,3 @@
-export const TRACK_HEIGHT = 44;
-
 export const OPEN_CHROMATIN_SIGNAL_HEIGHT = 8;
 export const OPEN_CHROMATIN_SIGNAL_OFFSET_TOP = 2;
 
