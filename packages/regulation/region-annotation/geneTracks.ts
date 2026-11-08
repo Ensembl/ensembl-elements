@@ -124,6 +124,8 @@ const renderGeneTrack = ({
   const shouldDisplayLowResGenes =
     end - start > MAX_SLICE_LENGTH_FOR_DETAILED_VIEW;
 
+  // Gene labels are rendered from right to left
+  // (it appears to better resolve label collisions than rendering them from left to right)
   const genesInLabelPriorityOrder = shouldDisplayLowResGenes
     ? track
     : track.toSorted((a, b) => b.data.start - a.data.start);
@@ -491,7 +493,7 @@ const renderGeneLabel = ({
 
   const style = 'font-family: "IBM Plex Mono"; user-select: none';
 
-  labelsForTrack.push({ start: labelX });
+  labelsForTrack.push({ start: labelX, end: labelX + labelWidth });
 
   // At this font size, the width of a letter in this monospace font is 6
   return svg`
@@ -570,8 +572,8 @@ const prepareGeneInfo = ({
 
 type GeneLabelsStore = {
   labels: {
-    forwardStrand: Record<string, { start: number }[]>;
-    reverseStrand: Record<string, { start: number }[]>;
+    forwardStrand: Record<string, { start: number; end: number; }[]>;
+    reverseStrand: Record<string, { start: number; end: number; }[]>;
   },
   textMeasuringCanvas: HTMLCanvasElement;
 };
