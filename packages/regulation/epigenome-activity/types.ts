@@ -1,44 +1,54 @@
-export type HistoneMetadata = {
-  peak_type: 'gapped' | 'narrow';
-  label: string; // arbitrary string
-  color: string; // hex color
+export type TrackDataType = 'signal' | 'narrow_peaks' | 'gapped_peaks';
+
+/** Missing entries are visible. Replace this object to trigger a component update. */
+export type TrackVisibility = Record<string, Partial<Record<TrackDataType, boolean>>>;
+
+export type TrackLegendItem = {
+  data_type: TrackDataType;
+  label: string;
+  fill_color: string;
+  stroke_color?: string;
+  legend_index: number;
 };
 
-export type HistoneMetadataMap = Record<string, HistoneMetadata>;
-
-export type TrackMetadata = {
-  histone: HistoneMetadataMap;
+export type ActivityTrackMetadata = {
+  label: string;
+  default_view_mode: 'expanded' | 'squished';
+  render_style: 'signal_with_peak_outlines' | 'solid_peaks' | 'gapped_peaks';
+  track_index: number;
+  legend_items: TrackLegendItem[];
 };
 
-/**
- * Data for a single track.
- * The `epigenome_ids` field contains ids of base epigenomes
- * used to collect data for this track. It is an array, because
- * base epigenomes may be combined together, when the data is requested)
- */
+export type TrackMetadata = Record<string, ActivityTrackMetadata>;
+
+export type ActivityTrack = {
+  track_type: string;
+  data: {
+    source_epigenome_ids: string[];
+    signal?: SignalInterval[];
+    narrow_peaks?: NarrowPeak[];
+    gapped_peaks?: GappedPeak[];
+  };
+};
+
+/** One requested epigenome group, including groups without available tracks. */
 export type TrackData = {
   epigenome_ids: string[];
-  open_chromatin: {
-    signal: Array<OpenChromatinSignal>;
-    peaks: Array<OpenChromatinPeak>;
-  };
-  histones: {
-    [key: string]: HistoneNarrowPeak[] | HistoneGappedPeak[];
-  };
+  tracks: ActivityTrack[];
 };
 
-type OpenChromatinSignal = {
+export type RegionActivityResponse = {
+  groups: TrackData[];
+  track_metadata: TrackMetadata;
+};
+
+type SignalInterval = {
   start: number; // start (Ensembl genomic coordinate)
   end: number; // end (Ensembl genomic coordinate)
   value: number; // value (an integer between 1 and 9)
 };
 
-type OpenChromatinPeak = {
-  start: number; // start (Ensembl genomic coordinate)
-  end: number; // end (Ensembl genomic coordinate)
-};
-
-type HistoneNarrowPeak = {
+type NarrowPeak = {
   start: number; // start (Ensembl genomic coordinate)
   end: number; // end (Ensembl genomic coordinate)
 };
@@ -48,7 +58,7 @@ type HistoneNarrowPeak = {
  * They describe data to draw rectangles whose left x coordinate corresponds to a block start,
  * and whose width corresponds to a block end.
  */
-export type HistoneGappedPeak = {
+type GappedPeak = {
   start: number;
   end: number;
   block_count: number; // this is kinda superfluous; it is the same as the length of 'block_starts' or 'block_sizes'
