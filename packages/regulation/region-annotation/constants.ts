@@ -15,6 +15,8 @@ export const REGULATORY_FEATURE_TRACK_HEIGHT = REGULATORY_FEATURE_HEIGHT + SPACE
 export const MAX_SLICE_LENGTH_FOR_DETAILED_VIEW = 3_000_000;
 
 export const RULER_HEIGHT = 15;
+// Keep an empty plotting area available for dragging when all tracks are hidden.
+export const MIN_EMPTY_PLOT_HEIGHT = REGULATORY_FEATURE_TRACKS_TOP_OFFSET + REGULATORY_FEATURE_TRACK_HEIGHT;
 
 export const COLORS = {
   gene: '#0099ff', // Ensembl brand blue colour

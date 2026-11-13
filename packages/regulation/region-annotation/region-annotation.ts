@@ -17,14 +17,9 @@ import { exportAsSvg, exportAsBitmap, type SVGExportTo } from './utils/export';
 import ViewportController from './viewportController';
 import AreaSelectionController from './selection/area-selection-controller';
 
-import type { GeneInRegionOverview, RegulatoryFeature, RegulatoryFeatureMetadata } from '../types/regionOverview';
 import type { InputData } from '../types/inputData';
 
-export type RegionOverviewData = {
-  genes: GeneInRegionOverview[];
-  regulatory_features: RegulatoryFeature[];
-  regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
-};
+export type RegionOverviewData = InputData;
 
 type CalculatedTrackPositions = {
   genesForwardStrand: number[];
@@ -80,6 +75,15 @@ export class RegionOverview extends LitElement {
 
   @property({ type: Object })
   data: InputData | null = null;
+
+  @property({ type: Boolean })
+  showGenes = true;
+
+  @property({ type: Boolean })
+  showRegulatoryFeatures = true;
+
+  @property({ type: Boolean })
+  showTss = true;
 
   @property({ type: Object })
   colors: Partial<Colors> | null = null;
@@ -277,7 +281,12 @@ export class RegionOverview extends LitElement {
       return;
     }
 
-    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets(this.featureTracks);
+    const calculatedHeightsAndOffsets = getImageHeightAndTopOffsets({
+      tracks: this.featureTracks,
+      showGenes: this.showGenes,
+      showRegulatoryFeatures: this.showRegulatoryFeatures,
+      showTss: this.showTss
+    });
     const {
       imageHeight,
       forwardStrandGeneTrackOffsets,
@@ -347,7 +356,7 @@ export class RegionOverview extends LitElement {
     strandDividerTopOffset: number;
     colors: Colors;
   }) {
-    if (!this.featureTracks || !this.bedScale) {
+    if (!this.showGenes || !this.featureTracks || !this.bedScale) {
       return;
     }
 
@@ -358,6 +367,7 @@ export class RegionOverview extends LitElement {
       reverseStrandTopOffsets,
       scale: this.bedScale,
       tracks: geneTracks,
+      showTss: this.showTss,
       start: this.start,
       regionName: this.regionName,
       end: this.end,
@@ -375,7 +385,7 @@ export class RegionOverview extends LitElement {
     offsetTop: number;
     colors: Colors;
   }) {
-    if (!this.featureTracks || !this.data || !this.bedScale) {
+    if (!this.showRegulatoryFeatures || !this.featureTracks || !this.data || !this.bedScale) {
       return;
     }
 
@@ -383,7 +393,7 @@ export class RegionOverview extends LitElement {
 
     return renderRegulatoryFeatureTracks({
       tracks: regulatoryFeatureTracks,
-      featureTypes: this.data.regulatory_feature_types,
+      featureTypes: this.data.regulatory_feature_types ?? {},
       scale: this.bedScale,
       regionName: this.regionName,
       focusRegulatoryFeatureIds: this.focusRegulatoryFeatureIds,

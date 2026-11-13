@@ -41,6 +41,21 @@ It also accepts the following optional properties:
 - `colors` - a configuration object that is a map of configurable colours. To see which colours of the regulatory annotation panel are configurable, inspect the `Colors` type exported from the package.
 - `focusGeneId` - id of the gene that is "in focus" (it is coloured differently from the others)
 - `focusRegulatoryFeatureIds` - ids of regulatory features that are "in focus" (they display an outline)
+- `showGenes`, `showRegulatoryFeatures`, `showTss` - boolean visibility properties, all defaulting to `true`.
+
+Set visibility through JavaScript properties, for example:
+
+```ts
+annotation.showGenes = true;
+annotation.showRegulatoryFeatures = true;
+annotation.showTss = false;
+```
+
+Hidden sections do not reserve space. With genes enabled, at least two lanes per strand are reserved even when gene data is missing or empty. Enabling TSS reserves space on both strands even if the current slice contains no TSS; only supplied arrows are drawn. Hiding genes also hides their labels, divider, and TSS space.
+
+Regulatory rows follow the supplied feature-type metadata, including rows without features in the current slice. Removing all metadata entries for a row removes its space. Without metadata, no regulatory rows are reserved.
+
+Input collections and each gene's `tss` field are optional and treated as empty when omitted. Their presence does not control section visibility. Changing visibility properties preserves the supplied data and does not recalculate feature tracks.
 
 The component also emits the following events:
 
