@@ -12,6 +12,14 @@ import type {
 export type InputData = {
   // Missing collections are treated as empty; component properties control visibility.
   genes?: GeneInRegionOverview[];
-  regulatory_features?: RegulatoryFeature[];
-  regulatory_feature_types?: Record<string, RegulatoryFeatureMetadata>;
-};
+} & (
+  | {
+      // Supply features and their type metadata together; features may be empty.
+      regulatory_features: RegulatoryFeature[];
+      regulatory_feature_types: Record<string, RegulatoryFeatureMetadata>;
+    }
+  | {
+      regulatory_features?: never;
+      regulatory_feature_types?: never;
+    }
+);
