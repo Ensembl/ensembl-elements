@@ -2,6 +2,12 @@ export * from './epigenome-activity';
 
 export type {
   TrackData,
+  TrackDataType,
+  TrackVisibility,
+  ActivityTrack,
+  ActivityTrackMetadata,
+  TrackLegendItem,
+  RegionActivityResponse,
   TrackMetadata,
   TrackPositionsChangeEvent,
   TrackPositionsPayload,
@@ -11,3 +17,4 @@ export type {
 export type {
   Colors
 } from './constants';
+export { getActivityLayout, type ActivityLayout } from './layout';

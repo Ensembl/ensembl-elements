@@ -1,12 +1,12 @@
 import { epigenomeIds } from './epigenomes';
 
 
-const release = '2025-02';
+const release = '2026-08';
 const assemblyId = 'GCA_000001405.29';
 
 const regionName = '8';
 
-const url = `https://regulation.ensembl.org/api/epigenomes/v0.8/release/${release}/region_activity/assembly/${assemblyId}`;
+const url = `https://regulation.ensembl.org/api/epigenomes/v0.11/release/${release}/region_activity/assembly/${assemblyId}`;
 
 export const fetchEpigenomeActivityData = ({start, end}: { start: number, end: number }) => {
   const body = {
